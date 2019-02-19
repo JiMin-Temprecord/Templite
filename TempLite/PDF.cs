@@ -12,6 +12,7 @@ namespace TempLite
         public static void Preview()
         {
             Communication.ReadLogger();
+            createPDF.getPDF();
         }
 
         public static void Email()
