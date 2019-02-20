@@ -2,88 +2,81 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
-using System.Text;
 
-namespace TempLite
+namespace TempLite.Services
 {
-    class Communication
+    public class _communicationServices
     {
-        private static SerialPort serial = new SerialPort();
+        private byte[] recievemsg = new byte[80];
+        public UInt16 crc16 = 0xFFFF;
 
-        private static byte[] sendmsg = new byte[11]; //{0x02,0x40,0x00,0x00,0x4a,0x0c,0x00,0x00};
-        private static byte[] recievemsg = new byte[80];
-        public static UInt16 crc16 = 0xFFFF;
-        static List<Hex> loggerHex = new List<Hex>();
+        public string serialnumber = "";
+        public string loggername = "";
 
-        public static string serialnumber = "";
-        public static string loggername = "";
-        
-        private static int byteData = 0;
-        private static int loggertype = 0;
+        private int byteData = 0;
+        private int loggertype = 0;
 
-        private static int maxlenreading = 0x40;
-        static string jsonfile = "";
-        private static int maxmemory = 0;
-        private static int memoryheaderpointer;
-        private static int[] memstart;
-        private static int[] memmax;
-        private static int requestmemorystartpointer;
-        private static int requestmemorymaxpointer;
+        private int maxlenreading = 0x40;
+        string jsonfile = "";
+        private int maxmemory = 0;
+        private int memoryheaderpointer;
+        private int[] memstart;
+        private int[] memmax;
+        private int requestmemorystartpointer;
+        private int requestmemorymaxpointer;
 
-        private static int memnumber = 0;
-        private static int memoryadd;
-        private static byte memoryaddMSB;
-        private static byte memoryaddLSB;
+        private int memnumber = 0;
+        private int memoryadd;
+        private byte memoryaddMSB;
+        private byte memoryaddLSB;
 
-        private static int length;
-        private static byte lengthMSB;
-        private static byte lengthLSB;
+        private int length;
+        private byte lengthMSB;
+        private byte lengthLSB;
 
-        private static string HEXfile;
+        private string HEXfile;
 
-
-        //==========================================================//        
-        public static void ReadLogger()
+        /// <summary>
+        /// 
+        /// </summary>   
+        public void ReadLogger(SerialPort serialPort)
         {
-            List<byte> msgList = sendmsg.ToList();
-            loggerHex.Clear();
+            var hexes = new List<Hex>();
+            var sendMessage = new byte[11]; //{0x02,0x40,0x00,0x00,0x4a,0x0c,0x00,0x00};
 
-            Reader.SetupCom(serial);
-            serial.Open();
+            serialPort.Open();
 
-            if (serial.IsOpen == true)
+            if (serialPort.IsOpen == true)
             {
-                Write("wakeup");
-                Read("wakeup");
+                WriteBytes(Command.WakeUp, serialPort, sendMessage);
+                ReadBytes(Command.WakeUp, serialPort, hexes);
 
-                Write("setread");
-                Read("setread");
+                WriteBytes(Command.SetRead, serialPort, sendMessage);
+                ReadBytes(Command.SetRead, serialPort, hexes);
 
                 while (memnumber < maxmemory)
                 {
-                    Write("readdata");
-                    Read("readdata");
+                    WriteBytes(Command.ReadLogger, serialPort, sendMessage);
+                    ReadBytes(Command.ReadLogger, serialPort, hexes);
                     getnextaddress();
-
                 }
             }
 
-            StreamWriter sw = new StreamWriter(@serialnumber + ".hex");
-            foreach (Hex hexinfo in loggerHex)
+            var sw = new StreamWriter(@serialnumber + ".hex");
+            foreach (var hex in hexes)
             {
-                sw.WriteLine(hexinfo.ToString());
+                sw.WriteLine(hex.ToString());
                 //Console.WriteLine(hexinfo);
             }
             sw.Close();
-            serial.Close();
+            serialPort.Close();
         }
         //==========================================================//
 
 
         //=============Recieve Data=================================//
         //==========================================================//
-        static void Read(string command)
+        private void ReadBytes(Command command, SerialPort serialPort, List<Hex> hexes)
         {
             string msg = "";
             recievemsg = new byte[80];
@@ -93,14 +86,14 @@ namespace TempLite
 
             try
             {
-                byteData = serial.ReadByte();
+                byteData = serialPort.ReadByte();
 
                 while (byteData != 13)
                 {
                     recievemsg[count] = (byte)byteData;
                     msg = msg + byteData.ToString("x02");
                     count++;
-                    byteData = serial.ReadByte();
+                    byteData = serialPort.ReadByte();
                 }
             }
             catch (TimeoutException) { }
@@ -109,7 +102,7 @@ namespace TempLite
             msg = msg + "0D";
             switch (command)
             {
-                case "wakeup":
+                case Command.WakeUp:
 
                     switch (recievemsg[2])
                     {
@@ -146,17 +139,17 @@ namespace TempLite
                     memoryaddLSB = (byte)recievemsg[memoryheaderpointer];
 
                     string timenow = "0000000000000000";
-                    long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()/1000;
+                    long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000;
                     string hextime = time.ToString("x02");
                     timenow = timenow.Substring(0, (timenow.Length - hextime.Length)) + hextime;
-                    loggerHex.Add(new Hex() { address = ("FF0000"), reply = timenow });
+                    hexes.Add(new Hex() { address = ("FF0000"), reply = timenow });
 
                     msg = msg.Substring(0, msg.Length - 6);
-                    loggerHex.Add(new Hex() { address = ("FE0000"), reply = msg });
+                    hexes.Add(new Hex() { address = ("FE0000"), reply = msg });
 
                     break;
 
-                case "setread":
+                case Command.SetRead:
                     switch (loggertype)
                     {
                         case 3:
@@ -177,20 +170,20 @@ namespace TempLite
                     }
                     break;
 
-                case "readdata":
+                case Command.ReadLogger:
                     if (recievemsg[0] == 0x00)
                     {
                         string finalmsg = "";
                         if (memnumber == 0)
                         {
                             finalmsg = msg.Substring(4, msg.Length - 10);
-                            loggerHex.Add(new Hex() { address = ("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")), reply = finalmsg });
+                            hexes.Add(new Hex() { address = ("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")), reply = finalmsg });
                         }
 
                         else
                         {
                             finalmsg = msg.Substring(2, msg.Length - 8);
-                            loggerHex.Add(new Hex() { address = ("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")), reply = finalmsg });
+                            hexes.Add(new Hex() { address = ("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")), reply = finalmsg });
                         }
                     }
 
@@ -206,64 +199,60 @@ namespace TempLite
 
 
         //==========================================================//
-        static void Write(string command)
+        private void WriteBytes(Command command, SerialPort serialPort, byte[] sendMessage)
         {
 
             switch (command)
             {
-                case "wakeup":
-                    sendmsg[0] = 0X00;
-                    sendmsg[1] = 0X55;
+                case Command.WakeUp:
+                    sendMessage[0] = 0X00;
+                    sendMessage[1] = 0X55;
                     break;
 
-                case "setread":
-
+                case Command.SetRead:
                     switch (loggertype)
                     {
                         case 3:
-
-                            sendmsg[0] = 0x02;
-                            sendmsg[1] = 0x06;
-                            sendmsg[2] = 0x00;
-                            sendmsg[3] = 0x01;
-                            sendmsg[4] = 0x46;
-                            sendmsg[5] = 0x00;
-                            sendmsg[6] = 0x00;
-                            sendmsg[7] = 0x00;
-                            addCRC(8);
+                            sendMessage[0] = 0x02;
+                            sendMessage[1] = 0x06;
+                            sendMessage[2] = 0x00;
+                            sendMessage[3] = 0x01;
+                            sendMessage[4] = 0x46;
+                            sendMessage[5] = 0x00;
+                            sendMessage[6] = 0x00;
+                            sendMessage[7] = 0x00;
                             break;
 
                         case 6:
-
-                            sendmsg[0] = 0x02;
-                            sendmsg[1] = 0x06;
-                            sendmsg[2] = 0x00;
-                            sendmsg[3] = 0x01;
-                            sendmsg[4] = 0x63;
-                            sendmsg[5] = 0x00;
-                            sendmsg[6] = 0x00;
-                            sendmsg[7] = 0x00;
-                            addCRC(8);
+                            sendMessage[0] = 0x02;
+                            sendMessage[1] = 0x06;
+                            sendMessage[2] = 0x00;
+                            sendMessage[3] = 0x01;
+                            sendMessage[4] = 0x63;
+                            sendMessage[5] = 0x00;
+                            sendMessage[6] = 0x00;
+                            sendMessage[7] = 0x00;
                             break;
-
+                        default:
+                            break;
                     }
-
                     break;
 
-                case "readdata":
-
-                    sendmsg[0] = 0x02;
-                    sendmsg[1] = lengthLSB;
-                    sendmsg[2] = lengthMSB;
-                    sendmsg[3] = (byte)memnumber;
-                    sendmsg[4] = memoryaddLSB;
-                    sendmsg[5] = memoryaddMSB;
-                    sendmsg[6] = (byte)0x00;
-                    sendmsg[7] = (byte)0x00;
-                    addCRC(8);
+                case Command.ReadLogger:
+                    sendMessage[0] = 0x02;
+                    sendMessage[1] = lengthLSB;
+                    sendMessage[2] = lengthMSB;
+                    sendMessage[3] = (byte)memnumber;
+                    sendMessage[4] = memoryaddLSB;
+                    sendMessage[5] = memoryaddMSB;
+                    sendMessage[6] = (byte)0x00;
+                    sendMessage[7] = (byte)0x00;
                     break;
-
+                default:
+                    break;
             }
+
+            AddCRC(8, sendMessage);
 
             try
             {
@@ -273,30 +262,12 @@ namespace TempLite
 
                 Console.WriteLine("");*/
 
-                serial.Write(sendmsg, 0, sendmsg.Length);
+                serialPort.Write(sendMessage, 0, sendMessage.Length);
             }
-            catch (System.TimeoutException) { }
+            catch (TimeoutException e) { }
         }
-        //==========================================================//
 
-
-        //==========================================================//
-        private static int hextodec(string hex)
-        {
-            return (Convert.ToInt32(hex, 16));
-        }
-        //==========================================================//
-
-
-        //==========================================================//
-        private static string dectohex(int dec)
-        {
-            return (dec.ToString("x04"));
-        }
-        //==========================================================//
-
-
-        public static void getnextaddress()
+        public void getnextaddress()
         {
             if (length >= (memmax[memnumber] - memoryadd))
             {
@@ -349,13 +320,13 @@ namespace TempLite
         }
 
         //==========================================================//
-        private static void addCRC(int len)
+        private void AddCRC(int len, byte[] sendMessage)
         {
             crc16 = 0xFFFF;
 
             for (int i = 0; i < 8; i++)
             {
-                crc16 = (UInt16)(crc16 ^ (Convert.ToUInt16(sendmsg[i]) << 8));
+                crc16 = (UInt16)(crc16 ^ (Convert.ToUInt16(sendMessage[i]) << 8));
                 for (int j = 0; j < 8; j++)
                 {
                     if ((crc16 & 0x8000) == 0x8000)
@@ -368,40 +339,40 @@ namespace TempLite
                     }
                 }
             }
-            
-            sendmsg[len++] = (byte)crc16;
-            sendmsg[len++] = (byte)(crc16 >> 8);
-            sendmsg[len++] = 0x0d;
 
-            addEscChar(len-1);
+            sendMessage[len++] = (byte)crc16;
+            sendMessage[len++] = (byte)(crc16 >> 8);
+            sendMessage[len++] = 0x0d;
+
+            AddEscChar(len - 1, sendMessage);
         }
 
         //==========================================================//
 
 
         //==========================================================//
-        private static void addEscChar(int Length)
+        private void AddEscChar(int Length, byte[] sendMessage)
         {
             int mx = 0;
             byte[] temp = new byte[80];
 
             for (int i = 0; i < Length; i++)
             {
-                if (sendmsg[i] == 0x1b) // 1B = 27
+                if (sendMessage[i] == 0x1b) // 1B = 27
                 {
                     temp[i + mx] = 0x1B; // 1B = 27
                     mx++;
                     temp[i + mx] = 0x00;
                 }
 
-                else if (sendmsg[i] == 0x0d) // 1D = 29
+                else if (sendMessage[i] == 0x0d) // 1D = 29
                 {
                     temp[i + mx] = 0x1B; // 1B = 27 
                     mx++;
                     temp[i + mx] = 0x01;
 
                 }
-                else if (sendmsg[i] == 0x55) // 55 = 85
+                else if (sendMessage[i] == 0x55) // 55 = 85
                 {
                     temp[i + mx] = 0x1B; // 1B = 27
                     mx++;
@@ -409,24 +380,24 @@ namespace TempLite
                 }
                 else
                 {
-                    temp[i + mx] = sendmsg[i];
+                    temp[i + mx] = sendMessage[i];
                 }
             }
 
             temp[Length + mx] = 0x0d;
-            sendmsg = new byte[Length + mx + 1];
-            Array.Copy(temp, sendmsg, Length + mx + 1);
+            sendMessage = new byte[Length + mx + 1];
+            Array.Copy(temp, sendMessage, Length + mx + 1);
         }
         //==========================================================//
 
 
 
         //==========================================================//
-        private static void removeEscChar(byte[] message)
+        private void removeEscChar(byte[] message)
         {
             int i = 0;
             int mx = 0;
-            
+
             while ((i < message.Length) && (message[i] != 13))
             {
                 if (message[i] == 27) // 1B = 27
@@ -460,7 +431,7 @@ namespace TempLite
             message[mx] = 0x0d;
 
             recievemsg = new byte[mx + 1];
-            Array.Copy(message, recievemsg,mx + 1);
+            Array.Copy(message, recievemsg, mx + 1);
             /*Console.Write("RECIEVE: ");
             for (int j = 0; j < mx + 1; j++)
                 Console.Write(recievemsg[j].ToString("X02") + "-");

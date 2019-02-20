@@ -4,12 +4,29 @@ using FTD2XX_NET;
 
 namespace TempLite
 {
-    class Reader
+    public class Reader
     {
-        private static string portName;
-        private static uint devID = 0;
+        private string portName;
+        private uint devID = 0;
 
-        public static void findFTDI()
+        //This ONE
+        public void SetupCom(SerialPort serial)
+        {
+            FindFTDI();
+
+            serial.DiscardNull = false;
+            serial.PortName = portName;
+            serial.BaudRate = 19200;
+            serial.Parity = Parity.None;
+            serial.DataBits = 8;
+            serial.StopBits = StopBits.One;
+            serial.Handshake = Handshake.None;
+
+            serial.ReadTimeout = 16;
+            serial.WriteTimeout = 16;
+        }
+
+        private void FindFTDI()
         {
             try
             {
@@ -43,23 +60,5 @@ namespace TempLite
         }
 
         public string PortName { get { return portName; } set { portName = value; } }
-
-        //This ONE
-        public static void SetupCom(SerialPort serial)
-        {
-            findFTDI();
-            
-            serial.DiscardNull = false;
-            serial.PortName = portName;
-            serial.BaudRate = 19200;
-            serial.Parity = Parity.None;
-            serial.DataBits = 8;
-            serial.StopBits = StopBits.One;
-            serial.Handshake = Handshake.None;
-
-            serial.ReadTimeout = 16;
-            serial.WriteTimeout = 16;
-        }
-
     }
 }

@@ -64,10 +64,11 @@
     <Compile Include="createJSON.cs" />
     <Compile Include="createPDF.cs" />
     <Compile Include="decodeHEX.cs" />
+    <Compile Include="Enum\Command.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="info.cs" />
-    <Compile Include="PDF.cs" />
-    <Compile Include="Communicaion.cs" />
+    <Compile Include="Services\PDFService.cs" />
+    <Compile Include="Services\CommunicaionService.cs" />
     <Compile Include="Reader.cs" />
     <Compile Include="TempLite.cs">
       <SubType>Form</SubType>
@@ -106,5 +107,6 @@
   <ItemGroup>
     <Content Include="FTD2XX_NET.XML" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

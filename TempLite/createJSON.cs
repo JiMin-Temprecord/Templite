@@ -148,7 +148,7 @@ namespace TempLite
                     //Console.WriteLine(add, len, code, hide);
 
                     decodeinfo = new string[] { add, len, code, hide };
-                    fromreader = decodeHEX.decodehex(decodeinfo);
+                    fromreader = decodeHEX.decodehex(decodeinfo,serialnumber);
                     
                 }
             }

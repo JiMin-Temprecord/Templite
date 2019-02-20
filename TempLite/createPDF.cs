@@ -9,51 +9,52 @@ using PdfSharp;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
+using TempLite.Services;
 
 namespace TempLite
 {
-    class createPDF
+    public class createPDF
     {
         //================================================================================================//
         //New Variables
 
         //private ArrayList<ArrayList<Double>> ChannelValues = new ArrayList<ArrayList<Double>>();
         //private ArrayList<Long> Time = new ArrayList<Long>();
-        private static long StartTimeUNIX = 0;
-        private static int NumberChannel = 0; //NumberChannel
-        private static bool[] EnabledChannels = { false, false, false, false, false, false, false, false };
-        private static bool Fahrenheit = false;
-        private static string[] SamplingPeriods = { "", "", "", "", "", "", "", "" };
-        private static int[] SamplesNumber = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private static bool[] WithinUpper = { true, true, true, true, true, true, true, true };
-        private static bool[] WithinLower = { true, true, true, true, true, true, true, true };
-        private static int WithinUpperCounter = 0;
-        private static int WithinLowerCounter = 0;
-        private static string[] PresetUpperLimit = { "", "", "", "", "", "", "", "" };
-        private static string[] PresetLowerLimit = { "", "", "", "", "", "", "", "" };
-        private static string[] Mean = { "", "", "", "", "", "", "", "" };
-        private static string[] Max = { "", "", "", "", "", "", "", "" };
-        private static string[] Min = { "", "", "", "", "", "", "", "" };
-        private static string[] MKT_C = { "", "", "", "", "", "", "", "" };
-        private static String State = "";
-        private static String SerialNumber = "";
-        private static String UserData = "";
-        private static String UserDataLength = "";
-        private static String TempUnit = "";
-        private static String StartDelay = "";
-        private static String BatteryPercentage = "";
+        private long StartTimeUNIX = 0;
+        private int NumberChannel = 0; //NumberChannel
+        private bool[] EnabledChannels = { false, false, false, false, false, false, false, false };
+        private bool Fahrenheit = false;
+        private string[] SamplingPeriods = { "", "", "", "", "", "", "", "" };
+        private int[] SamplesNumber = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private bool[] WithinUpper = { true, true, true, true, true, true, true, true };
+        private bool[] WithinLower = { true, true, true, true, true, true, true, true };
+        private int WithinUpperCounter = 0;
+        private int WithinLowerCounter = 0;
+        private string[] PresetUpperLimit = { "", "", "", "", "", "", "", "" };
+        private string[] PresetLowerLimit = { "", "", "", "", "", "", "", "" };
+        private string[] Mean = { "", "", "", "", "", "", "", "" };
+        private string[] Max = { "", "", "", "", "", "", "", "" };
+        private string[] Min = { "", "", "", "", "", "", "", "" };
+        private string[] MKT_C = { "", "", "", "", "", "", "", "" };
+        private String State = "";
+        private String SerialNumber = "";
+        private String UserData = "";
+        private String UserDataLength = "";
+        private String TempUnit = "";
+        private String StartDelay = "";
+        private String BatteryPercentage = "";
 
-        private static double[] WithinLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private static double[] OutsideLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private static double[] AboveLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private static double[] BelowLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] WithinLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] OutsideLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] AboveLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] BelowLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 
 
         //================================================================================================//
 
 
-        private static void writetovariable()
+        private void writetovariable()
         {
             NumberChannel = Int32.Parse(createJSON.readJson("SENSOR,SensorNumber"));
             State = createJSON.readJson("HEADER,State");
@@ -101,10 +102,10 @@ namespace TempLite
             }*/
         }
 
-        public static void getPDF()
+        public void getPDF(_communicationServices _communicationService)
         {
             PdfDocument document = new PdfDocument();
-            document.Info.Title = Communication.serialnumber.ToString();
+            document.Info.Title = _communicationService.serialnumber.ToString();
             info.infomation information = new info.infomation();
             writetovariable();
 
@@ -147,11 +148,11 @@ namespace TempLite
 
             //Draw the Text
             draw.DrawString("Logger Report", serialfont, XBrushes.Blue, 10, 70);
-            draw.DrawString("S/N: " + Communication.serialnumber.ToString(), serialfont, XBrushes.Blue, 550, 70);
+            draw.DrawString("S/N: " + _communicationService.serialnumber.ToString(), serialfont, XBrushes.Blue, 550, 70);
             draw.DrawRectangle(headerpen, headerline);
 
             draw.DrawString("Model :", font, XBrushes.Black, information.first_column, information.line_counter);
-            draw.DrawString(Communication.loggername.ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
+            draw.DrawString(_communicationService.loggername.ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Logger State :", font, XBrushes.Black, information.first_column, information.line_counter);
             draw.DrawString(State, font, XBrushes.Black, information.second_column, information.line_counter);
@@ -291,7 +292,7 @@ namespace TempLite
             draw.DrawString(DateTime.UtcNow.ToShortDateString() + " " + DateTime.UtcNow.ToLongTimeString(), font, XBrushes.Black, information.dateX, information.dateY);
             draw.DrawString("0.1.9.1", font, XBrushes.Black, information.versionX, information.versionY);
             //=====================================================================================//
-            string filename = Communication.serialnumber.ToString() + ".pdf";
+            string filename = _communicationService.serialnumber.ToString() + ".pdf";
             document.Save(filename);
             Process.Start(filename);
         }

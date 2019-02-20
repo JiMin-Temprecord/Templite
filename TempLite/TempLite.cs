@@ -1,20 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO.Ports;
 using System.Windows.Forms;
+using TempLite.Services;
 
 namespace TempLite
 {
     public partial class TempLite : Form
     {
+        private PDFService _pdfService;
+        private _communicationServices _communicationService;
+        private SerialPort _serialPort;
+
         public TempLite()
         {
             InitializeComponent();
+
+            //Initialise services
+            _communicationService = new _communicationServices();
+            _pdfService = new PDFService(_communicationService);
+
+            //Set up serial port
+            _serialPort = new SerialPort();
+            new Reader().SetupCom(_serialPort);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -56,17 +63,17 @@ namespace TempLite
 
         private void pdfpreview_Click(object sender, EventArgs e)
         {
-            PDF.Preview();
+            _pdfService.Preview(_serialPort);
         }
 
         private void pdfemail_Click(object sender, EventArgs e)
         {
-            PDF.Email();
+            _pdfService.Email(_serialPort);
         }
 
         private void pdfdownload_Click(object sender, EventArgs e)
         {
-            PDF.Download();
+            _pdfService.Download(_serialPort);
         }
     }
 }

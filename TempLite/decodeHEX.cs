@@ -19,11 +19,11 @@ namespace TempLite
         static long UTCreference = 0;
 
         //stringarrayinfo from JSON file [add,len,code,hide]
-        public static string decodehex(string[] stringarrayinfo)
+        public static string decodehex(string[] stringarrayinfo, string serialnumber)
         {
             //returned byte[] from the hex file
             fromreader = "";
-            decodebyte = ReadHex(stringarrayinfo);
+            decodebyte = ReadHex(stringarrayinfo, serialnumber);
             switch (stringarrayinfo[2])
             {
 
@@ -169,56 +169,56 @@ namespace TempLite
                 
 
                 case "Serial_Number_Decoding":
-                        string serialnumber = "";
+                        string serialNumber = "";
                         if ((decodebyte[3] & 0xF0) == 0x50)
                         {
-                            serialnumber = "L";
+                        serialNumber = "L";
 
                             switch (decodebyte[3] & 0x0F)
                             {
                                 case 0x00:
-                                    serialnumber += "0";
+                                serialNumber += "0";
                                     break;
                                 case 0x07:
-                                    serialnumber += "T";
+                                serialNumber += "T";
                                     break;
                                 case 0x08:
-                                    serialnumber += "G";
+                                serialNumber += "G";
                                     break;
                                 case 0x09:
-                                    serialnumber += "H";
+                                serialNumber += "H";
                                     break;
                                 case 0x0A:
-                                    serialnumber += "P";
+                                serialNumber += "P";
                                     break;
                                 case 0x0C:
-                                    serialnumber += "M";
+                                serialNumber += "M";
                                     break;
                                 case 0x0D:
-                                    serialnumber += "S";
+                                serialNumber += "S";
                                     break;
                                 case 0x0E:
-                                    serialnumber += "X";
+                                serialNumber += "X";
                                     break;
                                 case 0x0F:
-                                    serialnumber += "C";
+                                serialNumber += "C";
                                     break;
                                 default:
-                                    serialnumber = "L-------";
+                                serialNumber = "L-------";
                                     break;
                             }
                         }
                         else if ((decodebyte[3] & 0xF0) == 0x60)//For MonT
                         {
-                            serialnumber = "R0";
+                            serialNumber = "R0";
                         }
                         else
                         {
-                            serialnumber = "--------";
+                            serialNumber = "--------";
                         }
-                        serialnumber += ((((decodebyte[2] & 0xFF) << 16) | ((decodebyte[1] & 0xFF) << 8) | (decodebyte[0]) & 0xFF));
+                        serialNumber += ((((decodebyte[2] & 0xFF) << 16) | ((decodebyte[1] & 0xFF) << 8) | (decodebyte[0]) & 0xFF));
                     
-                    fromreader = serialnumber;
+                    fromreader = serialNumber;
                     break;
 
                 case "String":
@@ -252,7 +252,7 @@ namespace TempLite
             return (Value >> bit) & 1;
         }
 
-        public static byte[] ReadHex(string[] currentinfo)
+        public static byte[] ReadHex(string[] currentinfo, string seiralnumber)
         {
             byte[] bytes = { };
 
@@ -262,7 +262,7 @@ namespace TempLite
 
                 // Create an instance of StreamReader to read from a file.
                 // The using statement also closes the StreamReader.
-                using (StreamReader sr = new StreamReader(Communication.serialnumber.ToString() + ".hex"))
+                using (StreamReader sr = new StreamReader(seiralnumber + ".hex"))
                 {
                     string line;
                     int diff = 0;
