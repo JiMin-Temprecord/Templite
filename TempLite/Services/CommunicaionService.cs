@@ -17,7 +17,7 @@ namespace TempLite.Services
         private int loggertype = 0;
 
         private int maxlenreading = 0x40;
-        string jsonfile = "";
+        public string jsonfile = "";
         private int maxmemory = 0;
         private int memoryheaderpointer;
         private int[] memstart;
@@ -33,8 +33,6 @@ namespace TempLite.Services
         private int length;
         private byte lengthMSB;
         private byte lengthLSB;
-
-        private string HEXfile;
 
         /// <summary>
         /// 
@@ -132,7 +130,7 @@ namespace TempLite.Services
                     }
 
                     byte[] serial = { (byte)recievemsg[5], (byte)recievemsg[6], (byte)recievemsg[7], (byte)recievemsg[8] };
-                    serialnumber = createJSON.getSerialnumber(serial);
+                    serialnumber = getSerialnumber(serial);
 
                     memoryadd = (recievemsg[memoryheaderpointer + 1] & 0xFF) << 8 | (recievemsg[memoryheaderpointer] & 0xFF);
                     memoryaddMSB = (byte)recievemsg[memoryheaderpointer + 1];
@@ -256,12 +254,6 @@ namespace TempLite.Services
 
             try
             {
-                /*Console.Write("SENT  : ");
-                for (int i = 0; i < sendmsg.Length; i++)
-                    Console.Write(sendmsg[i].ToString("X02") + "-");
-
-                Console.WriteLine("");*/
-
                 serialPort.Write(sendMessage, 0, sendMessage.Length);
             }
             catch (TimeoutException e) { }
@@ -432,13 +424,68 @@ namespace TempLite.Services
 
             recievemsg = new byte[mx + 1];
             Array.Copy(message, recievemsg, mx + 1);
-            /*Console.Write("RECIEVE: ");
-            for (int j = 0; j < mx + 1; j++)
-                Console.Write(recievemsg[j].ToString("X02") + "-");
-
-            Console.WriteLine("");*/
         }
         //==========================================================//
 
+        public string getSerialnumber(byte[] msg)
+        {
+            serialnumber = "";
+
+            if ((msg[3] & 0xF0) == 0x50)
+            {
+                serialnumber = "L";
+
+                switch (msg[3] & 0x0F)
+                {
+                    case 0x00:
+                        serialnumber += "0";
+                        break;
+                    case 0x07:
+                        serialnumber += "T";
+                        break;
+                    case 0x08:
+                        serialnumber += "G";
+                        break;
+                    case 0x09:
+                        serialnumber += "H";
+                        break;
+                    case 0x0A:
+                        serialnumber += "P";
+                        break;
+                    case 0x0C:
+                        serialnumber += "M";
+                        break;
+                    case 0x0D:
+                        serialnumber += "S";
+                        break;
+                    case 0x0E:
+                        serialnumber += "X";
+                        break;
+                    case 0x0F:
+                        serialnumber += "C";
+                        break;
+                    default:
+                        serialnumber = "L-------";
+                        break;
+                }
+            }
+            else if ((msg[3] & 0xF0) == 0x60)//For MonT
+            {
+                serialnumber = "R0";
+            }
+            else
+            {
+                serialnumber = "--------";
+            }
+
+            var number = (((msg[2] & 0xFF) << 16) | ((msg[1] & 0xFF) << 8) | (msg[0]) & 0xFF).ToString();
+            while (number.Length != 6)
+                number = "0" + number;
+            serialnumber += number.ToString();
+
+            return serialnumber;
+        }
+
+        public string SerialNumber {  get { return serialnumber; } }
     }
 }

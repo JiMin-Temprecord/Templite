@@ -49,64 +49,17 @@ namespace TempLite
         private double[] AboveLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
         private double[] BelowLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-
+        private decodeHEX _decodeHex;
+        private PdfDocument document = new PdfDocument();
+        private info.infomation information = new info.infomation();
 
         //================================================================================================//
 
 
-        private void writetovariable()
-        {
-            NumberChannel = Int32.Parse(createJSON.readJson("SENSOR,SensorNumber"));
-            State = createJSON.readJson("HEADER,State");
-            SerialNumber = createJSON.readJson("HEADER,SerialNumber");
-            BatteryPercentage = createJSON.readJson("BATTERY_INFO,Battery") + "%";
-            SamplingPeriods[0] = createJSON.readJson("USER_SETTINGS,SamplingPeriod");
-            StartDelay = createJSON.readJson("USER_SETTINGS,StartDelay");
-            UserData = createJSON.readJson("USER_DATA,UserData");
-
-            for (int i = 0; i < NumberChannel; i++)
-            {
-                EnabledChannels[i] = true;
-            }
-
-            // Get if its Fahrenheit or celsius
-            //Fahrenheit = Convert.ToBoolean(createJSON.readJson("USER_SETTINGS,Fahrenheit"));
-
-            if (Fahrenheit)
-                TempUnit = " °F";
-            else
-                TempUnit = " °C";
-
-            PresetLowerLimit[0] =  createJSON.readJson("CHANNEL_INFO,LowerLimit");
-            PresetUpperLimit[0] =  createJSON.readJson("CHANNEL_INFO,UpperLimit");
-            
-            Console.WriteLine("LAST SAMEPLE AT : " + createJSON.readJson("DATA_INFO,LastSampleAt"));
-            Console.WriteLine("UPPER T LIMIT EXCEEDED : " + createJSON.readJson("DATA_INFO,LastSampleAt"));
-            Console.WriteLine("Lower T LIMIT COUNTER : " + createJSON.readJson("CHANNEL_INFO,LowerLimitCounter"));
-            Console.WriteLine("UPPER T LIMIT COUNTER : " + createJSON.readJson("CHANNEL_INFO,UpperLimitCounter"));
-            Console.WriteLine("TICKS AT LAST SAMPLE : " + createJSON.readJson("DATA_INFO,TicksAtLastSample"));
-            Console.WriteLine("RECORDED SAMPLES : " + createJSON.readJson("DATA_INFO,TicksAtLastSample"));
-
-            /*for (int i = 0; i < NumberChannel; i++)
-            {
-                PresetLowerLimit[i] =
-                PresetUpperLimit[i] =
-                Mean[i] =
-                Max[i] =
-                Min[i] =
-                MKT_C[i] =
-                WithinLimits[i] =
-                OutsideLimits[i] =
-                AboveLimits[i] =
-                BelowLimits[i] = 
-            }*/
-        }
-
         public void getPDF(_communicationServices _communicationService)
         {
-            PdfDocument document = new PdfDocument();
-            document.Info.Title = _communicationService.serialnumber.ToString();
-            info.infomation information = new info.infomation();
+            _decodeHex = new decodeHEX(_communicationService);
+            document.Info.Title = _communicationService.serialnumber;
             writetovariable();
 
             //Create an empty page
@@ -148,11 +101,11 @@ namespace TempLite
 
             //Draw the Text
             draw.DrawString("Logger Report", serialfont, XBrushes.Blue, 10, 70);
-            draw.DrawString("S/N: " + _communicationService.serialnumber.ToString(), serialfont, XBrushes.Blue, 550, 70);
+            draw.DrawString("S/N: " + _communicationService.SerialNumber, serialfont, XBrushes.Blue, 550, 70);
             draw.DrawRectangle(headerpen, headerline);
 
             draw.DrawString("Model :", font, XBrushes.Black, information.first_column, information.line_counter);
-            draw.DrawString(_communicationService.loggername.ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
+            draw.DrawString(_communicationService.loggername, font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Logger State :", font, XBrushes.Black, information.first_column, information.line_counter);
             draw.DrawString(State, font, XBrushes.Black, information.second_column, information.line_counter);
@@ -295,6 +248,57 @@ namespace TempLite
             string filename = _communicationService.serialnumber.ToString() + ".pdf";
             document.Save(filename);
             Process.Start(filename);
+        }
+
+
+        private void writetovariable()
+        {
+            NumberChannel = Int32.Parse(_decodeHex.readJson("SENSOR,SensorNumber"));
+            State = _decodeHex.readJson("HEADER,State");
+            SerialNumber = _decodeHex.readJson("HEADER,SerialNumber");
+            BatteryPercentage = _decodeHex.readJson("BATTERY_INFO,Battery") + "%";
+            SamplingPeriods[0] = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,SamplingPeriod"),16));
+            StartDelay = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,StartDelay"),16));
+            UserData = _decodeHex.readJson("USER_DATA,UserData");
+
+            for (int i = 0; i < NumberChannel; i++)
+            {
+                EnabledChannels[i] = true;
+            }
+
+            // Get if its Fahrenheit or celsius
+            //Fahrenheit = Convert.ToBoolean(createJSON.readJson("USER_SETTINGS,Fahrenheit"));
+
+            if (Fahrenheit)
+                TempUnit = " °F";
+            else
+                TempUnit = " °C";
+
+            Console.WriteLine("SAMPLE NUMBERS : " + _decodeHex.readJson("DATA_INFO, SamplesNumber"));
+           
+            /*for (int i = 0; i < NumberChannel; i++)
+            {
+                PresetLowerLimit[i] =
+                PresetUpperLimit[i] =
+                Mean[i] =
+                Max[i] =
+                Min[i] =
+                MKT_C[i] =
+                WithinLimits[i] =
+                OutsideLimits[i] =
+                AboveLimits[i] =
+                BelowLimits[i] = 
+            }*/
+        }
+
+        public String HHMMSS(double mseconds)
+        {
+            int hours = (int)mseconds / 3600;
+            int minutes = (int)(mseconds % 3600) / 60;
+            int seconds = (int)mseconds % 60;
+
+            String timeString = (hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00") + " (hh:mm:ss)");
+            return timeString;
         }
     }
 }

@@ -5,25 +5,98 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
+using Newtonsoft.Json.Linq;
+using TempLite.Services;
 
 namespace TempLite
 {
-    class decodeHEX
+    public class decodeHEX
     {
-        static string fromreader = "";
-        static string addtoread = "";
-        static byte[] decodebyte;
-        static bool bitbool = false;
+        string fromreader = "";
+        string addtoread = "";
+        byte[] decodebyte;
+        bool bitbool = false;
 
-        static long secondtimer = 0;
-        static long UTCreference = 0;
+        long UTCreference = 0;
+        long secondtimer = 0;
+
+        private string serialnumber;
+        private string jsonfile;
+
+        private int[] StartValue = new int[8];
+        private int memory_start = 0;
+        private int[] m_sensor_starting_value = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private int[] m_sensor_table_pointer = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private int[] m_sensor_type = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private int[] m_compression_table = new int[128];
+        private long m_starting_time;
+        private int m_sampling_period = 0;
+        private int m_sample_number = 0;
+        private int m_sensor_number = 0;
+        private int m_user_data_len = 0;
+        private long m_UTC_reference_time = 0;
+
+        private double m_pedestal = 0;
+        private double m_resolution = 0;
+        private long m_ticks_at_last_sample = 0;
+        private long m_ticks_since_start = 0;
+        private int m_holdoff = 0;
+        private bool m_overwriting = false;
+        private long m_seconds_timer = 0;
+        private long m_manufacture_date = 0;
+        private int m_total_rtc_ticks = 0;
+        private int m_total_sampling_events = 0;
+        private int m_total_uses = 0;
+
+        public decodeHEX(_communicationServices communicationServies)
+        {
+            serialnumber = communicationServies.serialnumber;
+            jsonfile = communicationServies.jsonfile;
+        }
+
+
+        public string readJson(string info)
+        {
+            var jsonobject = new JObject();
+            string[] decodeinfo;
+            string fromreader = "";
+
+            try
+            {
+                // Create an instance of StreamReader to read from a file.
+                // The using statement also closes the StreamReader.
+                using (StreamReader sr = new StreamReader(jsonfile))
+                {
+                    //come back and change the part where is read
+                    var json = sr.ReadToEnd();
+                    jsonobject = JObject.Parse(json);
+
+                    var add = jsonobject.GetValue(info).First.Last.ToString();
+                    var len = jsonobject.GetValue(info).First.Next.Last.ToString();
+                    var code = jsonobject.GetValue(info).First.Next.Next.Last.ToString();
+                    var hide = jsonobject.GetValue(info).Last.Last.ToString();
+
+                    decodeinfo = new string[] { add, len, code, hide };
+                    fromreader = decodehex(decodeinfo);
+
+                }
+            }
+            catch (Exception e)
+            {
+                // Let the user know what went wrong.
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+
+            return fromreader;
+        }
 
         //stringarrayinfo from JSON file [add,len,code,hide]
-        public static string decodehex(string[] stringarrayinfo, string serialnumber)
+        public string decodehex(string[] stringarrayinfo)
         {
             //returned byte[] from the hex file
             fromreader = "";
-            decodebyte = ReadHex(stringarrayinfo, serialnumber);
+            decodebyte = ReadHex(stringarrayinfo);
             switch (stringarrayinfo[2])
             {
 
@@ -142,7 +215,7 @@ namespace TempLite
 
                 case "DJNZ_2_Byte_Type_1":
                     decodebyte[1]--;
-                    fromreader = HHMMSS(decodebyte[1] + decodebyte[0]) + " (hh:mm:ss)";
+                    fromreader = littleEndian();
 
                     break;
 
@@ -163,6 +236,22 @@ namespace TempLite
                     break;
 
                 case "SampleNumber_logged_MonT":
+                    var one = readJson("DATA_INFO,Overwritten");
+                    Console.WriteLine("m_overwriting : " + one);
+                    var two = readJson("USER_SETTINGS,StartDelay");
+                    Console.WriteLine("m_holdoff : " + two);
+                    var three = readJson("USER_SETTINGS,SamplingPeriod");
+                    Console.WriteLine("m_sampling_period : " + three);
+                    m_ticks_at_last_sample = Convert.ToInt32(readJson("DATA_INFO, LastSampleAt"), 16);
+
+                    if (m_overwriting)
+                        fromreader = "4681";
+                    else
+                    {
+                        int samplenumber = (((int)(m_ticks_at_last_sample - m_holdoff) / m_sampling_period) + 1);
+                        Console.WriteLine("SAMPLE NUMBER : " + samplenumber);
+                        fromreader = m_sample_number.ToString();
+                    }
 
                     break;
                 
@@ -247,12 +336,17 @@ namespace TempLite
             return fromreader;
         }
 
+        private void writeJSON()
+        {
+
+        }
+
         static int GetBit(int Value, int bit)
         {
             return (Value >> bit) & 1;
         }
 
-        public static byte[] ReadHex(string[] currentinfo, string seiralnumber)
+        public byte[] ReadHex(string[] currentinfo)
         {
             byte[] bytes = { };
 
@@ -262,7 +356,7 @@ namespace TempLite
 
                 // Create an instance of StreamReader to read from a file.
                 // The using statement also closes the StreamReader.
-                using (StreamReader sr = new StreamReader(seiralnumber + ".hex"))
+                using (StreamReader sr = new StreamReader(serialnumber + ".hex"))
                 {
                     string line;
                     int diff = 0;
@@ -336,7 +430,7 @@ namespace TempLite
             return bytes;
         }
 
-        private static string littleEndian ()
+        private string littleEndian ()
         {
             string littleendian = "";
             for (int i = decodebyte.Length - 1; i >= 0; i--)
@@ -345,7 +439,7 @@ namespace TempLite
             return littleendian;
         }
 
-        private static string bigEndian()
+        private string bigEndian()
         {
             string bigendian = "";
             for (int i = 0; i < decodebyte.Length; i++)
@@ -353,7 +447,7 @@ namespace TempLite
             return bigendian;
         }
 
-        private static void Logger_State()
+        private void Logger_State()
         {
             String VALUE = "UNDEFINED";
             Console.WriteLine("LOGGER STATE: " + decodebyte[0].ToString("X02"));
@@ -379,33 +473,25 @@ namespace TempLite
 
             fromreader = VALUE;
         }
+        
 
-        public static String HHMMSS(double mseconds)
+        private void Time_LastSample_MonT()
         {
-            int hours = (int)mseconds / 3600;
-            int minutes = (int)(mseconds % 3600) / 60;
-            int seconds = (int)mseconds % 60;
-
-            String timeString = (hours.ToString("00") +":"+ minutes.ToString("00") +":"+ seconds.ToString("00"));
-            return timeString;
-        }
-
-        private static void Time_LastSample_MonT()
-        {
-            string temp = createJSON.readJson("SecondsTimer");
+            string temp = readJson("SecondsTimer");
             secondtimer = long.Parse(temp, NumberStyles.HexNumber);
-            temp = createJSON.readJson("UTCReferenceTime");
+            temp = readJson("UTCReferenceTime");
             UTCreference = long.Parse(temp, NumberStyles.HexNumber);
             String STOPPED_TIME = UNIXtoUTC((UTCreference) - (4294967040L - secondtimer));
-            Console.WriteLine("================================ STOPPED_TIME : " + STOPPED_TIME);
+            Console.WriteLine("STOPPED TIME : " + STOPPED_TIME);
             fromreader = STOPPED_TIME;
         }
 
-        public static String UNIXtoUTC(long now)
+        public String UNIXtoUTC(long now)
         {
-            //Date format to DATETIME
-            DateTime date = new DateTime (now * 100);
-            string simpledate = date.ToString("yyyy-MM-dd HH:mm:ss zzz");
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var date = epoch.AddMilliseconds(now * 1000);
+            date = date.ToUniversalTime();
+            string simpledate = date.ToString("yyyy-MM-dd HH:mm:ss");
             return simpledate;
         }
     }
