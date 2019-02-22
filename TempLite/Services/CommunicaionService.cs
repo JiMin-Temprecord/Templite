@@ -108,7 +108,7 @@ namespace TempLite.Services
                             loggername = "Mon T";
                             loggertype = 3;
                             jsonfile = "MonT.json";
-                            maxmemory = 2;                                                 //MON-T
+                            maxmemory = 0x02;                                                 //MON-T
                             memoryheaderpointer = 19;                                                   //MON-T
                             memstart = new int[] { 0x0000, 0x0020, 0x0000, 0x0000, 0x0000 };    //MON-T
                             memmax = new int[] { 0x2000, 0x0100, 0x0000, 0x0000, 0x2000 };    //MON-T
@@ -120,7 +120,7 @@ namespace TempLite.Services
                             loggername = "G4";
                             loggertype = 6;
                             jsonfile = "G4.json";
-                            maxmemory = 4;                                                 //G4
+                            maxmemory = 0x04;                                                 //G4
                             memoryheaderpointer = 13;                                                   //G4
                             memstart = new int[] { 0x0000, 0x0020, 0x0000, 0x0000, 0x0000 };    //G4
                             memmax = new int[] { 0x353C, 0x0100, 0x0000, 0x0000, 0x8000 };    //G4
@@ -485,7 +485,6 @@ namespace TempLite.Services
 
             return serialnumber;
         }
-
-        public string SerialNumber {  get { return serialnumber; } }
+       
     }
 }

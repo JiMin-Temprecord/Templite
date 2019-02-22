@@ -25,7 +25,7 @@ namespace TempLite
         private bool[] EnabledChannels = { false, false, false, false, false, false, false, false };
         private bool Fahrenheit = false;
         private string[] SamplingPeriods = { "", "", "", "", "", "", "", "" };
-        private int[] SamplesNumber = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private string[] SamplesNumber = { "", "", "", "", "", "", "", "" };
         private bool[] WithinUpper = { true, true, true, true, true, true, true, true };
         private bool[] WithinLower = { true, true, true, true, true, true, true, true };
         private int WithinUpperCounter = 0;
@@ -43,6 +43,8 @@ namespace TempLite
         private String TempUnit = "";
         private String StartDelay = "";
         private String BatteryPercentage = "";
+        private String FirstSample = "";
+        private String LastSample = "";
 
         private double[] WithinLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
         private double[] OutsideLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -60,6 +62,7 @@ namespace TempLite
         {
             _decodeHex = new decodeHEX(_communicationService);
             document.Info.Title = _communicationService.serialnumber;
+            
             writetovariable();
 
             //Create an empty page
@@ -101,7 +104,7 @@ namespace TempLite
 
             //Draw the Text
             draw.DrawString("Logger Report", serialfont, XBrushes.Blue, 10, 70);
-            draw.DrawString("S/N: " + _communicationService.SerialNumber, serialfont, XBrushes.Blue, 550, 70);
+            draw.DrawString("S/N: " + _communicationService.serialnumber, serialfont, XBrushes.Blue, 550, 70);
             draw.DrawRectangle(headerpen, headerline);
 
             draw.DrawString("Model :", font, XBrushes.Black, information.first_column, information.line_counter);
@@ -120,8 +123,10 @@ namespace TempLite
             draw.DrawString(StartDelay, font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("First Sample :", font, XBrushes.Black, information.first_column, information.line_counter);
+            draw.DrawString(FirstSample, font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Last Sample :", font, XBrushes.Black, information.first_column, information.line_counter);
+            draw.DrawString(LastSample, font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Recorded Samples :", font, XBrushes.Black, information.first_column, information.line_counter);
             draw.DrawString(SamplesNumber[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
@@ -260,6 +265,11 @@ namespace TempLite
             SamplingPeriods[0] = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,SamplingPeriod"),16));
             StartDelay = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,StartDelay"),16));
             UserData = _decodeHex.readJson("USER_DATA,UserData");
+            SamplesNumber[0] = _decodeHex.readJson("DATA_INFO,SamplesNumber");
+            Min[0] = _decodeHex.readJson("USER_SETTINGS,LowestTemp");
+
+            FirstSample = _decodeHex.readJson("DATA_INFO,Time_FirstSample_MonT");
+            LastSample = _decodeHex.readJson("DATA_INFO,LastSampleAt");
 
             for (int i = 0; i < NumberChannel; i++)
             {
@@ -273,9 +283,7 @@ namespace TempLite
                 TempUnit = " °F";
             else
                 TempUnit = " °C";
-
-            Console.WriteLine("SAMPLE NUMBERS : " + _decodeHex.readJson("DATA_INFO, SamplesNumber"));
-           
+            
             /*for (int i = 0; i < NumberChannel; i++)
             {
                 PresetLowerLimit[i] =
