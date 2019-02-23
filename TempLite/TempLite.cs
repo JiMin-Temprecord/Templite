@@ -23,12 +23,7 @@ namespace TempLite
             _serialPort = new SerialPort();
             new Reader().SetupCom(_serialPort);
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
+        
         private void PDF_Click(object sender, EventArgs e)
         {
             if (pdfdownload.Visible == false)

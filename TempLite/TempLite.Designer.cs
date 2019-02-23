@@ -168,7 +168,6 @@
             this.Controls.Add(this.pdfpanel);
             this.Name = "TempLite";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.pdfpanel.ResumeLayout(false);
             this.excelpanel.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -96,7 +96,7 @@ namespace TempLite.Services
             }
             catch (TimeoutException) { }
             recievemsg[count] = 0x0d;
-            //removeEscChar(recievemsg);
+            recievemsg = removeEscChar(recievemsg);
             msg = msg + "0D";
             switch (command)
             {
@@ -172,7 +172,7 @@ namespace TempLite.Services
                     if (recievemsg[0] == 0x00)
                     {
                         string finalmsg = "";
-                        if (memnumber == 0)
+                        if (memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02") == "0c4a")
                         {
                             finalmsg = msg.Substring(4, msg.Length - 10);
                             hexes.Add(new Hex() { address = ("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")), reply = finalmsg });
@@ -219,6 +219,7 @@ namespace TempLite.Services
                             sendMessage[5] = 0x00;
                             sendMessage[6] = 0x00;
                             sendMessage[7] = 0x00;
+                            sendMessage = AddCRC(8, sendMessage);
                             break;
 
                         case 6:
@@ -230,6 +231,7 @@ namespace TempLite.Services
                             sendMessage[5] = 0x00;
                             sendMessage[6] = 0x00;
                             sendMessage[7] = 0x00;
+                            sendMessage = AddCRC(8, sendMessage);
                             break;
                         default:
                             break;
@@ -245,13 +247,12 @@ namespace TempLite.Services
                     sendMessage[5] = memoryaddMSB;
                     sendMessage[6] = (byte)0x00;
                     sendMessage[7] = (byte)0x00;
+                    sendMessage = AddCRC(8, sendMessage);
                     break;
                 default:
                     break;
             }
-
-            AddCRC(8, sendMessage);
-
+            
             try
             {
                 serialPort.Write(sendMessage, 0, sendMessage.Length);
@@ -312,7 +313,7 @@ namespace TempLite.Services
         }
 
         //==========================================================//
-        private void AddCRC(int len, byte[] sendMessage)
+        private byte[] AddCRC(int len, byte[] sendMessage)
         {
             crc16 = 0xFFFF;
 
@@ -336,14 +337,14 @@ namespace TempLite.Services
             sendMessage[len++] = (byte)(crc16 >> 8);
             sendMessage[len++] = 0x0d;
 
-            AddEscChar(len - 1, sendMessage);
+            return AddEscChar(len - 1, sendMessage);
         }
 
         //==========================================================//
 
 
         //==========================================================//
-        private void AddEscChar(int Length, byte[] sendMessage)
+        private byte[] AddEscChar(int Length, byte[] sendMessage)
         {
             int mx = 0;
             byte[] temp = new byte[80];
@@ -352,21 +353,21 @@ namespace TempLite.Services
             {
                 if (sendMessage[i] == 0x1b) // 1B = 27
                 {
-                    temp[i + mx] = 0x1B; // 1B = 27
+                    temp[i + mx] = 0x1b; // 1B = 27
                     mx++;
                     temp[i + mx] = 0x00;
                 }
 
                 else if (sendMessage[i] == 0x0d) // 1D = 29
                 {
-                    temp[i + mx] = 0x1B; // 1B = 27 
+                    temp[i + mx] = 0x1b; // 1B = 27 
                     mx++;
                     temp[i + mx] = 0x01;
 
                 }
                 else if (sendMessage[i] == 0x55) // 55 = 85
                 {
-                    temp[i + mx] = 0x1B; // 1B = 27
+                    temp[i + mx] = 0x1b; // 1B = 27
                     mx++;
                     temp[i + mx] = 0x02;
                 }
@@ -379,13 +380,14 @@ namespace TempLite.Services
             temp[Length + mx] = 0x0d;
             sendMessage = new byte[Length + mx + 1];
             Array.Copy(temp, sendMessage, Length + mx + 1);
+            return sendMessage;
         }
         //==========================================================//
 
 
 
         //==========================================================//
-        private void removeEscChar(byte[] message)
+        private byte[] removeEscChar(byte[] message)
         {
             int i = 0;
             int mx = 0;
@@ -424,6 +426,7 @@ namespace TempLite.Services
 
             recievemsg = new byte[mx + 1];
             Array.Copy(message, recievemsg, mx + 1);
+            return recievemsg;
         }
         //==========================================================//
 

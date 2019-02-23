@@ -22,8 +22,8 @@ namespace TempLite
             serial.StopBits = StopBits.One;
             serial.Handshake = Handshake.None;
 
-            serial.ReadTimeout = 100;
-            serial.WriteTimeout = 100;
+            serial.ReadTimeout = 32;
+            serial.WriteTimeout = 32;
         }
 
         private void FindFTDI()

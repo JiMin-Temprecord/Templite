@@ -143,6 +143,7 @@ namespace TempLite
             //returned byte[] from the hex file
             fromreader = "";
             decodebyte = ReadHex(stringarrayinfo);
+            Console.WriteLine("Length : " + decodebyte.Length);
             switch (stringarrayinfo[2])
             {
 
@@ -261,8 +262,7 @@ namespace TempLite
                     int b = 0;
                     int array_pointer = 0;
                     bool Flag_End = false;
-
-                    Console.WriteLine("DATA LENGTH : " + decodebyte.Length);
+                    
                     Console.WriteLine("m_sample_number: " + m_sample_number);
 
                     if (m_sample_number > 0)
@@ -324,7 +324,7 @@ namespace TempLite
                             Console.WriteLine("DATA : " + val);
                         }
 
-                        fromreader = VALUE.ToString();
+                        Console.WriteLine("DATA LENGTH " + VALUE.Length);
                     }
                     Finalize_Statistics(0);
                     break;
@@ -491,22 +491,28 @@ namespace TempLite
                         {
                             diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
 
-                            if (diff>=0 && diff < 65)
+                            if (diff>=0 && diff < 65) // reader can only send 64bytes at a time
                             {
                                 int infolength = Convert.ToUInt16(currentinfo[1]);
                                 if (infolength > 65)
                                 {
-                                    int readinfo = 64 - diff * 2;
+                                    int readinfo = 64 - diff;
                                     while (infolength > 0)
                                     {
                                         temp += data.Substring(diff * 2, readinfo * 2);
                                         line = sr.ReadLine();
                                         data = line.Substring(7, line.Length - 7);
                                         infolength = infolength - readinfo;
+
                                         if (infolength > 65)
+                                        {
+                                            diff = 0;
                                             readinfo = 64;
+                                        }
                                         else
+                                        {
                                             readinfo = infolength;
+                                        }
                                     }
 
                                     int totallength = temp.Length;
@@ -522,7 +528,7 @@ namespace TempLite
                                     for (int i = 0; i < totallength; i += 2)
                                         bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
                                 }
-                                Console.WriteLine("BYTE LENGHT : " + bytes.Length);
+
                                 return bytes;
                             }
                         }
