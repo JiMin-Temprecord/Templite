@@ -58,26 +58,27 @@ namespace TempLite
         private double Delta_H = 83.14472;                         //Delta H   is the Activation Energy:   83.14472    kJ/mole
         private double R = 8.314472;                      //R         is the Gas Constant:        0.008314472 J/mole/degree
 
-        private int[] Sample_Number = new int[8];
-        private double[] m_upper_limit = new double[8];
-        private double[] m_lower_limit = new double[8];
-
-        private double[] m_sensor_min = new double[8];
-        private double[] m_sensor_max = new double[8];
-
-        private int[] m_highest_position = new int[8];
-        private int[] m_lowest_position = new int[8];
-        private double[] m_mean = new double[8];
-        private double[] m_MKT = new double[8];
-
-        private double[] m_nb_within_limit = new double[8];
-        private double[] m_nb_below_limit = new double[8];
-        private double[] m_nb_above_limit = new double[8];
+        public int[] Sample_Number = new int[8];
+        public double[] m_upper_limit = new double[8];
+        public double[] m_lower_limit = new double[8];
+        
+        public double[] m_sensor_min = new double[8];
+        public double[] m_sensor_max = new double[8];
+        
+        public int[] m_highest_position = new int[8];
+        public int[] m_lowest_position = new int[8];
+        public double[] m_mean = new double[8];
+        public double[] m_MKT = new double[8];
+        
+        public double[] m_nb_within_limit = new double[8];
+        public double[] m_nb_below_limit = new double[8];
+        public double[] m_nb_above_limit = new double[8];
 
         public decodeHEX(_communicationServices communicationServies)
         {
             serialnumber = communicationServies.serialnumber;
             jsonfile = communicationServies.jsonfile;
+            Console.WriteLine("USE DATA LENGTH : "  + readJson("USER_DATA,UserDataLen"));
             m_overwriting = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
             m_holdoff = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
             m_sampling_period = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
@@ -88,16 +89,8 @@ namespace TempLite
             m_pedestal = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
             m_resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio"))/100;
             readJson("SENSOR,Decode_MonT_Data");
-
-            Console.WriteLine("m_upper_limit : " + m_upper_limit[0]);
-            Console.WriteLine("m_lower_limit : " + m_lower_limit[0]);
-            Console.WriteLine("m_sensor_min : " + m_sensor_min[0]);
-            Console.WriteLine("m_sensor_max : " + m_sensor_max[0]);
-            Console.WriteLine("m_mean : " + m_mean[0]);
-            Console.WriteLine("m_MKT : " + m_MKT[0]);
-            Console.WriteLine("m_nb_within_limit : " + m_nb_within_limit[0]);
-            Console.WriteLine("m_nb_below_limit : " + m_nb_below_limit[0]);
-            Console.WriteLine("m_nb_above_limit : " + m_nb_above_limit[0]);
+            m_upper_limit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
+            m_lower_limit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
         }
 
 
@@ -417,7 +410,7 @@ namespace TempLite
                     break;
 
                 case "String":
-                    for (int i = 0; i < decodebyte.Length; i++)
+                    for (int i = 0; i < m_user_data_len; i++)
                     {
                         decodebyte[i] = (byte)(decodebyte[i] & 0xFF);
                         if ((decodebyte[i] == 0x01))

@@ -24,18 +24,18 @@ namespace TempLite
         private int NumberChannel = 0; //NumberChannel
         private bool[] EnabledChannels = { false, false, false, false, false, false, false, false };
         private bool Fahrenheit = false;
-        private string[] SamplingPeriods = { "", "", "", "", "", "", "", "" };
+        private double[] SamplingPeriods = { 0, 0, 0, 0, 0, 0, 0, 0 };
         private string[] SamplesNumber = { "", "", "", "", "", "", "", "" };
         private bool[] WithinUpper = { true, true, true, true, true, true, true, true };
         private bool[] WithinLower = { true, true, true, true, true, true, true, true };
         private int WithinUpperCounter = 0;
         private int WithinLowerCounter = 0;
-        private string[] PresetUpperLimit = { "", "", "", "", "", "", "", "" };
-        private string[] PresetLowerLimit = { "", "", "", "", "", "", "", "" };
-        private string[] Mean = { "", "", "", "", "", "", "", "" };
-        private string[] Max = { "", "", "", "", "", "", "", "" };
-        private string[] Min = { "", "", "", "", "", "", "", "" };
-        private string[] MKT_C = { "", "", "", "", "", "", "", "" };
+        private double[] PresetUpperLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] PresetLowerLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] Mean = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] Max = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] Min = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        private double[] MKT_C = { 0, 0, 0, 0, 0, 0, 0, 0 };
         private String State = "";
         private String SerialNumber = "";
         private String UserData = "";
@@ -87,7 +87,7 @@ namespace TempLite
             XRect headerline = new XRect(10, 80, 680, 0);
 
             //Draw Image
-            if (WithinUpperCounter == 0 && WithinLowerCounter == 0)
+            if (OutsideLimits[0] == 0)
             {
                 XImage greentick = XImage.FromFile("greentick.png");
                 draw.DrawImage(greentick, information.sign_left, information.sign_top, 90, 80);
@@ -117,7 +117,7 @@ namespace TempLite
             draw.DrawString(BatteryPercentage, font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Sample Period :", font, XBrushes.Black, information.first_column, information.line_counter);
-            draw.DrawString(SamplingPeriods[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
+            draw.DrawString(HHMMSS(SamplingPeriods[0]), font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Start Delay :", font, XBrushes.Black, information.first_column, information.line_counter);
             draw.DrawString(StartDelay, font, XBrushes.Black, information.second_column, information.line_counter);
@@ -140,20 +140,20 @@ namespace TempLite
             if (EnabledChannels[1]) draw.DrawString("#2 - Humidity", font, XBrushes.Black, information.third_column - 25, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Preset Upper Limit :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(PresetUpperLimit[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(PresetUpperLimit[1].ToString() + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString(PresetUpperLimit[0].ToString("0.##") + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString(PresetUpperLimit[1].ToString("0.##") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Preset Lower Limit :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(PresetLowerLimit[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(PresetLowerLimit[1].ToString() + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString(PresetLowerLimit[0].ToString("0.##") + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString(PresetLowerLimit[1].ToString("0.##") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Mean Value :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(Mean[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(Mean[1].ToString() + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString(Mean[0].ToString("0.##") + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString(Mean[1].ToString("0.##") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("MKT Value :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(MKT_C[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(MKT_C[1].ToString() + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString(MKT_C[0].ToString("0.##") + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString(MKT_C[1].ToString("0.##") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Max Recorded :", font, XBrushes.Black, information.first_column, information.line_counter);
             if (EnabledChannels[0]) draw.DrawString(Max[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
@@ -169,8 +169,8 @@ namespace TempLite
             if (EnabledChannels[1]) draw.DrawString(WithinLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Total Time within Limits :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(WithinLimits[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(WithinLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString((HHMMSS(WithinLimits[0]*SamplingPeriods[0])), font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString((HHMMSS(WithinLimits[1] * SamplingPeriods[1])), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             information.line_counter += information.line_inc;
             draw.DrawString("Total Samples out of Limits :", font, XBrushes.Black, information.first_column, information.line_counter);
@@ -178,8 +178,8 @@ namespace TempLite
             if (EnabledChannels[1]) draw.DrawString(OutsideLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Total Time out of Limits :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(OutsideLimits[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(OutsideLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString((HHMMSS(OutsideLimits[0] * SamplingPeriods[0])), font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString((HHMMSS(OutsideLimits[1] * SamplingPeriods[1])), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             information.line_counter += information.line_inc;
             draw.DrawString("Samples above upper Limit :", font, XBrushes.Black, information.first_column, information.line_counter);
@@ -187,8 +187,8 @@ namespace TempLite
             if (EnabledChannels[1]) draw.DrawString(AboveLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Time above Upper Limit :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(AboveLimits[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(AboveLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString((HHMMSS(AboveLimits[0] * SamplingPeriods[0])), font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString((HHMMSS(AboveLimits[1] * SamplingPeriods[1])), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             information.line_counter += information.line_inc;
             draw.DrawString("Samples below Lower Limit :", font, XBrushes.Black, information.first_column, information.line_counter);
@@ -196,8 +196,8 @@ namespace TempLite
             if (EnabledChannels[1]) draw.DrawString(BelowLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Time below Lower Limit :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(BelowLimits[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(BelowLimits[1].ToString(), font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString((HHMMSS(BelowLimits[0] * SamplingPeriods[0])), font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString((HHMMSS(BelowLimits[1] * SamplingPeriods[1])), font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             information.line_counter += information.line_inc;
             draw.DrawString("User Comments :", font, XBrushes.Black, information.first_column, information.line_counter);
@@ -262,11 +262,10 @@ namespace TempLite
             State = _decodeHex.readJson("HEADER,State");
             SerialNumber = _decodeHex.readJson("HEADER,SerialNumber");
             BatteryPercentage = _decodeHex.readJson("BATTERY_INFO,Battery") + "%";
-            SamplingPeriods[0] = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,SamplingPeriod"),16));
+            SamplingPeriods[0] = Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,SamplingPeriod"),16);
             StartDelay = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,StartDelay"),16));
             UserData = _decodeHex.readJson("USER_DATA,UserData");
             SamplesNumber[0] = _decodeHex.readJson("DATA_INFO,SamplesNumber");
-            Min[0] = _decodeHex.readJson("USER_SETTINGS,LowestTemp");
 
             FirstSample = _decodeHex.readJson("DATA_INFO,Time_FirstSample_MonT");
             LastSample = _decodeHex.readJson("DATA_INFO,LastSampleAt");
@@ -284,19 +283,19 @@ namespace TempLite
             else
                 TempUnit = " °C";
             
-            /*for (int i = 0; i < NumberChannel; i++)
+            for (int i = 0; i < NumberChannel; i++)
             {
-                PresetLowerLimit[i] =
-                PresetUpperLimit[i] =
-                Mean[i] =
-                Max[i] =
-                Min[i] =
-                MKT_C[i] =
-                WithinLimits[i] =
-                OutsideLimits[i] =
-                AboveLimits[i] =
-                BelowLimits[i] = 
-            }*/
+                PresetLowerLimit[i] = _decodeHex.m_lower_limit[i];
+                PresetUpperLimit[i] = _decodeHex.m_upper_limit[i];
+                Mean[i] = _decodeHex.m_mean[i];
+                Max[i] = _decodeHex.m_sensor_max[i];
+                Min[i] = _decodeHex.m_sensor_min[i];
+                MKT_C[i] = _decodeHex.m_MKT[i]- 273.15;
+                WithinLimits[i] = _decodeHex.m_nb_within_limit[i];
+                OutsideLimits[i] = _decodeHex.m_nb_above_limit[i] + _decodeHex.m_nb_below_limit[i];
+                AboveLimits[i] = _decodeHex.m_nb_above_limit[i];
+                BelowLimits[i] = _decodeHex.m_nb_below_limit[i];
+            }
         }
 
         public String HHMMSS(double mseconds)
