@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 using TempLite.Services;
+using System.Collections;
 
 namespace TempLite
 {
@@ -58,6 +59,9 @@ namespace TempLite
         private double Delta_H = 83.14472;                         //Delta H   is the Activation Energy:   83.14472    kJ/mole
         private double R = 8.314472;                      //R         is the Gas Constant:        0.008314472 J/mole/degree
 
+        public long STARTED_TIME = 0;
+        public double[] m_data;
+
         public int[] Sample_Number = new int[8];
         public double[] m_upper_limit = new double[8];
         public double[] m_lower_limit = new double[8];
@@ -78,7 +82,8 @@ namespace TempLite
         {
             serialnumber = communicationServies.serialnumber;
             jsonfile = communicationServies.jsonfile;
-            Console.WriteLine("USE DATA LENGTH : "  + readJson("USER_DATA,UserDataLen"));
+            m_user_data_len = Convert.ToInt32(readJson("USER_DATA,UserDataLen"),16);
+            m_UTC_reference_time = Convert.ToInt32(readJson("UTCReferenceTime"),16);
             m_overwriting = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
             m_holdoff = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
             m_sampling_period = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
@@ -136,7 +141,6 @@ namespace TempLite
             //returned byte[] from the hex file
             fromreader = "";
             decodebyte = ReadHex(stringarrayinfo);
-            Console.WriteLine("Length : " + decodebyte.Length);
             switch (stringarrayinfo[2])
             {
 
@@ -154,6 +158,7 @@ namespace TempLite
                         decodebyte[0] = (byte)(decodebyte[0] & 0xff);
                         fromreader = bigEndian();
                     }
+                    Console.WriteLine("USER ATA LENGTH : " + fromreader);
                     break;
 
                 case "_2_Byte_to_Decimal":
@@ -176,7 +181,7 @@ namespace TempLite
 
                     if (_4sectobyte > 0)
                     {
-                        _4sectobyte += 946684800000L;
+                        _4sectobyte += Y_2000;
                         DateTime date = new DateTime(_4sectobyte);
                         fromreader = date.ToString("dd/MM/yyyy HH:mm:sss");
                     }
@@ -185,8 +190,7 @@ namespace TempLite
                     break;
 
                 case "_8_Byte_to_Unix_UTC":
-                    string _8btyetounix = bigEndian();
-                    fromreader = _8btyetounix.ToString();
+                    fromreader = bigEndian();
                     break;
 
                 case "b0":
@@ -256,8 +260,6 @@ namespace TempLite
                     int array_pointer = 0;
                     bool Flag_End = false;
                     
-                    Console.WriteLine("m_sample_number: " + m_sample_number);
-
                     if (m_sample_number > 0)
                     {
                         var VALUE = new double[m_sample_number];
@@ -312,12 +314,7 @@ namespace TempLite
                             a++;
                         }
 
-                        foreach (double val in VALUE)
-                        {
-                            Console.WriteLine("DATA : " + val);
-                        }
-
-                        Console.WriteLine("DATA LENGTH " + VALUE.Length);
+                        m_data = VALUE;
                     }
                     Finalize_Statistics(0);
                     break;
@@ -412,23 +409,21 @@ namespace TempLite
                 case "String":
                     for (int i = 0; i < m_user_data_len; i++)
                     {
-                        decodebyte[i] = (byte)(decodebyte[i] & 0xFF);
-                        if ((decodebyte[i] == 0x01))
-                            decodebyte[i] = 0x20;
+                        fromreader += Convert.ToChar(decodebyte[i] & 0xFF);
                     }
-
-                    fromreader += Encoding.ASCII.GetString(decodebyte);
+                    
+                    fromreader = fromreader.Substring(0,m_user_data_len);
                     break;
 
                 case "Time_FirstSample_MonT":
                     if (m_overwriting)
                     {
-                        long STARTED_TIME = ((m_UTC_reference_time) - (4680 * m_sampling_period) - (m_ticks_since_start - m_ticks_at_last_sample));
+                        STARTED_TIME = ((m_UTC_reference_time) - (4680 * m_sampling_period) - (m_ticks_since_start - m_ticks_at_last_sample));
                         fromreader = UNIXtoUTC(STARTED_TIME);
                     }
                     else
                     {
-                        long STARTED_TIME = ((m_UTC_reference_time - m_ticks_since_start) + m_holdoff);
+                        STARTED_TIME = ((m_UTC_reference_time - m_ticks_since_start) + m_holdoff);
                         fromreader = UNIXtoUTC(STARTED_TIME);
                     }
 
@@ -484,10 +479,10 @@ namespace TempLite
                         {
                             diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
 
-                            if (diff>=0 && diff < 65) // reader can only send 64bytes at a time
+                            if (diff>=0 && diff < 64) // reader can only send 64bytes at a time
                             {
-                                int infolength = Convert.ToUInt16(currentinfo[1]);
-                                if (infolength > 65)
+                                int infolength = Convert.ToInt32(currentinfo[1]);
+                                if (infolength > 64)
                                 {
                                     int readinfo = 64 - diff;
                                     while (infolength > 0)
@@ -497,7 +492,7 @@ namespace TempLite
                                         data = line.Substring(7, line.Length - 7);
                                         infolength = infolength - readinfo;
 
-                                        if (infolength > 65)
+                                        if (infolength > 64)
                                         {
                                             diff = 0;
                                             readinfo = 64;
@@ -515,7 +510,7 @@ namespace TempLite
                                 }
                                 else
                                 {
-                                    temp = data.Substring(diff * 2, Convert.ToInt16(currentinfo[1]) * 2);
+                                    temp = data.Substring(diff * 2, infolength* 2);
                                     int totallength = temp.Length;
                                     bytes = new byte[totallength / 2];
                                     for (int i = 0; i < totallength; i += 2)
@@ -562,19 +557,19 @@ namespace TempLite
             switch (decodebyte[0])
             {
                 case 0:
-                    VALUE = "READY";
+                    VALUE = "Ready";
                     break;
                 case 1:
-                    VALUE = "DELAY";
+                    VALUE = "Delay";
                     break;
                 case 2:
-                    VALUE = "RUNNING";
+                    VALUE = "Running";
                     break;
                 case 3:
-                    VALUE = "STOPPED";
+                    VALUE = "Stopped";
                     break;
                 case 4:
-                    VALUE = "UNDEFINED";
+                    VALUE = "Undefined";
                     break;
             }
 
@@ -586,7 +581,25 @@ namespace TempLite
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);
             date = date.ToUniversalTime();
-            string simpledate = date.ToString("dd/MM/yyyy HH:mm:sss");
+            string simpledate = date.ToString("yyyy-MM-dd HH:mm:sss UTC");
+            return simpledate;
+        }
+
+        public String UNIXtoUTCDate(long now)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var date = epoch.AddMilliseconds(now * 1000);
+            date = date.ToUniversalTime();
+            string simpledate = date.ToString("yyyy-MM-dd");
+            return simpledate;
+        }
+
+        public String UNIXtoUTCTime(long now)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var date = epoch.AddMilliseconds(now * 1000);
+            date = date.ToUniversalTime();
+            string simpledate = date.ToString("HH:mm:sss UTC");
             return simpledate;
         }
 
