@@ -15,7 +15,7 @@ using TempLite.Services;
 
 namespace TempLite
 {
-    public class createPDF
+    public class PDFGenerator
     {
         //================================================================================================//
         //New Variables
@@ -57,16 +57,16 @@ namespace TempLite
 
         private ArrayList Time = new ArrayList();
 
-        private decodeHEX _decodeHex;
+        private HexfileDecoder _hexfileDecoder;
         private PdfDocument document = new PdfDocument();
-        private info.information information = new info.information();
+        private PDFcoordinates information = new PDFcoordinates();
 
         //================================================================================================//
 
 
-        public void getPDF(_communicationServices _communicationService)
+        public void createPDF(_communicationServices _communicationService)
         {
-            _decodeHex = new decodeHEX(_communicationService);
+            _hexfileDecoder = new HexfileDecoder(_communicationService);
             document.Info.Title = _communicationService.serialnumber;
 
             writetovariable();
@@ -86,7 +86,7 @@ namespace TempLite
             //create pen
             XPen pen = new XPen(XColors.Black, 1);
             XPen headerpen = new XPen(XColors.Blue, 3);
-            XPen ch0 = new XPen(XColors.DarkOliveGreen);
+            XPen ch0 = new XPen(XColors.DarkGreen);
             XPen ch1 = new XPen(XColors.Lavender);
             XPen withinlimits = new XPen(XColors.ForestGreen);
             withinlimits.DashStyle = XDashStyle.Dash;
@@ -144,10 +144,11 @@ namespace TempLite
             draw.DrawString(SamplesNumber[0].ToString(), font, XBrushes.Black, information.second_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Tags Placed :", font, XBrushes.Black, information.first_column, information.line_counter);
-            information.line_counter += information.line_inc;
+            draw.DrawString("0", font, XBrushes.Black, information.second_column, information.line_counter);
+            information.line_counter += (information.line_inc*0.75);
             XRect break1 = new XRect(10, information.line_counter, 680, 0);
             draw.DrawRectangle(pen, break1);
-            information.line_counter += information.line_inc;
+            information.line_counter += information.line_inc*0.75;
             if (EnabledChannels[0]) draw.DrawString("#1 - Temperature", font, XBrushes.Black, information.second_column - 25, information.line_counter);
             if (EnabledChannels[1]) draw.DrawString("#2 - Humidity", font, XBrushes.Black, information.third_column - 25, information.line_counter);
             information.line_counter += information.line_inc;
@@ -168,12 +169,12 @@ namespace TempLite
             if (EnabledChannels[1]) draw.DrawString(MKT_C[1].ToString("N2") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Max Recorded :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(Max[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(Max[1].ToString() + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString(Max[0].ToString("N2") + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString(Max[1].ToString("N2") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString("Min Recorded :", font, XBrushes.Black, information.first_column, information.line_counter);
-            if (EnabledChannels[0]) draw.DrawString(Min[0].ToString() + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
-            if (EnabledChannels[1]) draw.DrawString(Min[1].ToString() + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
+            if (EnabledChannels[0]) draw.DrawString(Min[0].ToString("N2") + TempUnit, font, XBrushes.Black, information.second_column, information.line_counter);
+            if (EnabledChannels[1]) draw.DrawString(Min[1].ToString("N2") + TempUnit, font, XBrushes.Black, information.third_column, information.line_counter);
             information.line_counter += information.line_inc;
             information.line_counter += (information.line_inc * 0.5);
             draw.DrawString("Total Samples within Limits :", font, XBrushes.Black, information.first_column, information.line_counter);
@@ -215,10 +216,10 @@ namespace TempLite
             draw.DrawString("User Comments :", font, XBrushes.Black, information.first_column, information.line_counter);
             information.line_counter += information.line_inc;
             draw.DrawString(UserData, font, XBrushes.Black, information.first_column, information.line_counter);
-            information.line_counter += information.line_inc;
+            information.line_counter += information.line_inc * 0.5;
             XRect break2 = new XRect(10, information.line_counter, 680, 0);
             draw.DrawRectangle(pen, break2);
-            information.line_counter += information.line_inc;
+            information.line_counter += information.line_inc * 0.75;
             if (EnabledChannels[0]) draw.DrawString("_ Temperature " + TempUnit, font, XBrushes.DarkOliveGreen, information.second_column, information.line_counter);
             if (EnabledChannels[1]) draw.DrawString("_ Humidity  %RH ", font, XBrushes.MediumPurple, information.second_column + 120, information.line_counter);
             information.line_counter += information.line_inc;
@@ -252,7 +253,7 @@ namespace TempLite
             //draw.DrawLine(pen, 10, 80, 690, 80);
             draw.DrawString("Page 1 ", font, XBrushes.Black, 600, 980);
             draw.DrawString("www.temprecord.com", font, XBrushes.Black, information.siteX, information.siteY);
-            draw.DrawString(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC") + " " + DateTime.UtcNow.ToLongTimeString(), font, XBrushes.Black, information.dateX, information.dateY);
+            draw.DrawString(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC"), font, XBrushes.Black, information.dateX, information.dateY);
             draw.DrawString("0.1.9.1", font, XBrushes.Black, information.versionX, information.versionY);
             //=====================================================================================//
 
@@ -401,7 +402,7 @@ namespace TempLite
             {
 
                 // ================================= initial y location on the graph =============//
-                information.temp_next_y = (float)(information.graph_H - (_decodeHex.m_data[0] - (information.ch_lowest)) * information.graph_y_scale) + information.graph_topY;
+                information.temp_next_y = (float)(information.graph_H - (_hexfileDecoder.m_data[0] - (information.ch_lowest)) * information.graph_y_scale) + information.graph_topY;
 
                 // ================================= ch2 upper limit =============================//
                 information.ch1_upper_Y = (information.graph_H - ((information.ch1_upper_L - information.ch_lowest) * information.graph_y_scale)) + information.graph_topY;
@@ -413,14 +414,14 @@ namespace TempLite
                 // ================================= Draw the line for the upper limit ===========//
                 draw.DrawLine(abovelimit, information.graph_l_lineX_start, (float)information.ch1_upper_Y, information.graph_l_lineX_end, (float)information.ch1_upper_Y);
                 // ================================= Draw the text ===============================//
-                draw.DrawString(TempUnit + "Upper Limit ", font, XBrushes.Coral, information.third_column, (float)information.ch1_upper_Y - information.graph_limit_label);
+                draw.DrawString(TempUnit + " Upper Limit ", font, XBrushes.Coral, information.third_column, (float)information.ch1_upper_Y - information.graph_limit_label);
                 draw.DrawString(information.ch1_upper_L.ToString("N2"), font, XBrushes.Black, information.first_column, (float)information.ch1_upper_Y);
 
 
                 // ================================= Draw the line for the lower limit ===========//
                 draw.DrawLine(belowlimit, information.graph_l_lineX_start, (float)information.ch1_lower_Y, information.graph_l_lineX_end, (float)information.ch1_lower_Y);
                 // ================================= Draw the text ===============================//
-                draw.DrawString(TempUnit + "Lower Limit ", font, XBrushes.CornflowerBlue, information.third_column, (float)information.ch1_lower_Y + information.graph_limit_label + 5);
+                draw.DrawString(TempUnit + " Lower Limit ", font, XBrushes.CornflowerBlue, information.third_column, (float)information.ch1_lower_Y + information.graph_limit_label + 5);
                 draw.DrawString(information.ch1_lower_L.ToString("N2"),font,XBrushes.Black, information.first_column, (float)information.ch1_lower_Y);
 
 
@@ -448,8 +449,8 @@ namespace TempLite
             {
                 if (EnabledChannels[0])                                                              //Channel 1 graph
                 {
-                    draw.DrawLine(ch0,information.x_point_loc, information.temp_next_y, information.x_point_loc + information.graph_x_scale, (float)(information.graph_H - ((_decodeHex.m_data[k] - (information.ch_lowest)) * information.graph_y_scale)) + information.graph_topY);
-                    information.temp_next_y = (float)(information.graph_H - ((_decodeHex.m_data[k] - (information.ch_lowest)) * information.graph_y_scale)) + information.graph_topY;
+                    draw.DrawLine(ch0,information.x_point_loc, information.temp_next_y, information.x_point_loc + information.graph_x_scale, (float)(information.graph_H - ((_hexfileDecoder.m_data[k] - (information.ch_lowest)) * information.graph_y_scale)) + information.graph_topY);
+                    information.temp_next_y = (float)(information.graph_H - ((_hexfileDecoder.m_data[k] - (information.ch_lowest)) * information.graph_y_scale)) + information.graph_topY;
                 }
 
                 if (EnabledChannels[1])                                                              //Channel 2 graph
@@ -470,8 +471,8 @@ namespace TempLite
             {
                 information.graph_date_x = (information.graph_x_scale * i) + information.graph_topX;
                 //draw.DrawEllipse(pen, ((information.graph_x_scale * i) + information.graph_topX), information.G_axis_meetY, ((information.graph_x_scale * i) + information.graph_topX), information.G_axis_meetY);
-                draw.DrawString(_decodeHex.UNIXtoUTCDate(Convert.ToInt32(Time[i])), font, XBrushes.Black, information.graph_date_x - 40, information.G_axis_meetY + 15);
-                draw.DrawString(_decodeHex.UNIXtoUTCTime(Convert.ToInt32(Time[i])), font, XBrushes.Black, information.graph_date_x - 45, information.G_axis_meetY + 28);
+                draw.DrawString(_hexfileDecoder.UNIXtoUTCDate(Convert.ToInt32(Time[i])), font, XBrushes.Black, information.graph_date_x - 40, information.G_axis_meetY + 15);
+                draw.DrawString(_hexfileDecoder.UNIXtoUTCTime(Convert.ToInt32(Time[i])), font, XBrushes.Black, information.graph_date_x - 45, information.G_axis_meetY + 28);
                 i += gap;
             }
             string filename = _communicationService.serialnumber.ToString() + ".pdf";
@@ -482,17 +483,17 @@ namespace TempLite
 
         private void writetovariable()
         {
-            NumberChannel = Int32.Parse(_decodeHex.readJson("SENSOR,SensorNumber"));
-            State = _decodeHex.readJson("HEADER,State");
-            SerialNumber = _decodeHex.readJson("HEADER,SerialNumber");
-            BatteryPercentage = _decodeHex.readJson("BATTERY_INFO,Battery") + "%";
-            SamplingPeriods[0] = Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,SamplingPeriod"), 16);
-            StartDelay = HHMMSS(Convert.ToInt32(_decodeHex.readJson("USER_SETTINGS,StartDelay"), 16));
-            UserData = _decodeHex.readJson("USER_DATA,UserData");
-            SamplesNumber[0] = Convert.ToInt32(_decodeHex.readJson("DATA_INFO,SamplesNumber"));
+            NumberChannel = Int32.Parse(_hexfileDecoder.readJson("SENSOR,SensorNumber"));
+            State = _hexfileDecoder.readJson("HEADER,State");
+            SerialNumber = _hexfileDecoder.readJson("HEADER,SerialNumber");
+            BatteryPercentage = _hexfileDecoder.readJson("BATTERY_INFO,Battery") + "%";
+            SamplingPeriods[0] = Convert.ToInt32(_hexfileDecoder.readJson("USER_SETTINGS,SamplingPeriod"), 16);
+            StartDelay = HHMMSS(Convert.ToInt32(_hexfileDecoder.readJson("USER_SETTINGS,StartDelay"), 16));
+            UserData = _hexfileDecoder.readJson("USER_DATA,UserData");
+            SamplesNumber[0] = Convert.ToInt32(_hexfileDecoder.readJson("DATA_INFO,SamplesNumber"));
 
-            FirstSample = _decodeHex.readJson("DATA_INFO,Time_FirstSample_MonT");
-            var STARTEDTIME = _decodeHex.STARTED_TIME;
+            FirstSample = _hexfileDecoder.readJson("DATA_INFO,Time_FirstSample_MonT");
+            var STARTEDTIME = _hexfileDecoder.STARTED_TIME;
 
             for (int i = 0; i < Convert.ToInt32(SamplesNumber[0]); i++)
             {
@@ -500,8 +501,7 @@ namespace TempLite
                 STARTEDTIME = STARTEDTIME + SamplingPeriods[0];
             }
             long STOPPED_TIME = Convert.ToInt32(Time[(Time.Count - 1)]);
-            LastSample = _decodeHex.UNIXtoUTC(STOPPED_TIME);
-            Console.WriteLine("TIME AT LAST SAMPLE : " + LastSample);
+            LastSample = _hexfileDecoder.UNIXtoUTC(STOPPED_TIME);
 
             for (int i = 0; i < NumberChannel; i++)
             {
@@ -509,7 +509,7 @@ namespace TempLite
             }
 
             // Get if its Fahrenheit or celsius
-            //Fahrenheit = Convert.ToBoolean(createJSON.readJson("USER_SETTINGS,Fahrenheit"));
+            Fahrenheit = Convert.ToBoolean(_hexfileDecoder.readJson("USER_SETTINGS,Fahrenheit"));
 
             if (Fahrenheit)
                 TempUnit = " °F";
@@ -518,16 +518,16 @@ namespace TempLite
 
             for (int i = 0; i < NumberChannel; i++)
             {
-                PresetLowerLimit[i] = _decodeHex.m_lower_limit[i];
-                PresetUpperLimit[i] = _decodeHex.m_upper_limit[i];
-                Mean[i] = _decodeHex.m_mean[i];
-                Max[i] = _decodeHex.m_sensor_max[i];
-                Min[i] = _decodeHex.m_sensor_min[i];
-                MKT_C[i] = _decodeHex.m_MKT[i] - 273.15;
-                WithinLimits[i] = _decodeHex.m_nb_within_limit[i];
-                OutsideLimits[i] = _decodeHex.m_nb_above_limit[i] + _decodeHex.m_nb_below_limit[i];
-                AboveLimits[i] = _decodeHex.m_nb_above_limit[i];
-                BelowLimits[i] = _decodeHex.m_nb_below_limit[i];
+                PresetLowerLimit[i] = _hexfileDecoder.m_lower_limit[i];
+                PresetUpperLimit[i] = _hexfileDecoder.m_upper_limit[i];
+                Mean[i] = _hexfileDecoder.m_mean[i];
+                Max[i] = _hexfileDecoder.m_sensor_max[i];
+                Min[i] = _hexfileDecoder.m_sensor_min[i];
+                MKT_C[i] = _hexfileDecoder.m_MKT[i] - 273.15;
+                WithinLimits[i] = _hexfileDecoder.m_nb_within_limit[i];
+                OutsideLimits[i] = _hexfileDecoder.m_nb_above_limit[i] + _hexfileDecoder.m_nb_below_limit[i];
+                AboveLimits[i] = _hexfileDecoder.m_nb_above_limit[i];
+                BelowLimits[i] = _hexfileDecoder.m_nb_below_limit[i];
 
                 if (AboveLimits[i] > 0)
                     breachedU = " (breached)";

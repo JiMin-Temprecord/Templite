@@ -23,52 +23,5 @@ namespace TempLite
             _serialPort = new SerialPort();
             new Reader().SetupCom(_serialPort);
         }
-        
-        private void PDF_Click(object sender, EventArgs e)
-        {
-            if (pdfdownload.Visible == false)
-            {
-                pdfdownload.Visible = true;
-                pdfemail.Visible = true;
-                pdfpreview.Visible = true;
-            }
-            else
-            {
-                pdfdownload.Visible = false;
-                pdfemail.Visible = false;
-                pdfpreview.Visible = false;
-            }
-        }
-
-        private void EXCEL_Click(object sender, EventArgs e)
-        {
-            if (exceldownload.Visible == false)
-            {
-                exceldownload.Visible = true;
-                excelemail.Visible = true;
-                excelpreview.Visible = true;
-            }
-            else
-            {
-                exceldownload.Visible = false;
-                excelemail.Visible = false;
-                excelpreview.Visible = false;
-            }
-        }
-
-        private void pdfpreview_Click(object sender, EventArgs e)
-        {
-            _pdfService.Preview(_serialPort);
-        }
-
-        private void pdfemail_Click(object sender, EventArgs e)
-        {
-            _pdfService.Email(_serialPort);
-        }
-
-        private void pdfdownload_Click(object sender, EventArgs e)
-        {
-            _pdfService.Download(_serialPort);
-        }
     }
 }

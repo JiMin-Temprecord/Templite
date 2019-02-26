@@ -11,9 +11,9 @@ using System.Collections;
 
 namespace TempLite
 {
-    public class decodeHEX
+    public class HexfileDecoder
     {
-        string fromreader = "";
+        string fromreader =  "";
         string addtoread = "";
         byte[] decodebyte;
         bool bitbool = false;
@@ -37,10 +37,11 @@ namespace TempLite
         private int[] m_sensor_type = { 0, 0, 0, 0, 0, 0, 0, 0 };
         private int[] m_compression_table = new int[128];
         private long m_starting_time;
-        private int m_sampling_period = 0;
+        private long m_sampling_period = 0;
         private int m_sample_number = 0;
         private int m_sensor_number = 0;
         private int m_user_data_len = 0;
+        private string m_batterypercentage;
         private long m_UTC_reference_time = 0;
 
         private double m_pedestal = 0;
@@ -55,7 +56,7 @@ namespace TempLite
         private int m_total_sampling_events = 0;
         private int m_total_uses = 0;
 
-                                                                         //    private static  final   double      R                       = 0.008314472;                      //R         is the Gas Constant:        0.008314472 kJ/mole/degree
+        //    private static  final   double      R                       = 0.008314472;                      //R         is the Gas Constant:        0.008314472 kJ/mole/degree
         private double Delta_H = 83.14472;                         //Delta H   is the Activation Energy:   83.14472    kJ/mole
         private double R = 8.314472;                      //R         is the Gas Constant:        0.008314472 J/mole/degree
 
@@ -65,25 +66,29 @@ namespace TempLite
         public int[] Sample_Number = new int[8];
         public double[] m_upper_limit = new double[8];
         public double[] m_lower_limit = new double[8];
-        
+
         public double[] m_sensor_min = new double[8];
         public double[] m_sensor_max = new double[8];
-        
+
         public int[] m_highest_position = new int[8];
         public int[] m_lowest_position = new int[8];
         public double[] m_mean = new double[8];
         public double[] m_MKT = new double[8];
-        
+
         public double[] m_nb_within_limit = new double[8];
         public double[] m_nb_below_limit = new double[8];
         public double[] m_nb_above_limit = new double[8];
 
-        public decodeHEX(_communicationServices communicationServies)
+        public HexfileDecoder(_communicationServices communicationServies)
         {
             serialnumber = communicationServies.serialnumber;
             jsonfile = communicationServies.jsonfile;
-            m_user_data_len = Convert.ToInt32(readJson("USER_DATA,UserDataLen"),16);
-            m_UTC_reference_time = Convert.ToInt32(readJson("UTCReferenceTime"),16);
+            m_user_data_len = Convert.ToInt32(readJson("USER_DATA,UserDataLen"), 16);
+            m_UTC_reference_time = Convert.ToInt32(readJson("UTCReferenceTime"), 16);
+            m_total_rtc_ticks = Convert.ToInt32(readJson("HEADER,TotalRTCTicks"), 16);
+            readJson("HEADER,ManufactureDate");
+            m_total_sampling_events = Convert.ToInt32(readJson("HEADER,TotalSamplingEvents"), 16);
+            m_total_uses = Convert.ToInt32(readJson("HEADER,TotalUses"), 16);
             m_overwriting = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
             m_holdoff = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
             m_sampling_period = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
@@ -92,7 +97,7 @@ namespace TempLite
             m_ticks_at_last_sample = Convert.ToInt32(readJson("DATA_INFO,TicksAtLastSample"), 16);
             m_sample_number = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
             m_pedestal = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
-            m_resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio"))/100;
+            m_resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio")) / 100;
             readJson("SENSOR,Decode_MonT_Data");
             m_upper_limit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
             m_lower_limit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
@@ -139,7 +144,6 @@ namespace TempLite
         public string decodehex(string[] stringarrayinfo)
         {
             //returned byte[] from the hex file
-            fromreader = "";
             decodebyte = ReadHex(stringarrayinfo);
             switch (stringarrayinfo[2])
             {
@@ -151,30 +155,31 @@ namespace TempLite
                             decodebyte[i] = (byte)(decodebyte[i] & 0xff);
 
                         if (stringarrayinfo[3] == "0")
-                            fromreader = bigEndian();
+                            return bigEndian();
                     }
                     else
                     {
                         decodebyte[0] = (byte)(decodebyte[0] & 0xff);
-                        fromreader = bigEndian();
+                        return bigEndian();
                     }
-                    Console.WriteLine("USER ATA LENGTH : " + fromreader);
                     break;
 
                 case "_2_Byte_to_Decimal":
-                    fromreader = decodebyte[1].ToString("X02") + decodebyte[0].ToString("X02");
-                    break;
+                    return (((decodebyte[1] & 0xFF) << 8)| (decodebyte[0] & 0xFF)).ToString();
 
                 case "_2_Byte_to_Temperature_MonT":
                     int value = (((decodebyte[1]) & 0xFF) << 8) | (decodebyte[0] & 0xFF);
                     value -= 4000;
                     double V = ((double)value / 100);
-                    fromreader = V.ToString("F");
-                    break;
+                    return V.ToString("F");
 
                 case "_4_Byte_to_Decimal":
-                    fromreader = decodebyte[3].ToString("X02") + decodebyte[2].ToString("X02") + decodebyte[1].ToString("X02") + decodebyte[0].ToString("X02");
-                    break;
+                    return decodebyte[3].ToString("X02") + decodebyte[2].ToString("X02") + decodebyte[1].ToString("X02") + decodebyte[0].ToString("X02");
+
+                case "_4_Byte_to_UNIX":
+                    long _4byteUnix = (Convert.ToInt32(littleEndian(),16) * (long)1000);
+                    m_manufacture_date = ((long)_4byteUnix + Y_2000) / (long)1000;
+                    return m_manufacture_date.ToString();
 
                 case "_4_Byte_Sec_to_Date":
                     long _4sectobyte = (decodebyte[3] + decodebyte[2] + decodebyte[1] + decodebyte[0]) * 1000;
@@ -183,83 +188,92 @@ namespace TempLite
                     {
                         _4sectobyte += Y_2000;
                         DateTime date = new DateTime(_4sectobyte);
-                        fromreader = date.ToString("dd/MM/yyyy HH:mm:sss");
+                        return date.ToString("dd/MM/yyyy HH:mm:sss");
                     }
                     else
-                        fromreader = "";
-                    break;
+                        return "";
 
                 case "_8_Byte_to_Unix_UTC":
-                    fromreader = bigEndian();
-                    break;
+                    return bigEndian();
 
                 case "b0":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 0) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
 
                 case "b1":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 1) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
 
                 case "b2":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 2) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
 
                 case "b3":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 3) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
 
                 case "b4":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 4) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
+
 
                 case "b5":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 5) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
 
                 case "b6":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 6) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
+                    return bitbool.ToString();
 
                 case "b7":
                     bitbool = false;
                     if (GetBit(decodebyte[0], 7) != 0)
                         bitbool = true;
-                    fromreader = bitbool.ToString();
-                    break;
-                
+                    return bitbool.ToString();
+
+                case "Battery_MonT":
+                    double RCLBatteryMargin = 0.25;    // i.e. leave 25% in reserve
+                    double RCLSelfDischargeCurrentuA = 0.630;
+                    double RCLQuiescentDischargeCurrentuA = 9.000;
+                    double RCLConversionDischargeCurrentuA = 1300.0;
+                    double RCLDownloadDischargeCurrentuA = 2900.00;
+                    double RCLConversionDurationS = 1.0;
+                    double RCLDownloadDurationS = 3.5;
+                    double RCLAssumedDownloadsPerTrip = 2.0;
+
+                    int batteryPercentage;
+                    int INITAL_BATTERY = (int)((1.0 - RCLBatteryMargin) * 0.56 * 60 * 60 * 1000000); //mAHr
+                    double BatteryUsed =
+                    (((m_UTC_reference_time - m_manufacture_date) * RCLSelfDischargeCurrentuA) +
+                    (m_total_rtc_ticks * RCLQuiescentDischargeCurrentuA) +
+                    ((m_total_sampling_events + 4681) * RCLConversionDurationS * RCLConversionDischargeCurrentuA) +
+                    (RCLAssumedDownloadsPerTrip * m_total_uses * RCLDownloadDurationS * RCLDownloadDischargeCurrentuA));
+                    batteryPercentage = (int)(((INITAL_BATTERY - BatteryUsed) / INITAL_BATTERY) * 100);
+                    return batteryPercentage.ToString();
 
                 case "Channel_1_MonT":
-                    fromreader = "1";
-                    break;
+                    return "1";
 
                 case "Decode_MonT_Data":
                     int a = 0;
                     int b = 0;
                     int array_pointer = 0;
                     bool Flag_End = false;
-                    
+
                     if (m_sample_number > 0)
                     {
                         var VALUE = new double[m_sample_number];
@@ -321,113 +335,104 @@ namespace TempLite
 
                 case "DJNZ_2_Byte_Type_1":
                     decodebyte[1]--;
-                    fromreader = littleEndian();
-
-                    break;
+                    return littleEndian();
 
                 case "DJNZ_4_Byte_Type_2":
-                    for (int i =0; i< 4; i++)
+                    for (int i = 0; i < 4; i++)
                     {
                         int z = (0x100) - (decodebyte[i] & 0xFF);
-                        decodebyte[i] = (byte) z;
+                        decodebyte[i] = (byte)z;
                     }
-                    fromreader = littleEndian();
-                    break;
+                    return littleEndian();
 
                 case "*Logger_State":
-                    Logger_State();
-                    break;
+                    return Logger_State();
 
                 case "Logging_selection_MonT":
                     break;
 
                 case "SampleNumber_logged_MonT":
                     if (m_overwriting)
-                        fromreader = "4681";
+                        return "4681";
                     else
                     {
-                        int samplenumber = (((int)(m_ticks_at_last_sample - m_holdoff) / m_sampling_period) + 1);
-                        fromreader = samplenumber.ToString();
+                        long samplenumber = (((long)(m_ticks_at_last_sample - m_holdoff) / m_sampling_period) + 1);
+                        return samplenumber.ToString();
                     }
-                    break;
-                
-                
+
+
 
                 case "Serial_Number_Decoding":
-                        string serialNumber = "";
-                        if ((decodebyte[3] & 0xF0) == 0x50)
-                        {
+                    string serialNumber = "";
+                    if ((decodebyte[3] & 0xF0) == 0x50)
+                    {
                         serialNumber = "L";
 
-                            switch (decodebyte[3] & 0x0F)
-                            {
-                                case 0x00:
+                        switch (decodebyte[3] & 0x0F)
+                        {
+                            case 0x00:
                                 serialNumber += "0";
-                                    break;
-                                case 0x07:
+                                break;
+                            case 0x07:
                                 serialNumber += "T";
-                                    break;
-                                case 0x08:
+                                break;
+                            case 0x08:
                                 serialNumber += "G";
-                                    break;
-                                case 0x09:
+                                break;
+                            case 0x09:
                                 serialNumber += "H";
-                                    break;
-                                case 0x0A:
+                                break;
+                            case 0x0A:
                                 serialNumber += "P";
-                                    break;
-                                case 0x0C:
+                                break;
+                            case 0x0C:
                                 serialNumber += "M";
-                                    break;
-                                case 0x0D:
+                                break;
+                            case 0x0D:
                                 serialNumber += "S";
-                                    break;
-                                case 0x0E:
+                                break;
+                            case 0x0E:
                                 serialNumber += "X";
-                                    break;
-                                case 0x0F:
+                                break;
+                            case 0x0F:
                                 serialNumber += "C";
-                                    break;
-                                default:
+                                break;
+                            default:
                                 serialNumber = "L-------";
-                                    break;
-                            }
+                                break;
                         }
-                        else if ((decodebyte[3] & 0xF0) == 0x60)//For MonT
-                        {
-                            serialNumber = "R0";
-                        }
-                        else
-                        {
-                            serialNumber = "--------";
-                        }
-                        serialNumber += ((((decodebyte[2] & 0xFF) << 16) | ((decodebyte[1] & 0xFF) << 8) | (decodebyte[0]) & 0xFF));
-                    
-                    fromreader = serialNumber;
-                    break;
+                    }
+                    else if ((decodebyte[3] & 0xF0) == 0x60)//For MonT
+                    {
+                        serialNumber = "R0";
+                    }
+                    else
+                    {
+                        serialNumber = "--------";
+                    }
+                    serialNumber += ((((decodebyte[2] & 0xFF) << 16) | ((decodebyte[1] & 0xFF) << 8) | (decodebyte[0]) & 0xFF));
+
+                    return serialNumber;
 
                 case "String":
-                    for (int i = 0; i < m_user_data_len; i++)
+                    for (int i = 0; i < decodebyte.Length ; i++)
                     {
-                        fromreader += Convert.ToChar(decodebyte[i] & 0xFF);
+                        fromreader += (char)(decodebyte[i] & 0xFF);
                     }
-                    
-                    fromreader = fromreader.Substring(0,m_user_data_len);
-                    break;
+
+                    return fromreader.Substring(0, m_user_data_len);
 
                 case "Time_FirstSample_MonT":
                     if (m_overwriting)
                     {
                         STARTED_TIME = ((m_UTC_reference_time) - (4680 * m_sampling_period) - (m_ticks_since_start - m_ticks_at_last_sample));
-                        fromreader = UNIXtoUTC(STARTED_TIME);
+                        return UNIXtoUTC(STARTED_TIME);
                     }
                     else
                     {
                         STARTED_TIME = ((m_UTC_reference_time - m_ticks_since_start) + m_holdoff);
-                        fromreader = UNIXtoUTC(STARTED_TIME);
+                        return UNIXtoUTC(STARTED_TIME);
                     }
-
-                    break;
 
                 case "Time_LastSample_MonT":
                     string temp = readJson("SecondsTimer");
@@ -435,11 +440,7 @@ namespace TempLite
                     temp = readJson("UTCReferenceTime");
                     UTCreference = long.Parse(temp, NumberStyles.HexNumber);
                     String STOPPED_TIME = UNIXtoUTC((UTCreference) - (4294967040L - secondtimer));
-                    fromreader = STOPPED_TIME;
-                    break;
-
-                case "XXX":
-                    break;
+                    return STOPPED_TIME;
             }
 
             return fromreader;
@@ -471,7 +472,7 @@ namespace TempLite
                         string address = line.Substring(0, 6);
                         string data = line.Substring(7, line.Length - 7);
                         string temp = "";
-                        
+
                         if (int.Parse(currentinfo[0], NumberStyles.HexNumber) >= int.Parse(address, NumberStyles.HexNumber))
                             addtoread = address;
 
@@ -479,7 +480,7 @@ namespace TempLite
                         {
                             diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
 
-                            if (diff>=0 && diff < 64) // reader can only send 64bytes at a time
+                            if (diff >= 0 && diff < 64) // reader can only send 64bytes at a time
                             {
                                 int infolength = Convert.ToInt32(currentinfo[1]);
                                 if (infolength > 64)
@@ -510,7 +511,7 @@ namespace TempLite
                                 }
                                 else
                                 {
-                                    temp = data.Substring(diff * 2, infolength* 2);
+                                    temp = data.Substring(diff * 2, infolength * 2);
                                     int totallength = temp.Length;
                                     bytes = new byte[totallength / 2];
                                     for (int i = 0; i < totallength; i += 2)
@@ -532,7 +533,7 @@ namespace TempLite
             return bytes;
         }
 
-        private string littleEndian ()
+        private string littleEndian()
         {
             string littleendian = "";
             for (int i = decodebyte.Length - 1; i >= 0; i--)
@@ -549,10 +550,9 @@ namespace TempLite
             return bigendian;
         }
 
-        private void Logger_State()
+        private string Logger_State()
         {
             String VALUE = "UNDEFINED";
-            Console.WriteLine("LOGGER STATE: " + decodebyte[0].ToString("X02"));
 
             switch (decodebyte[0])
             {
@@ -573,7 +573,7 @@ namespace TempLite
                     break;
             }
 
-            fromreader = VALUE;
+            return VALUE;
         }
 
         public String UNIXtoUTC(long now)

@@ -40,7 +40,7 @@ namespace TempLite.Services
         public void ReadLogger(SerialPort serialPort)
         {
             var hexes = new List<Hex>();
-            var sendMessage = new byte[11]; //{0x02,0x40,0x00,0x00,0x4a,0x0c,0x00,0x00};
+            var sendMessage = new byte[11];
 
             serialPort.Open();
 
@@ -96,7 +96,7 @@ namespace TempLite.Services
             }
             catch (TimeoutException) { }
             recievemsg[count] = 0x0d;
-            recievemsg = removeEscChar(recievemsg);
+            recievemsg = RemoveEscChar(recievemsg);
             msg = msg + "0D";
             switch (command)
             {
@@ -130,7 +130,7 @@ namespace TempLite.Services
                     }
 
                     byte[] serial = { (byte)recievemsg[5], (byte)recievemsg[6], (byte)recievemsg[7], (byte)recievemsg[8] };
-                    serialnumber = getSerialnumber(serial);
+                    serialnumber = GetSerialnumber(serial);
 
                     memoryadd = (recievemsg[memoryheaderpointer + 1] & 0xFF) << 8 | (recievemsg[memoryheaderpointer] & 0xFF);
                     memoryaddMSB = (byte)recievemsg[memoryheaderpointer + 1];
@@ -387,7 +387,7 @@ namespace TempLite.Services
 
 
         //==========================================================//
-        private byte[] removeEscChar(byte[] message)
+        private byte[] RemoveEscChar(byte[] message)
         {
             int i = 0;
             int mx = 0;
@@ -430,7 +430,7 @@ namespace TempLite.Services
         }
         //==========================================================//
 
-        public string getSerialnumber(byte[] msg)
+        public string GetSerialnumber(byte[] msg)
         {
             serialnumber = "";
 

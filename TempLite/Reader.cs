@@ -12,6 +12,8 @@ namespace TempLite
         //This ONE
         public void SetupCom(SerialPort serial)
         {
+            //While loop? until user has plugged in the reader and it can be found. 
+            //Change readerPanel to LoggerPanel
             FindFTDI();
 
             serial.DiscardNull = false;

@@ -28,164 +28,83 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TempLite));
-            this.pdfpanel = new System.Windows.Forms.Panel();
-            this.pdfdownload = new System.Windows.Forms.Button();
-            this.pdfemail = new System.Windows.Forms.Button();
-            this.pdfpreview = new System.Windows.Forms.Button();
-            this.PDFimage = new System.Windows.Forms.Button();
-            this.excelpanel = new System.Windows.Forms.Panel();
-            this.exceldownload = new System.Windows.Forms.Button();
-            this.excelemail = new System.Windows.Forms.Button();
-            this.excelpreview = new System.Windows.Forms.Button();
-            this.EXCEL = new System.Windows.Forms.Button();
-            this.pdfpanel.SuspendLayout();
-            this.excelpanel.SuspendLayout();
+            this.readerImage = new System.Windows.Forms.PictureBox();
+            this.readerLabel = new System.Windows.Forms.Label();
+            this.readerTextbox = new System.Windows.Forms.TextBox();
+            this.readerPanel = new System.Windows.Forms.Panel();
+            ((System.ComponentModel.ISupportInitialize)(this.readerImage)).BeginInit();
+            this.readerPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // pdfpanel
+            // readerImage
             // 
-            this.pdfpanel.Controls.Add(this.pdfdownload);
-            this.pdfpanel.Controls.Add(this.pdfemail);
-            this.pdfpanel.Controls.Add(this.pdfpreview);
-            this.pdfpanel.Controls.Add(this.PDFimage);
-            this.pdfpanel.Location = new System.Drawing.Point(0, 0);
-            this.pdfpanel.Margin = new System.Windows.Forms.Padding(10);
-            this.pdfpanel.Name = "pdfpanel";
-            this.pdfpanel.Size = new System.Drawing.Size(300, 300);
-            this.pdfpanel.TabIndex = 0;
+            this.readerImage.Image = global::TempLite.Properties.Resources.reader_l;
+            this.readerImage.Location = new System.Drawing.Point(0, 0);
+            this.readerImage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.readerImage.Name = "readerImage";
+            this.readerImage.Size = new System.Drawing.Size(783, 590);
+            this.readerImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.readerImage.TabIndex = 0;
+            this.readerImage.TabStop = false;
             // 
-            // pdfdownload
+            // readerLabel
             // 
-            this.pdfdownload.Location = new System.Drawing.Point(233, 68);
-            this.pdfdownload.Name = "pdfdownload";
-            this.pdfdownload.Size = new System.Drawing.Size(50, 50);
-            this.pdfdownload.TabIndex = 5;
-            this.pdfdownload.UseVisualStyleBackColor = true;
-            this.pdfdownload.Visible = false;
-            this.pdfdownload.Click += new System.EventHandler(this.pdfdownload_Click);
+            this.readerLabel.AutoSize = true;
+            this.readerLabel.BackColor = System.Drawing.Color.Transparent;
+            this.readerLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.readerLabel.Location = new System.Drawing.Point(18, 615);
+            this.readerLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.readerLabel.Name = "readerLabel";
+            this.readerLabel.Size = new System.Drawing.Size(217, 36);
+            this.readerLabel.TabIndex = 1;
+            this.readerLabel.Text = "Connect Reader";
             // 
-            // pdfemail
+            // readerTextbox
             // 
-            this.pdfemail.Location = new System.Drawing.Point(233, 12);
-            this.pdfemail.Name = "pdfemail";
-            this.pdfemail.Size = new System.Drawing.Size(50, 50);
-            this.pdfemail.TabIndex = 4;
-            this.pdfemail.UseVisualStyleBackColor = true;
-            this.pdfemail.Visible = false;
-            this.pdfemail.Click += new System.EventHandler(this.pdfemail_Click);
+            this.readerTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.readerTextbox.Font = new System.Drawing.Font("Myriad Pro", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.readerTextbox.Location = new System.Drawing.Point(27, 675);
+            this.readerTextbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.readerTextbox.Name = "readerTextbox";
+            this.readerTextbox.Size = new System.Drawing.Size(717, 20);
+            this.readerTextbox.TabIndex = 2;
+            this.readerTextbox.Text = "Use a suitable adaptor to connect a Temprecord reader to your device.";
             // 
-            // pdfpreview
+            // readerPanel
             // 
-            this.pdfpreview.Location = new System.Drawing.Point(177, 12);
-            this.pdfpreview.Name = "pdfpreview";
-            this.pdfpreview.Size = new System.Drawing.Size(50, 50);
-            this.pdfpreview.TabIndex = 3;
-            this.pdfpreview.UseVisualStyleBackColor = true;
-            this.pdfpreview.Visible = false;
-            this.pdfpreview.Click += new System.EventHandler(this.pdfpreview_Click);
-            // 
-            // PDFimage
-            // 
-            this.PDFimage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.PDFimage.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.PDFimage.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.PDFimage.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("PDFimage.BackgroundImage")));
-            this.PDFimage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.PDFimage.FlatAppearance.BorderSize = 0;
-            this.PDFimage.Location = new System.Drawing.Point(100, 100);
-            this.PDFimage.Margin = new System.Windows.Forms.Padding(5);
-            this.PDFimage.Name = "PDFimage";
-            this.PDFimage.Padding = new System.Windows.Forms.Padding(5);
-            this.PDFimage.Size = new System.Drawing.Size(100, 100);
-            this.PDFimage.TabIndex = 2;
-            this.PDFimage.UseVisualStyleBackColor = false;
-            this.PDFimage.Click += new System.EventHandler(this.PDF_Click);
-            // 
-            // excelpanel
-            // 
-            this.excelpanel.Controls.Add(this.exceldownload);
-            this.excelpanel.Controls.Add(this.excelemail);
-            this.excelpanel.Controls.Add(this.excelpreview);
-            this.excelpanel.Controls.Add(this.EXCEL);
-            this.excelpanel.Location = new System.Drawing.Point(323, 0);
-            this.excelpanel.Name = "excelpanel";
-            this.excelpanel.Size = new System.Drawing.Size(300, 300);
-            this.excelpanel.TabIndex = 1;
-            // 
-            // exceldownload
-            // 
-            this.exceldownload.Location = new System.Drawing.Point(239, 68);
-            this.exceldownload.Name = "exceldownload";
-            this.exceldownload.Size = new System.Drawing.Size(50, 50);
-            this.exceldownload.TabIndex = 8;
-            this.exceldownload.UseVisualStyleBackColor = true;
-            this.exceldownload.Visible = false;
-            // 
-            // excelemail
-            // 
-            this.excelemail.Location = new System.Drawing.Point(239, 12);
-            this.excelemail.Name = "excelemail";
-            this.excelemail.Size = new System.Drawing.Size(50, 50);
-            this.excelemail.TabIndex = 7;
-            this.excelemail.UseVisualStyleBackColor = true;
-            this.excelemail.Visible = false;
-            // 
-            // excelpreview
-            // 
-            this.excelpreview.Location = new System.Drawing.Point(183, 12);
-            this.excelpreview.Name = "excelpreview";
-            this.excelpreview.Size = new System.Drawing.Size(50, 50);
-            this.excelpreview.TabIndex = 6;
-            this.excelpreview.UseVisualStyleBackColor = true;
-            this.excelpreview.Visible = false;
-            // 
-            // EXCEL
-            // 
-            this.EXCEL.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.EXCEL.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.EXCEL.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.EXCEL.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("EXCEL.BackgroundImage")));
-            this.EXCEL.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.EXCEL.FlatAppearance.BorderSize = 0;
-            this.EXCEL.Location = new System.Drawing.Point(100, 100);
-            this.EXCEL.Name = "EXCEL";
-            this.EXCEL.Size = new System.Drawing.Size(100, 100);
-            this.EXCEL.TabIndex = 1;
-            this.EXCEL.UseVisualStyleBackColor = false;
-            this.EXCEL.Click += new System.EventHandler(this.EXCEL_Click);
+            this.readerPanel.BackColor = System.Drawing.Color.White;
+            this.readerPanel.Controls.Add(this.readerImage);
+            this.readerPanel.Controls.Add(this.readerTextbox);
+            this.readerPanel.Controls.Add(this.readerLabel);
+            this.readerPanel.Location = new System.Drawing.Point(18, 22);
+            this.readerPanel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.readerPanel.Name = "readerPanel";
+            this.readerPanel.Size = new System.Drawing.Size(783, 738);
+            this.readerPanel.TabIndex = 3;
             // 
             // TempLite
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(624, 300);
-            this.Controls.Add(this.excelpanel);
-            this.Controls.Add(this.pdfpanel);
+            this.ClientSize = new System.Drawing.Size(821, 884);
+            this.Controls.Add(this.readerPanel);
+            this.Font = new System.Drawing.Font("Myriad Pro", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "TempLite";
-            this.Text = "Form1";
-            this.pdfpanel.ResumeLayout(false);
-            this.excelpanel.ResumeLayout(false);
+            this.Text = "TempLite";
+            ((System.ComponentModel.ISupportInitialize)(this.readerImage)).EndInit();
+            this.readerPanel.ResumeLayout(false);
+            this.readerPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Panel pdfpanel;
-        private System.Windows.Forms.Panel excelpanel;
-        private System.Windows.Forms.Button PDFimage;
-        private System.Windows.Forms.Button EXCEL;
-        private System.Windows.Forms.Button pdfdownload;
-        private System.Windows.Forms.Button pdfemail;
-        private System.Windows.Forms.Button pdfpreview;
-        private System.Windows.Forms.Button exceldownload;
-        private System.Windows.Forms.Button excelemail;
-        private System.Windows.Forms.Button excelpreview;
+        private System.Windows.Forms.PictureBox readerImage;
+        private System.Windows.Forms.Label readerLabel;
+        private System.Windows.Forms.TextBox readerTextbox;
+        private System.Windows.Forms.Panel readerPanel;
     }
 }
 
