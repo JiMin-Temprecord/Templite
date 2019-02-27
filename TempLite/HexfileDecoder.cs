@@ -13,138 +13,182 @@ namespace TempLite
 {
     public class HexfileDecoder
     {
-        string fromreader =  "";
-        string addtoread = "";
-        byte[] decodebyte;
-        bool bitbool = false;
+        string serialnumber;
+        string jsonfile;
+        string batteryPercentage;
 
-        long UTCreference = 0;
-        long secondtimer = 0;
+        bool loopOverwrite = false;
+        bool Fahrenheit = false;
 
-        private string serialnumber;
-        private string jsonfile;
+        double Kelvin_Dec = 273.15;
+        double lowestTemp = 0;
+        double Resolution = 0;
 
-        private long Y_2000 = 946684800000L;
-        private long Y_2010 = 1262304000000L;
-        private int Kelvin = 27315;
-        private double Kelvin_Dec = 273.15;
-        private int Data_Address = 0x7FFF;
-        private int NUM_DATA_LOGGED = 0;
-        private int[] StartValue = new int[8];
-        private int memory_start = 0;
-        private int[] m_sensor_starting_value = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private int[] m_sensor_table_pointer = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private int[] m_sensor_type = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        private int[] m_compression_table = new int[128];
-        private long m_starting_time;
-        private long m_sampling_period = 0;
-        private int m_sample_number = 0;
-        private int m_sensor_number = 0;
-        private int m_user_data_len = 0;
-        private string m_batterypercentage;
-        private long m_UTC_reference_time = 0;
+        long Y_2000 = 946684800000L;
+        long Y_2010 = 1262304000000L;
+        long timeFirstSample = 0;
+        long lastSample = 0;
+        long samplePeriod = 0;
+        long UTCreferenceTime = 0;
+        long ticksAtLastSample = 0;
+        long ticksSinceStart = 0;
+        long secondsTimer = 0;
+        long manufactureDate = 0;
 
-        private double m_pedestal = 0;
-        private double m_resolution = 0;
-        private long m_ticks_at_last_sample = 0;
-        private long m_ticks_since_start = 0;
-        private int m_holdoff = 0;
-        private bool m_overwriting = false;
-        private long m_seconds_timer = 0;
-        private long m_manufacture_date = 0;
-        private int m_total_rtc_ticks = 0;
-        private int m_total_sampling_events = 0;
-        private int m_total_uses = 0;
+        int Kelvin = 27315;
+        int recordedSamples = 0;
+        int numberChannel = 0;
+        int userDataLength = 0;
+        int startDelay = 0;
+        int totalRTCticks = 0;
+        int totalSamplingEvents = 0;
+        int totalUses = 0;
 
-        //    private static  final   double      R                       = 0.008314472;                      //R         is the Gas Constant:        0.008314472 kJ/mole/degree
-        private double Delta_H = 83.14472;                         //Delta H   is the Activation Energy:   83.14472    kJ/mole
-        private double R = 8.314472;                      //R         is the Gas Constant:        0.008314472 J/mole/degree
+        int[] highestPosition = new int[8];
+        int[] lowestPosition = new int[8];
 
-        public long STARTED_TIME = 0;
-        public double[] m_data;
-
-        public int[] Sample_Number = new int[8];
-        public double[] m_upper_limit = new double[8];
-        public double[] m_lower_limit = new double[8];
-
-        public double[] m_sensor_min = new double[8];
-        public double[] m_sensor_max = new double[8];
-
-        public int[] m_highest_position = new int[8];
-        public int[] m_lowest_position = new int[8];
-        public double[] m_mean = new double[8];
-        public double[] m_MKT = new double[8];
-
-        public double[] m_nb_within_limit = new double[8];
-        public double[] m_nb_below_limit = new double[8];
-        public double[] m_nb_above_limit = new double[8];
-
-        public HexfileDecoder(_communicationServices communicationServies)
+        double Delta_H = 83.14472; //Delta H   is the Activation Energy:   83.14472    kJ/mole
+        double R = 8.314472; //R is the Gas Constant: 0.008314472 J/mole/degree
+        
+        double[] m_data;
+        double[] upperLimit = new double[8];
+        double[] lowerLimit = new double[8];
+        double[] sensorMin = new double[8];
+        double[] sensorMax = new double[8];
+        double[] Mean = new double[8];
+        double[] MKT = new double[8];
+        double[] withinLimit = new double[8];
+        double[] belowLimit = new double[8];
+        double[] aboveLimit = new double[8];
+        
+        private void AssignValues (PDFvariables pdfVariables)
         {
-            serialnumber = communicationServies.serialnumber;
+            pdfVariables.recordedSample = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
+            pdfVariables.serialNumber = readJson("HEADER,SerialNumber");
+            pdfVariables.loggerState = readJson("HEADER,State");
+            pdfVariables.batteryPercentage = readJson("BATTERY_INFO,Battery") + "%";
+            pdfVariables.sameplePeriod = HHMMSS(samplePeriod);
+            pdfVariables.startDelay = readJson("USER_SETTINGS,StartDelay");
+            pdfVariables.firstSample = readJson("DATA_INFO,Time_FirstSample_MonT");
+            pdfVariables.tagsPlaced = "0";
+            pdfVariables.userData = readJson("USER_DATA,UserData");
+            
+            if (Fahrenheit)
+            {
+                pdfVariables.tempUnit = " °F";
+            }
+
+            else
+            {
+                pdfVariables.tempUnit = " °C";
+
+            }
+            for (int i = 0; i < numberChannel; i++)
+            {
+                pdfVariables.enabledChannels[i] = true;
+                pdfVariables.presetLowerLimit[i] = lowerLimit[i];
+                pdfVariables.presetUpperLimit[i] = upperLimit[i];
+                pdfVariables.Mean[i] = Mean[i];
+                pdfVariables.MKT_C[i] = MKT[i] - Kelvin_Dec;
+                pdfVariables.Max[i] = sensorMax[i];
+                pdfVariables.Min[i] = sensorMin[i];
+                pdfVariables.withinLimits[i] = withinLimit[i];
+                pdfVariables.outsideLimits[i] = aboveLimit[i] + belowLimit[i];
+                pdfVariables.aboveLimits[i] = aboveLimit[i];
+                pdfVariables.belowLimits[i] = belowLimit[i];
+                pdfVariables.timeWithinLimits[i] = HHMMSS(pdfVariables.withinLimits[i] * pdfVariables.recordedSample);
+                pdfVariables.timeOutLimits[i] = HHMMSS(pdfVariables.outsideLimits[i] * pdfVariables.recordedSample);
+                pdfVariables.timeAboveLimits[i] = HHMMSS(pdfVariables.aboveLimits[i] * pdfVariables.recordedSample);
+                pdfVariables.timeBelowLimits[i] = HHMMSS(pdfVariables.belowLimits[i] * pdfVariables.recordedSample);
+
+
+                if (pdfVariables.aboveLimits[i] > 0)
+                    pdfVariables.breachedAbove[i] = " (breached)";
+
+                if (pdfVariables.belowLimits[i] > 0)
+                    pdfVariables.breachedBelow[i] = " (breached)";
+
+            }
+
+
+            for (int i = 0; i < pdfVariables.recordedSample; i++)
+            {
+                pdfVariables.Time.Add(timeFirstSample);
+                timeFirstSample = timeFirstSample + samplePeriod;
+            }
+            long timeLastSample = Convert.ToInt32(pdfVariables.Time[(pdfVariables.Time.Count - 1)]);
+            pdfVariables.lastSample = UNIXtoUTC(timeLastSample);
+
+        }
+        public HexfileDecoder(_communicationServices communicationServies, PDFvariables pdfVariables)
+        {
             jsonfile = communicationServies.jsonfile;
-            m_user_data_len = Convert.ToInt32(readJson("USER_DATA,UserDataLen"), 16);
-            m_UTC_reference_time = Convert.ToInt32(readJson("UTCReferenceTime"), 16);
-            m_total_rtc_ticks = Convert.ToInt32(readJson("HEADER,TotalRTCTicks"), 16);
+            numberChannel = Convert.ToInt32(readJson("SENSOR,SensorNumber"), 16);
+            Fahrenheit = Convert.ToBoolean(readJson("USER_SETTINGS,Fahrenheit"));
+            UTCreferenceTime = Convert.ToInt32(readJson("UTCReferenceTime"), 16);
+            totalRTCticks = Convert.ToInt32(readJson("HEADER,TotalRTCTicks"), 16);
             readJson("HEADER,ManufactureDate");
-            m_total_sampling_events = Convert.ToInt32(readJson("HEADER,TotalSamplingEvents"), 16);
-            m_total_uses = Convert.ToInt32(readJson("HEADER,TotalUses"), 16);
-            m_overwriting = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
-            m_holdoff = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
-            m_sampling_period = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
-            m_seconds_timer = Convert.ToInt32(readJson("SecondsTimer"), 16);
-            m_ticks_since_start = Convert.ToInt32(readJson("DATA_INFO,TicksSinceArousal"), 16);
-            m_ticks_at_last_sample = Convert.ToInt32(readJson("DATA_INFO,TicksAtLastSample"), 16);
-            m_sample_number = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
-            m_pedestal = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
-            m_resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio")) / 100;
+            totalSamplingEvents = Convert.ToInt32(readJson("HEADER,TotalSamplingEvents"), 16);
+            totalUses = Convert.ToInt32(readJson("HEADER,TotalUses"), 16);
+            loopOverwrite = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
+            startDelay = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
+            samplePeriod = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
+            secondsTimer = Convert.ToInt32(readJson("SecondsTimer"), 16);
+            ticksSinceStart = Convert.ToInt32(readJson("DATA_INFO,TicksSinceArousal"), 16);
+            ticksAtLastSample = Convert.ToInt32(readJson("DATA_INFO,TicksAtLastSample"), 16);
+            recordedSamples = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
+            lowestTemp = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
+            Resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio")) / 100;
             readJson("SENSOR,Decode_MonT_Data");
-            m_upper_limit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
-            m_lower_limit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
+            upperLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
+            lowerLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
         }
 
 
         public string readJson(string info)
         {
-            var jsonobject = new JObject();
-            string[] decodeinfo;
-            string fromreader = "";
+            var jsonObject = new JObject();
+            var decodeInfo = new string[4];
 
             try
             {
-                // Create an instance of StreamReader to read from a file.
-                // The using statement also closes the StreamReader.
-                using (StreamReader sr = new StreamReader(jsonfile))
-                {
-                    //come back and change the part where is read
-                    var json = sr.ReadToEnd();
-                    jsonobject = JObject.Parse(json);
-
-                    var add = jsonobject.GetValue(info).First.Last.ToString();
-                    var len = jsonobject.GetValue(info).First.Next.Last.ToString();
-                    var code = jsonobject.GetValue(info).First.Next.Next.Last.ToString();
-                    var hide = jsonobject.GetValue(info).Last.Last.ToString();
-
-                    decodeinfo = new string[] { add, len, code, hide };
-                    fromreader = decodehex(decodeinfo);
-
-                }
+                jsonObject = GetJsonObject();
+                decodeInfo = JsontoString(jsonObject, info);
             }
             catch (Exception e)
             {
-                // Let the user know what went wrong.
                 Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
             }
 
-            return fromreader;
+            return decodeHex(decodeInfo);
+        }
+
+        private JObject GetJsonObject()
+        {
+            using (var sr = new StreamReader(jsonfile))
+            {
+                return JObject.Parse(sr.ReadToEnd());
+            }
+        }
+
+        private string[] JsontoString(JObject jsonObject, string info)
+        {
+            var add = jsonObject.GetValue(info).First.Last.ToString();
+            var len = jsonObject.GetValue(info).First.Next.Last.ToString();
+            var code = jsonObject.GetValue(info).First.Next.Next.Last.ToString();
+            var hide = jsonObject.GetValue(info).Last.Last.ToString();
+
+            return new string[] { add, len, code, hide };
+
         }
 
         //stringarrayinfo from JSON file [add,len,code,hide]
-        public string decodehex(string[] stringarrayinfo)
+        public string decodeHex(string[] stringarrayinfo)
         {
             //returned byte[] from the hex file
-            decodebyte = ReadHex(stringarrayinfo);
+            bool bitbool = false;
+            var decodebyte = ReadHex(stringarrayinfo);
             switch (stringarrayinfo[2])
             {
 
@@ -155,17 +199,17 @@ namespace TempLite
                             decodebyte[i] = (byte)(decodebyte[i] & 0xff);
 
                         if (stringarrayinfo[3] == "0")
-                            return bigEndian();
+                            return bigEndian(decodebyte);
                     }
                     else
                     {
                         decodebyte[0] = (byte)(decodebyte[0] & 0xff);
-                        return bigEndian();
+                        return bigEndian(decodebyte);
                     }
                     break;
 
                 case "_2_Byte_to_Decimal":
-                    return (((decodebyte[1] & 0xFF) << 8)| (decodebyte[0] & 0xFF)).ToString();
+                    return (((decodebyte[1] & 0xFF) << 8) | (decodebyte[0] & 0xFF)).ToString();
 
                 case "_2_Byte_to_Temperature_MonT":
                     int value = (((decodebyte[1]) & 0xFF) << 8) | (decodebyte[0] & 0xFF);
@@ -177,9 +221,9 @@ namespace TempLite
                     return decodebyte[3].ToString("X02") + decodebyte[2].ToString("X02") + decodebyte[1].ToString("X02") + decodebyte[0].ToString("X02");
 
                 case "_4_Byte_to_UNIX":
-                    long _4byteUnix = (Convert.ToInt32(littleEndian(),16) * (long)1000);
-                    m_manufacture_date = ((long)_4byteUnix + Y_2000) / (long)1000;
-                    return m_manufacture_date.ToString();
+                    long _4byteUnix = (Convert.ToInt32(ToLittleEndian(decodebyte), 16) * (long)1000);
+                    manufactureDate = ((long)_4byteUnix + Y_2000) / (long)1000;
+                    return manufactureDate.ToString();
 
                 case "_4_Byte_Sec_to_Date":
                     long _4sectobyte = (decodebyte[3] + decodebyte[2] + decodebyte[1] + decodebyte[0]) * 1000;
@@ -194,7 +238,7 @@ namespace TempLite
                         return "";
 
                 case "_8_Byte_to_Unix_UTC":
-                    return bigEndian();
+                    return bigEndian(decodebyte);
 
                 case "b0":
                     bitbool = false;
@@ -258,10 +302,10 @@ namespace TempLite
                     int batteryPercentage;
                     int INITAL_BATTERY = (int)((1.0 - RCLBatteryMargin) * 0.56 * 60 * 60 * 1000000); //mAHr
                     double BatteryUsed =
-                    (((m_UTC_reference_time - m_manufacture_date) * RCLSelfDischargeCurrentuA) +
-                    (m_total_rtc_ticks * RCLQuiescentDischargeCurrentuA) +
-                    ((m_total_sampling_events + 4681) * RCLConversionDurationS * RCLConversionDischargeCurrentuA) +
-                    (RCLAssumedDownloadsPerTrip * m_total_uses * RCLDownloadDurationS * RCLDownloadDischargeCurrentuA));
+                    (((UTCreferenceTime - manufactureDate) * RCLSelfDischargeCurrentuA) +
+                    (totalRTCticks * RCLQuiescentDischargeCurrentuA) +
+                    ((totalSamplingEvents + 4681) * RCLConversionDurationS * RCLConversionDischargeCurrentuA) +
+                    (RCLAssumedDownloadsPerTrip * totalUses * RCLDownloadDurationS * RCLDownloadDischargeCurrentuA));
                     batteryPercentage = (int)(((INITAL_BATTERY - BatteryUsed) / INITAL_BATTERY) * 100);
                     return batteryPercentage.ToString();
 
@@ -274,33 +318,28 @@ namespace TempLite
                     int array_pointer = 0;
                     bool Flag_End = false;
 
-                    if (m_sample_number > 0)
+                    if (recordedSamples > 0)
                     {
-                        var VALUE = new double[m_sample_number];
+                        var VALUE = new double[recordedSamples];
                         Init_Sensor_Statistics_Field(0);
 
                         //==================================If loop overwriting=====================================
-                        if (m_overwriting)
+                        if (loopOverwrite)
                         {
                             while ((b < decodebyte.Length))
                             {
 
-                                if (decodebyte[b] == 0xFF)                                                                //0xFF = 255 Two's complement
+                                if (decodebyte[b] == 0xFF) //0xFF = 255 Two's complement
                                 {
                                     break;
                                 }
                                 b++;
                             }
-                            b++;                                                                                        //Go to the index after the 0xFF
-                            while ((b < decodebyte.Length))                                                           //reads the data after the 0xFF
+                            b++;  //Go to the index after the 0xFF
+                            while ((b < decodebyte.Length)) //reads the data after the 0xFF
                             {
-                                NUM_DATA_LOGGED++;
-
-                                Temperature_Statistics(0, m_pedestal + ((decodebyte[b] & 0xFF) * m_resolution), array_pointer);
-
-                                VALUE[array_pointer++] = (m_pedestal + ((decodebyte[b] & 0xFF) * m_resolution));
-
-
+                                Temperature_Statistics(0, lowestTemp + ((decodebyte[b] & 0xFF) * Resolution), array_pointer);
+                                VALUE[array_pointer++] = (lowestTemp + ((decodebyte[b] & 0xFF) * Resolution));
                                 b++;
                             }
 
@@ -310,20 +349,14 @@ namespace TempLite
                         //=========================Used when Loop overwrite is enabled or disabled==================
                         while ((a < decodebyte.Length) && (!Flag_End))
                         {
-                            if (decodebyte[a] == 0xFE || decodebyte[a] == 0xFF)                                               //0xFE = 254 Two's complement || 0xFF = 255 Two's complement
+                            if (decodebyte[a] == 0xFE || decodebyte[a] == 0xFF) //0xFE = 254 Two's complement || 0xFF = 255 Two's complement
                             {
                                 Flag_End = true;
                             }
                             else
                             {
-
-                                Temperature_Statistics(0, m_pedestal + ((decodebyte[a] & 0xFF) * m_resolution), array_pointer);
-
-                                VALUE[array_pointer++] = (m_pedestal + ((decodebyte[a] & 0xFF) * m_resolution));
-
-
-                                NUM_DATA_LOGGED++;
-
+                                Temperature_Statistics(0, lowestTemp + ((decodebyte[a] & 0xFF) * Resolution), array_pointer);
+                                VALUE[array_pointer++] = (lowestTemp + ((decodebyte[a] & 0xFF) * Resolution));
                             }
                             a++;
                         }
@@ -335,7 +368,7 @@ namespace TempLite
 
                 case "DJNZ_2_Byte_Type_1":
                     decodebyte[1]--;
-                    return littleEndian();
+                    return ToLittleEndian(decodebyte);
 
                 case "DJNZ_4_Byte_Type_2":
                     for (int i = 0; i < 4; i++)
@@ -343,20 +376,20 @@ namespace TempLite
                         int z = (0x100) - (decodebyte[i] & 0xFF);
                         decodebyte[i] = (byte)z;
                     }
-                    return littleEndian();
+                    return ToLittleEndian(decodebyte);
 
                 case "*Logger_State":
-                    return Logger_State();
+                    return Logger_State(decodebyte);
 
                 case "Logging_selection_MonT":
                     break;
 
                 case "SampleNumber_logged_MonT":
-                    if (m_overwriting)
+                    if (loopOverwrite)
                         return "4681";
                     else
                     {
-                        long samplenumber = (((long)(m_ticks_at_last_sample - m_holdoff) / m_sampling_period) + 1);
+                        long samplenumber = (((long)(ticksAtLastSample - startDelay) / samplePeriod) + 1);
                         return samplenumber.ToString();
                     }
 
@@ -415,35 +448,33 @@ namespace TempLite
                     return serialNumber;
 
                 case "String":
-                    for (int i = 0; i < decodebyte.Length ; i++)
+                    var userdatastring = string.Empty; 
+                    for (int i = 0; i < decodebyte.Length; i++)
                     {
-                        fromreader += (char)(decodebyte[i] & 0xFF);
+                        userdatastring += (char)(decodebyte[i] & 0xFF);
                     }
 
-                    return fromreader.Substring(0, m_user_data_len);
+                    return userdatastring.Substring(0, userDataLength);
 
                 case "Time_FirstSample_MonT":
-                    if (m_overwriting)
+                    if (loopOverwrite)
                     {
-                        STARTED_TIME = ((m_UTC_reference_time) - (4680 * m_sampling_period) - (m_ticks_since_start - m_ticks_at_last_sample));
-                        return UNIXtoUTC(STARTED_TIME);
+                        timeFirstSample = ((UTCreferenceTime) - (4680 * samplePeriod) - (ticksSinceStart - ticksAtLastSample));
+                        return UNIXtoUTC(timeFirstSample);
                     }
                     else
                     {
-                        STARTED_TIME = ((m_UTC_reference_time - m_ticks_since_start) + m_holdoff);
-                        return UNIXtoUTC(STARTED_TIME);
+                        timeFirstSample = ((UTCreferenceTime - ticksSinceStart) + startDelay);
+                        return UNIXtoUTC(timeFirstSample);
                     }
 
                 case "Time_LastSample_MonT":
-                    string temp = readJson("SecondsTimer");
-                    secondtimer = long.Parse(temp, NumberStyles.HexNumber);
-                    temp = readJson("UTCReferenceTime");
-                    UTCreference = long.Parse(temp, NumberStyles.HexNumber);
-                    String STOPPED_TIME = UNIXtoUTC((UTCreference) - (4294967040L - secondtimer));
+                    var UTCreference = long.Parse(readJson("UTCReferenceTime"), NumberStyles.HexNumber);
+                    String STOPPED_TIME = UNIXtoUTC((UTCreference) - (4294967040L - secondsTimer));
                     return STOPPED_TIME;
             }
 
-            return fromreader;
+            return string.Empty;
         }
 
         static int GetBit(int Value, int bit)
@@ -454,19 +485,15 @@ namespace TempLite
         public byte[] ReadHex(string[] currentinfo)
         {
             byte[] bytes = { };
+            string addtoread = "";
 
             try
             {
                 //currentinfo = [add, len, code, hide];
-
-                // Create an instance of StreamReader to read from a file.
-                // The using statement also closes the StreamReader.
                 using (StreamReader sr = new StreamReader(serialnumber + ".hex"))
                 {
                     string line;
                     int diff = 0;
-                    // Read and display lines from the file until the end of 
-                    // the file is reached.
                     while ((line = sr.ReadLine()) != null)
                     {
                         string address = line.Substring(0, 6);
@@ -533,24 +560,27 @@ namespace TempLite
             return bytes;
         }
 
-        private string littleEndian()
+        private string ToLittleEndian(byte[] decodebyte)
         {
-            string littleendian = "";
+            var sb = new StringBuilder();
             for (int i = decodebyte.Length - 1; i >= 0; i--)
-                littleendian += decodebyte[i].ToString("x02");
-
-            return littleendian;
+            {
+                sb.Append(decodebyte[i].ToString("x02"));
+            }
+            return sb.ToString();
         }
 
-        private string bigEndian()
+        private string bigEndian(byte[] decodebyte)
         {
-            string bigendian = "";
+            var sb = new StringBuilder();
             for (int i = 0; i < decodebyte.Length; i++)
-                bigendian += decodebyte[i].ToString("x02");
-            return bigendian;
+            {
+                sb.Append(decodebyte[i].ToString("x02"));
+            }
+            return sb.ToString();
         }
 
-        private string Logger_State()
+        private string Logger_State(byte[] decodebyte)
         {
             String VALUE = "UNDEFINED";
 
@@ -581,90 +611,75 @@ namespace TempLite
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);
             date = date.ToUniversalTime();
-            string simpledate = date.ToString("yyyy-MM-dd HH:mm:sss UTC");
+            var simpledate = date.ToString("yyyy-MM-dd HH:mm:sss UTC");
             return simpledate;
         }
 
-        public String UNIXtoUTCDate(long now)
+        private void Init_Sensor_Statistics_Field(int currentChannel)
         {
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            string simpledate = date.ToString("yyyy-MM-dd");
-            return simpledate;
+            recordedSamples = 0;
+
+            sensorMin[currentChannel] = 0xFFFFFFFFFFL;
+            sensorMax[currentChannel] = -274;
+
+            highestPosition[currentChannel] = 0;
+            lowestPosition[currentChannel] = 0;
+
+            Mean[currentChannel] = 0;
+            MKT[currentChannel] = 0;
+
+            withinLimit[currentChannel] = 0;
+            belowLimit[currentChannel] = 0;
+            aboveLimit[currentChannel] = 0;
         }
 
-        public String UNIXtoUTCTime(long now)
+        private void Temperature_Statistics(int currentChannel, double Value, int index)
         {
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            string simpledate = date.ToString("HH:mm:sss UTC");
-            return simpledate;
-        }
-
-        private void Init_Sensor_Statistics_Field(int m_current_sensor)
-        {
-            Sample_Number[m_current_sensor] = 0;
-
-            m_sensor_min[m_current_sensor] = 0xFFFFFFFFFFL;
-            m_sensor_max[m_current_sensor] = -274;
-
-            m_highest_position[m_current_sensor] = 0;
-            m_lowest_position[m_current_sensor] = 0;
-
-            m_mean[m_current_sensor] = 0;
-            m_MKT[m_current_sensor] = 0;
-
-            m_nb_within_limit[m_current_sensor] = 0;
-            m_nb_below_limit[m_current_sensor] = 0;
-            m_nb_above_limit[m_current_sensor] = 0;
-        }
-        //==========================================================//
-
-        //==========================================================//
-        private void Temperature_Statistics(int m_current_sensor, double Value, int index)
-        {
-            if (Value < m_sensor_min[m_current_sensor])
+            if (Value < sensorMin[currentChannel])
             {
-                m_lowest_position[m_current_sensor] = index + 1;// Cause it starts from zero
-                m_sensor_min[m_current_sensor] = Value;
+                lowestPosition[currentChannel] = index + 1;// Cause it starts from zero
+                sensorMin[currentChannel] = Value;
             }
 
-            if (Value > m_sensor_max[m_current_sensor])
+            if (Value > sensorMax[currentChannel])
             {
-                m_highest_position[m_current_sensor] = index + 1;
-                m_sensor_max[m_current_sensor] = Value;
+                highestPosition[currentChannel] = index + 1;
+                sensorMax[currentChannel] = Value;
             }
 
 
-            if (Value > m_upper_limit[m_current_sensor])
+            if (Value > upperLimit[currentChannel])
             {
-                m_nb_above_limit[m_current_sensor]++;
+                aboveLimit[currentChannel]++;
             }
-            else if (Value < m_lower_limit[m_current_sensor])
+            else if (Value < lowerLimit[currentChannel])
             {
-                m_nb_below_limit[m_current_sensor]++;
+                belowLimit[currentChannel]++;
             }
             else
             {
-                m_nb_within_limit[m_current_sensor]++;
+                withinLimit[currentChannel]++;
             }
 
             //exp(-Delta_H/R x Tn)
-            m_MKT[m_current_sensor] += Math.Exp((-Delta_H) / ((Value + Kelvin_Dec) * R));
-            m_mean[m_current_sensor] += Value;
-            Sample_Number[m_current_sensor]++;
+            MKT[currentChannel] += Math.Exp((-Delta_H) / ((Value + Kelvin_Dec) * R));
+            Mean[currentChannel] += Value;
+            recordedSamples++;
         }
-        //==========================================================//
 
-        //==========================================================//
-        private void Finalize_Statistics(int m_current_sensor)
+        private void Finalize_Statistics(int currentChannel)
         {
-            String[] m_path = { "STATISTICS", "Sensor_" + m_current_sensor };
+            Mean[currentChannel] /= recordedSamples;
+            MKT[currentChannel] = (Delta_H / R) / (-Math.Log(MKT[currentChannel] / recordedSamples));
+        }
 
-            m_mean[m_current_sensor] /= Sample_Number[m_current_sensor];
-            m_MKT[m_current_sensor] = (Delta_H / R) / (-Math.Log(m_MKT[m_current_sensor] / Sample_Number[m_current_sensor]));
+        public String HHMMSS(double mseconds)
+        {
+            int hours = (int)(mseconds / 3600);
+            int minutes = (int)((mseconds % 3600) / 60);
+            int seconds = (int)(mseconds % 60);
+            
+            return $"{hours}:{minutes}:{seconds}"; 
         }
     }
 }

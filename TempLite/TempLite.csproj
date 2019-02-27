@@ -61,7 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="createJSON.cs" />
+    <Compile Include="PDFvariables.cs" />
     <Compile Include="PDFGenerator.cs" />
     <Compile Include="HexfileDecoder.cs" />
     <Compile Include="Enum\Command.cs" />
