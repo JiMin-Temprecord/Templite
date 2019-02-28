@@ -67,7 +67,6 @@
     <Compile Include="Enum\Command.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="PDFcoordinates.cs" />
-    <Compile Include="Services\PDFService.cs" />
     <Compile Include="Services\CommunicaionService.cs" />
     <Compile Include="Reader.cs" />
     <Compile Include="TempLite.cs">

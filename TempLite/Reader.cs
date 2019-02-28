@@ -1,20 +1,21 @@
-﻿using System;
-using System.IO.Ports;
+﻿using System.IO.Ports;
 using FTD2XX_NET;
 
 namespace TempLite
 {
     public class Reader
     {
-        private string portName;
+        private string portName = string.Empty;
         private uint devID = 0;
-
-        //This ONE
-        public void SetupCom(SerialPort serial)
+        
+        public string  FindReader (SerialPort serialPort)
         {
-            //While loop? until user has plugged in the reader and it can be found. 
-            //Change readerPanel to LoggerPanel
             FindFTDI();
+            return portName;
+        }
+
+        public void SetUpCom(SerialPort serial)
+        {
 
             serial.DiscardNull = false;
             serial.PortName = portName;
@@ -24,8 +25,8 @@ namespace TempLite
             serial.StopBits = StopBits.One;
             serial.Handshake = Handshake.None;
 
-            serial.ReadTimeout = 32;
-            serial.WriteTimeout = 32;
+            serial.ReadTimeout = 100;
+            serial.WriteTimeout = 100;
         }
 
         private void FindFTDI()

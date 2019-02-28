@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO.Ports;
 using System.Windows.Forms;
 using TempLite.Services;
@@ -7,21 +8,38 @@ namespace TempLite
 {
     public partial class TempLite : Form
     {
-        private PDFService _pdfService;
-        private _communicationServices _communicationService;
+        private PDFGenerator _pdfGenerator = new PDFGenerator();
+        private CommunicationServices _communicationService;
         private SerialPort _serialPort;
+        private Reader _reader;
 
         public TempLite()
         {
             InitializeComponent();
+            _communicationService = new CommunicationServices();
+        }
 
-            //Initialise services
-            _communicationService = new _communicationServices();
-            _pdfService = new PDFService(_communicationService);
-
-            //Set up serial port
+        private void TempLite_Shown(object sender, EventArgs e)
+        {
             _serialPort = new SerialPort();
-            new Reader().SetupCom(_serialPort);
+            _reader = new Reader();
+            string portname = string.Empty;
+
+            while (portname == string.Empty)
+            {
+                portname = _reader.FindReader(_serialPort);
+                System.Threading.Thread.Sleep(500);
+            }
+            _reader.SetUpCom(_serialPort);
+            
+            loggerPanel.Visible = true;
+            readerPanel.Visible = false;
+        }
+
+        private void loggerPanel_VisibleChanged(object sender, EventArgs e)
+        {
+            _communicationService.ReadLogger(_serialPort);
+            _pdfGenerator.CreatePDF(_communicationService);
         }
     }
 }

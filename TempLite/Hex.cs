@@ -8,14 +8,19 @@ namespace TempLite
 {
     class Hex
     {
+        public Hex(string address, string reply)
+        {
+            Address = address;
+            Reply = reply;
+        }
 
-        public string address { get; set; }
+        private string Address { get; set; }
 
-        public string reply { get; set; }
+        private string Reply { get; set; }
 
         public override string ToString()
         {
-            return address + ":" + reply;
+            return $"{Address}:{Reply}";
         }
     }
 }

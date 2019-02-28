@@ -13,18 +13,24 @@ namespace TempLite
 
         public bool[] enabledChannels = { false, false, false, false, false, false, false, false };
 
-        public double[] presetUpperLimit = new double[8];
-        public double[] presetLowerLimit = new double[8];
-        public double[] Mean = new double[8];
-        public double[] MKT_C = new double[8];
-        public double[] Max = new double[8];
-        public double[] Min = new double[8];
-        public double[] withinLimits = new double[8];
-        public double[] outsideLimits = new double[8];
-        public double[] aboveLimits = new double[8];
-        public double[] belowLimits = new double[8];
         public double[] Data;
+        public double[] presetUpperLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] presetLowerLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] Mean = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] MKT_C = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] Max = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] Min = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] withinLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] outsideLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] aboveLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] belowLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
+        public String[] breachedAbove = { "", "", "", "", "", "", "", "" };
+        public String[] breachedBelow = { "", "", "", "", "", "", "", "" };
+        public String[] timeWithinLimits = { "", "", "", "", "", "", "", "" };
+        public String[] timeOutLimits = { "", "", "", "", "", "", "", "" };
+        public String[] timeAboveLimits = { "", "", "", "", "", "", "", "" };
+        public String[] timeBelowLimits = { "", "", "", "", "", "", "", "" };
         public String serialNumber = "";
         public String loggerState = "";
         public String batteryPercentage = "";
@@ -35,13 +41,7 @@ namespace TempLite
         public String tagsPlaced = "";
         public String tempUnit = "";
         public String userData = "";
-        public String[] breachedAbove = { "", "", "", "", "", "", "", "" };
-        public String[] breachedBelow = { "", "", "", "", "", "", "", "" };
-        public String[] timeWithinLimits = { "", "", "", "", "", "", "", "" };
-        public String[] timeOutLimits = { "", "", "", "", "", "", "", "" };
-        public String[] timeAboveLimits = { "", "", "", "", "", "", "", "" };
-        public String[] timeBelowLimits = { "", "", "", "", "", "", "", "" };
-
+        
         public ArrayList Time = new ArrayList();
 
         public String UNIXtoUTCDate(long now)
