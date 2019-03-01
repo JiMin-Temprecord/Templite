@@ -26,6 +26,7 @@ namespace TempLite
 
             new HexfileDecoder(_communicationService, _pdfVariables);
             _pdfDocument.Info.Title = _communicationService.serialnumber;
+            
             //Create an empty page
             PdfPage page = _pdfDocument.AddPage();
             page.Height = 1000;
@@ -40,11 +41,7 @@ namespace TempLite
             //create pen
             XPen pen = new XPen(XColors.Black, 1);
             XPen headerpen = new XPen(XColors.Blue, 3);
-
-            //create rectange
-            XRect headerline = new XRect(10, 60, 680, 0);
-
-            //Draw Image
+            
             if (_pdfVariables.outsideLimits[0] == 0)
             {
                 XImage greentick = XImage.FromFile("greentick.png");
@@ -172,30 +169,26 @@ namespace TempLite
             if (_pdfVariables.enabledChannels[1]) draw.DrawString("_ Humidity  %RH ", font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
             lineCounter += PDFcoordinates.line_inc;
             
-            //draw graph
-            drawGraph(draw, pen, font);
-
-            draw.DrawString("Comment ", font, XBrushes.Black, PDFcoordinates.commentX, PDFcoordinates.commentY);
-            draw.DrawString("Signature ", font, XBrushes.Black, PDFcoordinates.sigX, PDFcoordinates.sigY);
-
-            //================================================================================================//
+            //Draw graph
+            DrawGraph(draw, pen, font);
             
-            //=========================== HEADER / FOOTER ========================================//
+            //Header/Footer
             draw.DrawString("Logger Report", serialfont, XBrushes.Blue, 10, 50);
             draw.DrawString("S/N: " + _communicationService.serialnumber, serialfont, XBrushes.Blue, 550, 50);
-            draw.DrawRectangle(headerpen, headerline);
+            draw.DrawRectangle(headerpen, new XRect(10, 60, 680, 0));
+            draw.DrawString("Comment ", font, XBrushes.Black, PDFcoordinates.commentX, PDFcoordinates.commentY);
+            draw.DrawString("Signature ", font, XBrushes.Black, PDFcoordinates.sigX, PDFcoordinates.sigY);
             draw.DrawString("Page 1/1 ", font, XBrushes.Black, 600, 980);
             draw.DrawString("www.temprecord.com", font, XBrushes.Black, PDFcoordinates.siteX, PDFcoordinates.siteY);
             draw.DrawString(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC"), font, XBrushes.Black, PDFcoordinates.dateX, PDFcoordinates.dateY);
             draw.DrawString("0.1.9.1", font, XBrushes.Black, PDFcoordinates.versionX, PDFcoordinates.versionY);
-            //=====================================================================================//
 
             string filename = _communicationService.serialnumber + ".pdf";
             _pdfDocument.Save(filename);
             Process.Start(filename); //Previews PDF
         }
 
-        private void drawGraph (XGraphics draw, XPen pen, XFont font)
+        private void DrawGraph (XGraphics draw, XPen pen, XFont font)
         {
             XPen ch0 = new XPen(XColors.DarkGreen);
             XPen ch1 = new XPen(XColors.Lavender);

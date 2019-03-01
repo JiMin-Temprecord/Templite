@@ -8,7 +8,8 @@ namespace TempLite.Services
 {
     public class CommunicationServices
     {
-        public UInt16 crc16 = 0xFFFF;
+        public bool reading = false;
+        public ushort crc16 = 0xFFFF;
 
         public string serialnumber = "";
         public string loggername = "";
@@ -55,7 +56,7 @@ namespace TempLite.Services
                 {
                     WriteBytes(Command.ReadLogger, serialPort, sendMessage);
                     ReadBytes(Command.ReadLogger, serialPort, hexes);
-                    getnextaddress();
+                    GetNextAddress();
                 }
             }
 
@@ -142,13 +143,15 @@ namespace TempLite.Services
                 case Command.SetRead:
                     switch (loggertype)
                     {
+                        //MonT
                         case 3:
                             memstart[0] = 0x0000;
                             memmax[0] = 0x2000;
 
                             break;
 
-                        case 6:     //G4
+                        //G4
+                        case 6: 
                             memstart[4] = (recievemsg[requestmemorystartpointer + 1] & 0xFF) << 8 | (recievemsg[requestmemorystartpointer] & 0xFF);
                             memmax[4] = (recievemsg[requestmemorymaxpointer + 1] & 0xFF) << 8 | (recievemsg[requestmemorymaxpointer] & 0xFF);
 
@@ -247,8 +250,8 @@ namespace TempLite.Services
             }
             catch (TimeoutException e) { }
         }
-
-        public void getnextaddress()
+        
+        private void GetNextAddress()
         {
             if (length >= (memmax[memnumber] - memoryadd))
             {
@@ -296,7 +299,8 @@ namespace TempLite.Services
                 }
             }
         }
-        
+
+        #region Byte Mainpulation 
         private byte[] AddCRC(int len, byte[] sendMessage)
         {
             crc16 = 0xFFFF;
@@ -404,6 +408,7 @@ namespace TempLite.Services
             Array.Copy(message, recievemsg, mx + 1);
             return recievemsg;
         }
+        #endregion
 
         public string GetSerialnumber(byte[] msg)
         {

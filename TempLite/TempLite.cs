@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Drawing;
 using System.IO.Ports;
 using System.Windows.Forms;
 using TempLite.Services;
+using System.Threading;
 
 namespace TempLite
 {
@@ -12,6 +12,9 @@ namespace TempLite
         private CommunicationServices _communicationService;
         private SerialPort _serialPort;
         private Reader _reader;
+        private string portname = string.Empty;
+
+
 
         public TempLite()
         {
@@ -21,19 +24,33 @@ namespace TempLite
 
         private void TempLite_Shown(object sender, EventArgs e)
         {
+            Thread thread = new Thread(new ThreadStart(FindReader));
+            thread.IsBackground = true;
+            thread.Start();
+        }
+
+        private void FindReader()
+        {
             _serialPort = new SerialPort();
             _reader = new Reader();
-            string portname = string.Empty;
 
             while (portname == string.Empty)
             {
                 portname = _reader.FindReader(_serialPort);
-                System.Threading.Thread.Sleep(500);
+
+                if (portname != string.Empty)
+                {
+                    _reader.SetUpCom(_serialPort);
+                    Thread.CurrentThread.Abort();
+                }
             }
-            _reader.SetUpCom(_serialPort);
-            
-            loggerPanel.Visible = true;
+        }
+
+
+        public static void State()
+        {
             readerPanel.Visible = false;
+            loggerPanel.Visible = true;
         }
 
         private void loggerPanel_VisibleChanged(object sender, EventArgs e)

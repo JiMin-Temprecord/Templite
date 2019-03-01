@@ -1,4 +1,6 @@
-﻿using System.IO.Ports;
+﻿using System;
+using System.IO.Ports;
+using System.Windows.Forms;
 using FTD2XX_NET;
 
 namespace TempLite
@@ -7,7 +9,7 @@ namespace TempLite
     {
         private string portName = string.Empty;
         private uint devID = 0;
-        
+
         public string  FindReader (SerialPort serialPort)
         {
             FindFTDI();
@@ -18,7 +20,7 @@ namespace TempLite
         {
 
             serial.DiscardNull = false;
-            serial.PortName = portName;
+            serial.PortName = PortName;
             serial.BaudRate = 19200;
             serial.Parity = Parity.None;
             serial.DataBits = 8;
@@ -51,6 +53,8 @@ namespace TempLite
                             ft.GetCOMPort(out portName);
                             ft.GetDeviceID(ref devID);
                             ft.Close();
+
+                            PortName = portName;
                         }
                     }
                     catch
@@ -62,6 +66,6 @@ namespace TempLite
             catch { }
         }
 
-        public string PortName { get { return portName; } set { portName = value; } }
+        public string PortName { get { return portName; } set{ portName = value; TempLite.State(); }}
     }
 }

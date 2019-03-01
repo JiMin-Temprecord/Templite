@@ -56,7 +56,34 @@ namespace TempLite
         double[] withinLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] belowLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] aboveLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        
+
+        public HexfileDecoder(CommunicationServices communicationServies, PDFvariables pdfVariables)
+        {
+            serialnumber = communicationServies.serialnumber;
+            jsonfile = communicationServies.jsonfile;
+            numberChannel = Convert.ToInt32(readJson("SENSOR,SensorNumber"), 16);
+            Fahrenheit = Convert.ToBoolean(readJson("USER_SETTINGS,Fahrenheit"));
+            UTCreferenceTime = Convert.ToInt32(readJson("UTCReferenceTime"), 16);
+            totalRTCticks = Convert.ToInt32(readJson("HEADER,TotalRTCTicks"), 16);
+            readJson("HEADER,ManufactureDate");
+            totalSamplingEvents = Convert.ToInt32(readJson("HEADER,TotalSamplingEvents"), 16);
+            totalUses = Convert.ToInt32(readJson("HEADER,TotalUses"), 16);
+            loopOverwrite = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
+            startDelay = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
+            samplePeriod = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
+            secondsTimer = Convert.ToInt32(readJson("SecondsTimer"), 16);
+            ticksSinceStart = Convert.ToInt32(readJson("DATA_INFO,TicksSinceArousal"), 16);
+            ticksAtLastSample = Convert.ToInt32(readJson("DATA_INFO,TicksAtLastSample"), 16);
+            recordedSamples = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
+            lowestTemp = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
+            Resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio")) / 100;
+            readJson("SENSOR,Decode_MonT_Data");
+            upperLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
+            lowerLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
+
+            AssignPDFValue(pdfVariables);
+        }
+
         private void AssignPDFValue (PDFvariables pdfVariables)
         {
             pdfVariables.recordedSample = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
@@ -109,33 +136,82 @@ namespace TempLite
             pdfVariables.lastSample = UNIXtoUTC(timeLastSample);
         }
 
-        public HexfileDecoder(CommunicationServices communicationServies, PDFvariables pdfVariables)
+        private byte[] ReadHex(string[] currentinfo)
         {
-            serialnumber = communicationServies.serialnumber;
-            jsonfile = communicationServies.jsonfile;
-            numberChannel = Convert.ToInt32(readJson("SENSOR,SensorNumber"), 16);
-            Fahrenheit = Convert.ToBoolean(readJson("USER_SETTINGS,Fahrenheit"));
-            UTCreferenceTime = Convert.ToInt32(readJson("UTCReferenceTime"), 16);
-            totalRTCticks = Convert.ToInt32(readJson("HEADER,TotalRTCTicks"), 16);
-            readJson("HEADER,ManufactureDate");
-            totalSamplingEvents = Convert.ToInt32(readJson("HEADER,TotalSamplingEvents"), 16);
-            totalUses = Convert.ToInt32(readJson("HEADER,TotalUses"), 16);
-            loopOverwrite = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
-            startDelay = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
-            samplePeriod = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
-            secondsTimer = Convert.ToInt32(readJson("SecondsTimer"), 16);
-            ticksSinceStart = Convert.ToInt32(readJson("DATA_INFO,TicksSinceArousal"), 16);
-            ticksAtLastSample = Convert.ToInt32(readJson("DATA_INFO,TicksAtLastSample"), 16);
-            recordedSamples = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
-            lowestTemp = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
-            Resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio")) / 100;
-            readJson("SENSOR,Decode_MonT_Data");
-            upperLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
-            lowerLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
+            byte[] bytes = { };
+            string addtoread = "";
 
-            AssignPDFValue(pdfVariables);
+            try
+            {
+                using (StreamReader sr = new StreamReader(serialnumber + ".hex"))
+                {
+                    string line;
+                    int diff = 0;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        string address = line.Substring(0, 6);
+                        string data = line.Substring(7, line.Length - 7);
+                        string temp = "";
+
+                        if (int.Parse(currentinfo[0], NumberStyles.HexNumber) >= int.Parse(address, NumberStyles.HexNumber))
+                            addtoread = address;
+
+                        if (addtoread == address)
+                        {
+                            diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
+
+                            if (diff >= 0 && diff < 64) // reader can only send 64bytes at a time
+                            {
+                                int infolength = Convert.ToInt32(currentinfo[1]);
+                                if (infolength > 64)
+                                {
+                                    int readinfo = 64 - diff;
+                                    while (infolength > 0)
+                                    {
+                                        temp += data.Substring(diff * 2, readinfo * 2);
+                                        line = sr.ReadLine();
+                                        data = line.Substring(7, line.Length - 7);
+                                        infolength = infolength - readinfo;
+
+                                        if (infolength > 64)
+                                        {
+                                            diff = 0;
+                                            readinfo = 64;
+                                        }
+                                        else
+                                        {
+                                            readinfo = infolength;
+                                        }
+                                    }
+                                    int totallength = temp.Length;
+                                    bytes = new byte[totallength / 2];
+                                    for (int i = 0; i < totallength; i += 2)
+                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                }
+                                else
+                                {
+                                    temp = data.Substring(diff * 2, infolength * 2);
+                                    int totallength = temp.Length;
+                                    bytes = new byte[totallength / 2];
+                                    for (int i = 0; i < totallength; i += 2)
+                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                }
+                                return bytes;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // Let the user know what went wrong.
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+            return bytes;
         }
-        
+
+        #region Reading Json File
         private string readJson(string info)
         {
             var jsonObject = new JObject();
@@ -152,7 +228,7 @@ namespace TempLite
                 Console.WriteLine(e.Message);
             }
 
-            return DecodeHex(decodeInfo);
+            return CallDecodeFunctions(decodeInfo);
         }
 
         private JObject GetJsonObject()
@@ -173,9 +249,10 @@ namespace TempLite
             return new string[] { add, len, code, hide };
 
         }
+        #endregion
 
-        #region DecodeHex
-        public string DecodeHex(string[] stringArrayInfo)
+        #region Decoding Hex Functions 
+        private string CallDecodeFunctions(string[] stringArrayInfo)
         {
             bool bitbool = false;
             var decodeByte = ReadHex(stringArrayInfo);
@@ -288,7 +365,6 @@ namespace TempLite
 
             return string.Empty;
         }
-        #endregion
 
         private string _1ByteToDecimal(string[] stringArrayInfo, byte[] decodeByte)
         {
@@ -523,7 +599,7 @@ namespace TempLite
             return VALUE;
         }
 
-        public String UNIXtoUTC(long now)
+        private string UNIXtoUTC(long now)
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);
@@ -587,85 +663,7 @@ namespace TempLite
             Mean[currentChannel] /= recordedSamples;
             MKT[currentChannel] = (Delta_H / R) / (-Math.Log(MKT[currentChannel] / recordedSamples));
         }
-
-        #region ReadHex
-        public byte[] ReadHex(string[] currentinfo)
-        {
-            byte[] bytes = { };
-            string addtoread = "";
-
-            try
-            {
-                //currentinfo = [add, len, code, hide];
-                using (StreamReader sr = new StreamReader(serialnumber + ".hex"))
-                {
-                    string line;
-                    int diff = 0;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        string address = line.Substring(0, 6);
-                        string data = line.Substring(7, line.Length - 7);
-                        string temp = "";
-
-                        if (int.Parse(currentinfo[0], NumberStyles.HexNumber) >= int.Parse(address, NumberStyles.HexNumber))
-                            addtoread = address;
-
-                        if (addtoread == address)
-                        {
-                            diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
-
-                            if (diff >= 0 && diff < 64) // reader can only send 64bytes at a time
-                            {
-                                int infolength = Convert.ToInt32(currentinfo[1]);
-                                if (infolength > 64)
-                                {
-                                    int readinfo = 64 - diff;
-                                    while (infolength > 0)
-                                    {
-                                        temp += data.Substring(diff * 2, readinfo * 2);
-                                        line = sr.ReadLine();
-                                        data = line.Substring(7, line.Length - 7);
-                                        infolength = infolength - readinfo;
-
-                                        if (infolength > 64)
-                                        {
-                                            diff = 0;
-                                            readinfo = 64;
-                                        }
-                                        else
-                                        {
-                                            readinfo = infolength;
-                                        }
-                                    }
-
-                                    int totallength = temp.Length;
-                                    bytes = new byte[totallength / 2];
-                                    for (int i = 0; i < totallength; i += 2)
-                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                }
-                                else
-                                {
-                                    temp = data.Substring(diff * 2, infolength * 2);
-                                    int totallength = temp.Length;
-                                    bytes = new byte[totallength / 2];
-                                    for (int i = 0; i < totallength; i += 2)
-                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                }
-
-                                return bytes;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                // Let the user know what went wrong.
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
-            }
-            return bytes;
-        }
         #endregion
+        
     }
 }
