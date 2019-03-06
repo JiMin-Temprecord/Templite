@@ -1,20 +1,20 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Globalization;
-using Newtonsoft.Json.Linq;
+using System.IO;
+using System.Text;
 using TempLite.Services;
-using System.Collections;
 
 namespace TempLite
 {
     public class HexfileDecoder
     {
-        string serialnumber;
-        string jsonfile;
+        string serialNumber;
+        string jsonFile;
+        string loggerState;
+        string batteryPercentage;
+        string timeAtFirstSameple;
+        string userData;
 
         bool loopOverwrite = false;
         bool Fahrenheit = false;
@@ -57,83 +57,100 @@ namespace TempLite
         double[] belowLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] aboveLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-        public HexfileDecoder(CommunicationServices communicationServies, PDFvariables pdfVariables)
+        public HexfileDecoder(CommunicationServices communicationServies)
         {
-            serialnumber = communicationServies.serialnumber;
-            jsonfile = communicationServies.jsonfile;
-            numberChannel = Convert.ToInt32(readJson("SENSOR,SensorNumber"), 16);
-            Fahrenheit = Convert.ToBoolean(readJson("USER_SETTINGS,Fahrenheit"));
-            UTCreferenceTime = Convert.ToInt32(readJson("UTCReferenceTime"), 16);
-            totalRTCticks = Convert.ToInt32(readJson("HEADER,TotalRTCTicks"), 16);
-            readJson("HEADER,ManufactureDate");
-            totalSamplingEvents = Convert.ToInt32(readJson("HEADER,TotalSamplingEvents"), 16);
-            totalUses = Convert.ToInt32(readJson("HEADER,TotalUses"), 16);
-            loopOverwrite = Convert.ToBoolean(readJson("DATA_INFO,Overwritten"));
-            startDelay = Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"), 16);
-            samplePeriod = Convert.ToInt32(readJson("USER_SETTINGS,SamplingPeriod"), 16);
-            secondsTimer = Convert.ToInt32(readJson("SecondsTimer"), 16);
-            ticksSinceStart = Convert.ToInt32(readJson("DATA_INFO,TicksSinceArousal"), 16);
-            ticksAtLastSample = Convert.ToInt32(readJson("DATA_INFO,TicksAtLastSample"), 16);
-            recordedSamples = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
-            lowestTemp = Convert.ToDouble(readJson("USER_SETTINGS,LowestTemp"));
-            Resolution = Convert.ToDouble(readJson("USER_SETTINGS,ResolutionRatio")) / 100;
-            readJson("SENSOR,Decode_MonT_Data");
-            upperLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,UpperLimit"));
-            lowerLimit[0] = Convert.ToDouble(readJson("CHANNEL_INFO,LowerLimit"));
-
-            AssignPDFValue(pdfVariables);
+            serialNumber = communicationServies.serialnumber;
+            jsonFile = communicationServies.jsonfile;
+            var jsonObject = GetJsonObject();
+            numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject,"SENSOR,SensorNumber"), 16);
+            userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
+            loggerState = ReadFromJObject(jsonObject, "HEADER,State");
+            batteryPercentage = ReadFromJObject(jsonObject, "BATTERY_INFO,Battery") + "%";
+            Fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, "USER_SETTINGS,Fahrenheit"));
+            UTCreferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, "UTCReferenceTime"), 16);
+            totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalRTCTicks"), 16);
+            manufactureDate = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,ManufactureDate"));
+            totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalSamplingEvents"), 16);
+            totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalUses"), 16);
+            loopOverwrite = Convert.ToBoolean(ReadFromJObject(jsonObject, "DATA_INFO,Overwritten"));
+            startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,StartDelay"), 16);
+            samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,SamplingPeriod"), 16);
+            secondsTimer = Convert.ToInt32(ReadFromJObject(jsonObject, "SecondsTimer"), 16);
+            ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
+            timeAtFirstSameple = ReadFromJObject(jsonObject, "DATA_INFO,Time_FirstSample_MonT");
+            ticksAtLastSample = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksAtLastSample"), 16);
+            recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"));
+            lowestTemp = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,LowestTemp"));
+            Resolution = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,ResolutionRatio")) / 100;
+            ReadFromJObject(jsonObject, "SENSOR,Decode_MonT_Data");
+            upperLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit"));
+            lowerLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit"));
         }
 
-        private void AssignPDFValue (PDFvariables pdfVariables)
+        public PDFvariables AssignPDFValue ()
         {
-            pdfVariables.recordedSample = Convert.ToInt32(readJson("DATA_INFO,SamplesNumber"));
-            pdfVariables.serialNumber = readJson("HEADER,SerialNumber");
-            pdfVariables.loggerState = readJson("HEADER,State");
-            pdfVariables.batteryPercentage = readJson("BATTERY_INFO,Battery") + "%";
-            pdfVariables.sameplePeriod = HHMMSS(samplePeriod);
-            pdfVariables.startDelay = HHMMSS(Convert.ToInt32(readJson("USER_SETTINGS,StartDelay"),16));
-            pdfVariables.firstSample = readJson("DATA_INFO,Time_FirstSample_MonT");
-            pdfVariables.tagsPlaced = "0";
-            pdfVariables.userData = readJson("USER_DATA,UserData");
-            pdfVariables.Data = Data;
+            var pdfVariables = new PDFvariables();
 
-            if (Fahrenheit)
-                pdfVariables.tempUnit = " °F";
+            pdfVariables.RecordedSamples = recordedSamples;
+            pdfVariables.SerialNumber = serialNumber;
+            pdfVariables.LoggerState = loggerState;
+            pdfVariables.BatteryPercentage = batteryPercentage;
+            pdfVariables.SameplePeriod = HHMMSS(samplePeriod);
+            pdfVariables.StartDelay = HHMMSS(startDelay);
+            pdfVariables.FirstSample = timeAtFirstSameple;
+            pdfVariables.TagsPlaced = "0";
+            pdfVariables.UserData = userData;
 
-            else
-                pdfVariables.tempUnit = " °C";
-
-            for (int i = 0; i < numberChannel; i++)
-            {
-                pdfVariables.enabledChannels[i] = true;
-                pdfVariables.presetLowerLimit[i] = lowerLimit[i];
-                pdfVariables.presetUpperLimit[i] = upperLimit[i];
-                pdfVariables.Mean[i] = Mean[i];
-                pdfVariables.MKT_C[i] = MKT[i] - Kelvin_Dec;
-                pdfVariables.Max[i] = sensorMax[i];
-                pdfVariables.Min[i] = sensorMin[i];
-                pdfVariables.withinLimits[i] = withinLimit[i];
-                pdfVariables.outsideLimits[i] = aboveLimit[i] + belowLimit[i];
-                pdfVariables.aboveLimits[i] = aboveLimit[i];
-                pdfVariables.belowLimits[i] = belowLimit[i];
-                pdfVariables.timeWithinLimits[i] = HHMMSS(withinLimit[i] * samplePeriod);
-                pdfVariables.timeOutLimits[i] = HHMMSS((aboveLimit[i] + belowLimit[i]) * samplePeriod);
-                pdfVariables.timeAboveLimits[i] = HHMMSS(aboveLimit[i] * samplePeriod);
-                pdfVariables.timeBelowLimits[i] = HHMMSS(belowLimit[i] * samplePeriod);
-                
-                if (pdfVariables.aboveLimits[i] > 0)
-                    pdfVariables.breachedAbove[i] = " (breached)";
-
-                if (pdfVariables.belowLimits[i] > 0)
-                    pdfVariables.breachedBelow[i] = " (breached)";
-            }
-            for (int i = 0; i < pdfVariables.recordedSample; i++)
+            for (int i = 0; i < pdfVariables.RecordedSamples; i++)
             {
                 pdfVariables.Time.Add(timeFirstSample);
                 timeFirstSample = timeFirstSample + samplePeriod;
             }
-            long timeLastSample = Convert.ToInt32(pdfVariables.Time[(pdfVariables.Time.Count - 1)]);
-            pdfVariables.lastSample = UNIXtoUTC(timeLastSample);
+
+            var timeLastSample = Convert.ToInt32(pdfVariables.Time[(pdfVariables.Time.Count - 1)]);
+            pdfVariables.LastSample = UNIXtoUTC(timeLastSample);
+
+            if (Fahrenheit)
+                pdfVariables.TempUnit = " °F";
+
+            else
+                pdfVariables.TempUnit = " °C";
+            
+            AssignChannelValues(pdfVariables.ChannelOne, 0);
+
+            if (numberChannel > 1)
+            {
+                pdfVariables.IsChannelTwoEnabled = true;
+                AssignChannelValues(pdfVariables.ChannelTwo, 1);
+            }
+
+            return pdfVariables;
+        }
+
+        private void AssignChannelValues (ChannelConfig Channel, int i)
+        {
+            Channel.PresetLowerLimit = lowerLimit[i];
+            Channel.PresetUpperLimit = upperLimit[i];
+            Channel.Mean = Mean[i];
+            Channel.MKT_C = MKT[i] - Kelvin_Dec;
+            Channel.Max = sensorMax[i];
+            Channel.Min = sensorMin[i];
+            Channel.WithinLimits = withinLimit[i];
+            Channel.OutsideLimits = aboveLimit[i] + belowLimit[i];
+            Channel.AboveLimits = aboveLimit[i];
+            Channel.BelowLimits = belowLimit[i];
+            Channel.TimeWithinLimits = HHMMSS(withinLimit[i] * samplePeriod);
+            Channel.TimeOutLimits = HHMMSS((aboveLimit[i] + belowLimit[i]) * samplePeriod);
+            Channel.TimeAboveLimits = HHMMSS(aboveLimit[i] * samplePeriod);
+            Channel.TimeBelowLimits = HHMMSS(belowLimit[i] * samplePeriod);
+
+            if (Channel.AboveLimits > 0)
+                Channel.BreachedAbove = " (breached)";
+
+            if (Channel.BelowLimits > 0)
+                Channel.BreachedBelow = " (breached)";
+
+            Channel.Data = Data;
         }
 
         private byte[] ReadHex(string[] currentinfo)
@@ -143,7 +160,7 @@ namespace TempLite
 
             try
             {
-                using (StreamReader sr = new StreamReader(serialnumber + ".hex"))
+                using (StreamReader sr = new StreamReader(serialNumber + ".hex"))
                 {
                     string line;
                     int diff = 0;
@@ -212,28 +229,15 @@ namespace TempLite
         }
 
         #region Reading Json File
-        private string readJson(string info)
+        private string ReadFromJObject(JObject jsonObject, string info)
         {
-            var jsonObject = new JObject();
-            var decodeInfo = new string[4];
-
-            try
-            {
-                jsonObject = GetJsonObject();
-                decodeInfo = JsontoString(jsonObject, info);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
-            }
-
+            var decodeInfo = JsontoString(jsonObject, info);
             return CallDecodeFunctions(decodeInfo);
         }
 
         private JObject GetJsonObject()
         {
-            using (var sr = new StreamReader(jsonfile))
+            using (var sr = new StreamReader(jsonFile))
             {
                 return JObject.Parse(sr.ReadToEnd());
             }
@@ -358,9 +362,6 @@ namespace TempLite
 
                 case "Time_FirstSample_MonT":
                     return TimeFirstSampleMonT(decodeByte);
-
-                case "Time_LastSample_MonT":
-                    return TimeLastSampleMonT(decodeByte);
             }
 
             return string.Empty;
@@ -537,13 +538,6 @@ namespace TempLite
             }
         }
 
-        private string TimeLastSampleMonT(byte[] decodeByte)
-        {
-            var UTCreference = long.Parse(readJson("UTCReferenceTime"), NumberStyles.HexNumber);
-            String StoppedTime = UNIXtoUTC((UTCreference) - (4294967040L - secondsTimer));
-            return StoppedTime;
-        }
-
         public string HHMMSS(double mseconds)
         {
             int hours = (int)(mseconds / 3600);
@@ -605,6 +599,24 @@ namespace TempLite
             var date = epoch.AddMilliseconds(now * 1000);
             date = date.ToUniversalTime();
             var simpledate = date.ToString("yyyy-MM-dd HH:mm:sss UTC");
+            return simpledate;
+        }
+
+        public string UNIXtoUTCDate (long now)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var date = epoch.AddMilliseconds(now * 1000);
+            date = date.ToUniversalTime();
+            var simpledate = date.ToString("yyyy-MM-dd");
+            return simpledate;
+        }
+
+        public string UNIXtoUTCTime(long now)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var date = epoch.AddMilliseconds(now * 1000);
+            date = date.ToUniversalTime();
+            var simpledate = date.ToString("HH:mm:sss UTC");
             return simpledate;
         }
 

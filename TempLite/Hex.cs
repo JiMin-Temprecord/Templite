@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TempLite
+﻿namespace TempLite
 {
     class Hex
     {
@@ -14,9 +8,9 @@ namespace TempLite
             Reply = reply;
         }
 
-        private string Address { get; set; }
+        private string Address { get; }
 
-        private string Reply { get; set; }
+        private string Reply { get; }
 
         public override string ToString()
         {

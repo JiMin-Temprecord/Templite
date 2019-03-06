@@ -1,8 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO.Ports;
 using System.Windows.Forms;
 using TempLite.Services;
-using System.Threading;
 
 namespace TempLite
 {
@@ -12,7 +12,7 @@ namespace TempLite
         private CommunicationServices _communicationService;
         private SerialPort _serialPort;
         private Reader _reader;
-        private string portname = string.Empty;
+        private bool findReader = false;
 
 
 
@@ -20,34 +20,51 @@ namespace TempLite
         {
             InitializeComponent();
             _communicationService = new CommunicationServices();
+            readerBackgroundWorker.DoWork += new DoWorkEventHandler(readerBackgroundWorker_DoWork);
+            readerBackgroundWorker.Disposed += new EventHandler(readerBackgroundWorker_Disposed);
+
         }
 
         private void TempLite_Shown(object sender, EventArgs e)
         {
-            Thread thread = new Thread(new ThreadStart(FindReader));
-            thread.IsBackground = true;
-            thread.Start();
-        }
-
-        private void FindReader()
-        {
+            //readerBackgroundWorker.RunWorkerAsync();
             _serialPort = new SerialPort();
             _reader = new Reader();
 
-            while (portname == string.Empty)
+            while (findReader == false)
             {
-                portname = _reader.FindReader(_serialPort);
-
-                if (portname != string.Empty)
+                findReader = _reader.FindFTDI();
+                if (findReader == true)
                 {
                     _reader.SetUpCom(_serialPort);
-                    Thread.CurrentThread.Abort();
+                    readerPanel.Visible = false;
+                    loggerPanel.Visible = true;
+                    //worker.Dispose();
                 }
             }
         }
 
+        private void readerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            //BackgroundWorker worker = sender as BackgroundWorker;
+            
+            _serialPort = new SerialPort();
+            _reader = new Reader();
 
-        public static void State()
+            while (findReader == false)
+            {
+                findReader = _reader.FindFTDI();
+                if (findReader == true)
+                {
+                    _reader.SetUpCom(_serialPort);
+                    readerPanel.Visible = false;
+                    loggerPanel.Visible = true;
+                    //worker.Dispose();
+                }
+            }
+        }
+
+        private void readerBackgroundWorker_Disposed(object sender, EventArgs e)
         {
             readerPanel.Visible = false;
             loggerPanel.Visible = true;
@@ -58,5 +75,6 @@ namespace TempLite
             _communicationService.ReadLogger(_serialPort);
             _pdfGenerator.CreatePDF(_communicationService);
         }
+
     }
 }

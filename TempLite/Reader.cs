@@ -10,12 +10,6 @@ namespace TempLite
         private string portName = string.Empty;
         private uint devID = 0;
 
-        public string  FindReader (SerialPort serialPort)
-        {
-            FindFTDI();
-            return portName;
-        }
-
         public void SetUpCom(SerialPort serial)
         {
 
@@ -31,7 +25,7 @@ namespace TempLite
             serial.WriteTimeout = 100;
         }
 
-        private void FindFTDI()
+        public bool FindFTDI()
         {
             try
             {
@@ -54,7 +48,7 @@ namespace TempLite
                             ft.GetDeviceID(ref devID);
                             ft.Close();
 
-                            PortName = portName;
+                            return true;
                         }
                     }
                     catch
@@ -64,8 +58,10 @@ namespace TempLite
                 }
             }
             catch { }
+
+            return false;
         }
 
-        public string PortName { get { return portName; } set{ portName = value; TempLite.State(); }}
+        public string PortName { get { return portName; } set{ portName = value; }}
     }
 }

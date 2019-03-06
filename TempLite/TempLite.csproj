@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChannelConfig.cs" />
     <Compile Include="PDFvariables.cs" />
     <Compile Include="PDFGenerator.cs" />
     <Compile Include="HexfileDecoder.cs" />

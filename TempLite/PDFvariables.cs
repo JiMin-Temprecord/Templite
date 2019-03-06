@@ -9,57 +9,47 @@ namespace TempLite
 {
     public class PDFvariables
     {
-        public int recordedSample = 0;
+        ArrayList time = new ArrayList();
+        ChannelConfig channelOne;
+        ChannelConfig channelTwo;
 
-        public bool[] enabledChannels = { false, false, false, false, false, false, false, false };
+        public bool[] EnabledChannels { get; set; }
+        public int RecordedSamples { get; set; }
+        public String SerialNumber { get; set; }
+        public String LoggerState { get; set; }
+        public String BatteryPercentage { get; set; }
+        public String SameplePeriod { get; set; }
+        public String StartDelay { get; set; }
+        public String FirstSample { get; set; }
+        public String LastSample { get; set; }
+        public String TagsPlaced { get; set; }
+        public String TempUnit { get; set; }
+        public String UserData { get; set; }
+        public ArrayList Time { get { return time; } set { time = value; } }
 
-        public double[] Data;
-        public double[] presetUpperLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] presetLowerLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] Mean = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] MKT_C = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] Max = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] Min = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] withinLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] outsideLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] aboveLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] belowLimits = { 0, 0, 0, 0, 0, 0, 0, 0 };
-
-        public String[] breachedAbove = { "", "", "", "", "", "", "", "" };
-        public String[] breachedBelow = { "", "", "", "", "", "", "", "" };
-        public String[] timeWithinLimits = { "", "", "", "", "", "", "", "" };
-        public String[] timeOutLimits = { "", "", "", "", "", "", "", "" };
-        public String[] timeAboveLimits = { "", "", "", "", "", "", "", "" };
-        public String[] timeBelowLimits = { "", "", "", "", "", "", "", "" };
-        public String serialNumber = "";
-        public String loggerState = "";
-        public String batteryPercentage = "";
-        public String sameplePeriod = "";
-        public String startDelay = "";
-        public String firstSample = "";
-        public String lastSample = "";
-        public String tagsPlaced = "";
-        public String tempUnit = "";
-        public String userData = "";
-        
-        public ArrayList Time = new ArrayList();
-
-        public String UNIXtoUTCDate(long now)
+        public ChannelConfig ChannelOne
         {
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            string simpledate = date.ToString("yyyy-MM-dd");
-            return simpledate;
+            get
+            {
+                if (channelOne == null)
+                {
+                    channelOne = new ChannelConfig();
+                }
+                return channelOne;
+            }
         }
 
-        public String UNIXtoUTCTime(long now)
+        public ChannelConfig ChannelTwo
         {
-            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            string simpledate = date.ToString("HH:mm:sss UTC");
-            return simpledate;
+            get
+            {
+                if (channelTwo == null)
+                {
+                    channelTwo = new ChannelConfig();
+                }
+                return channelTwo;
+            }
         }
+        public Boolean IsChannelTwoEnabled { get; set; }
     }
 }
