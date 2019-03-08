@@ -1,7 +1,5 @@
-﻿using System;
+﻿using FTD2XX_NET;
 using System.IO.Ports;
-using System.Windows.Forms;
-using FTD2XX_NET;
 
 namespace TempLite
 {

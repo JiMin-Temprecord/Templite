@@ -27,39 +27,49 @@ namespace TempLite.Services
         int memnumber = 0;
         int memoryadd;
         int length;
-        
+
         byte[] recievemsg = new byte[80];
         byte memoryaddMSB;
         byte memoryaddLSB;
         byte lengthMSB;
         byte lengthLSB;
 
-        /// <summary>
-        /// 
-        /// </summary>   
-        public void ReadLogger(SerialPort serialPort)
+        List<Hex> hexes = new List<Hex>();
+        bool findLogger = false;
+        
+        public void ReadLogger(SerialPort serialPort, Command command)
         {
-            var hexes = new List<Hex>();
             var sendMessage = new byte[11];
 
-            serialPort.Open();
+            if (serialPort.IsOpen == false)
+                serialPort.Open();
 
-            if (serialPort.IsOpen == true)
+            switch (command)
             {
-                WriteBytes(Command.WakeUp, serialPort, sendMessage);
-                ReadBytes(Command.WakeUp, serialPort, hexes);
+                case Command.WakeUp:
+                    while (FindLogger == false)
+                    {
+                        WriteBytes(command, serialPort, sendMessage);
+                        ReadBytes(command, serialPort, hexes);
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                    break;
 
-                WriteBytes(Command.SetRead, serialPort, sendMessage);
-                ReadBytes(Command.SetRead, serialPort, hexes);
+                case Command.SetRead:
+                    WriteBytes(Command.SetRead, serialPort, sendMessage);
+                    ReadBytes(Command.SetRead, serialPort, hexes);
+                    ReadLogger(serialPort, Command.ReadLogger);
+                    break;
 
-                while (memnumber < maxmemory)
-                {
-                    WriteBytes(Command.ReadLogger, serialPort, sendMessage);
-                    ReadBytes(Command.ReadLogger, serialPort, hexes);
-                    GetNextAddress();
-                }
+                case Command.ReadLogger:
+                    while (memnumber < maxmemory)
+                    {
+                        WriteBytes(Command.ReadLogger, serialPort, sendMessage);
+                        ReadBytes(Command.ReadLogger, serialPort, hexes);
+                        GetNextAddress();
+                    }
+                    break;
             }
-
             var sw = new StreamWriter(serialnumber + ".hex");
             foreach (var hex in hexes)
             {
@@ -93,6 +103,17 @@ namespace TempLite.Services
             recievemsg[count] = 0x0d;
             recievemsg = RemoveEscChar(recievemsg);
             msg.Append("0D");
+
+            if(recievemsg.Length < 2)
+            {
+                FindLogger = false;
+                return;
+            }
+            else
+            {
+                FindLogger = true;
+            }
+
             switch (command)
             {
                 case Command.WakeUp:
@@ -468,6 +489,18 @@ namespace TempLite.Services
 
             return serialnumber;
         }
-       
+
+        public bool FindLogger
+        {
+            get
+            {
+                return findLogger;
+            }
+            set
+            {
+                findLogger = value;
+            }
+        }
+
     }
 }

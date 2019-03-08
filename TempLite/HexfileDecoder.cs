@@ -56,7 +56,7 @@ namespace TempLite
         double[] withinLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] belowLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] aboveLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-
+        
         public HexfileDecoder(CommunicationServices communicationServies)
         {
             serialNumber = communicationServies.serialnumber;
@@ -160,7 +160,7 @@ namespace TempLite
 
             try
             {
-                using (StreamReader sr = new StreamReader(serialNumber + ".hex"))
+                using (var sr = new StreamReader(serialNumber + ".hex"))
                 {
                     string line;
                     int diff = 0;
@@ -170,7 +170,7 @@ namespace TempLite
                         string data = line.Substring(7, line.Length - 7);
                         string temp = "";
 
-                        if (int.Parse(currentinfo[0], NumberStyles.HexNumber) >= int.Parse(address, NumberStyles.HexNumber))
+                        if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
                             addtoread = address;
 
                         if (addtoread == address)
@@ -204,6 +204,7 @@ namespace TempLite
                                     bytes = new byte[totallength / 2];
                                     for (int i = 0; i < totallength; i += 2)
                                         bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                    return bytes;
                                 }
                                 else
                                 {
@@ -212,8 +213,8 @@ namespace TempLite
                                     bytes = new byte[totallength / 2];
                                     for (int i = 0; i < totallength; i += 2)
                                         bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                    return bytes;
                                 }
-                                return bytes;
                             }
                         }
                     }
@@ -352,7 +353,7 @@ namespace TempLite
                     return DJNZ4ByteType_2(decodeByte);
 
                 case "*Logger_State":
-                    return Logger_State(decodeByte);
+                    return LoggerState(decodeByte);
 
                 case "SampleNumber_logged_MonT":
                     return SampleNumberLoggedMonT(decodeByte);
@@ -567,7 +568,7 @@ namespace TempLite
             return sb.ToString();
         }
 
-        private string Logger_State(byte[] decodebyte)
+        private string LoggerState(byte[] decodebyte)
         {
             String VALUE = "UNDEFINED";
 

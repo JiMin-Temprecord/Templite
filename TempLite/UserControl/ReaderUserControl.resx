@@ -117,17 +117,139 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="readerLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="readerLabel.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Myriad Pro, 21.75pt, style=Bold</value>
+  </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="email" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\email.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="readerLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
-  <data name="loggers_l" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\loggers_l.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="readerLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>100, 625</value>
   </data>
-  <data name="reader_l" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\reader_l.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="readerLabel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 0, 4, 0</value>
   </data>
-  <data name="emailSuccess" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\emailSuccess.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="readerLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>217, 36</value>
+  </data>
+  <data name="readerLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="readerLabel.Text" xml:space="preserve">
+    <value>Connect Reader</value>
+  </data>
+  <data name="&gt;&gt;readerLabel.Name" xml:space="preserve">
+    <value>readerLabel</value>
+  </data>
+  <data name="&gt;&gt;readerLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;readerLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;readerLabel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="readerTextbox.Enabled" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="readerTextbox.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Myriad Pro, 12pt</value>
+  </data>
+  <data name="readerTextbox.Location" type="System.Drawing.Point, System.Drawing">
+    <value>100, 675</value>
+  </data>
+  <data name="readerTextbox.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 5, 4, 5</value>
+  </data>
+  <data name="readerTextbox.Size" type="System.Drawing.Size, System.Drawing">
+    <value>486, 20</value>
+  </data>
+  <data name="readerTextbox.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <data name="readerTextbox.Text" xml:space="preserve">
+    <value>Use a suitable adaptor to connect a Temprecord reader to your device.</value>
+  </data>
+  <data name="&gt;&gt;readerTextbox.Name" xml:space="preserve">
+    <value>readerTextbox</value>
+  </data>
+  <data name="&gt;&gt;readerTextbox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;readerTextbox.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;readerTextbox.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="readerImage.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="readerImage.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="readerImage.Size" type="System.Drawing.Size, System.Drawing">
+    <value>725, 600</value>
+  </data>
+  <data name="readerImage.SizeMode" type="System.Windows.Forms.PictureBoxSizeMode, System.Windows.Forms">
+    <value>Zoom</value>
+  </data>
+  <data name="readerImage.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;readerImage.Name" xml:space="preserve">
+    <value>readerImage</value>
+  </data>
+  <data name="&gt;&gt;readerImage.Type" xml:space="preserve">
+    <value>System.Windows.Forms.PictureBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;readerImage.Parent" xml:space="preserve">
+    <value>readerPanel</value>
+  </data>
+  <data name="&gt;&gt;readerImage.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="readerPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="readerPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>725, 600</value>
+  </data>
+  <data name="readerPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;readerPanel.Name" xml:space="preserve">
+    <value>readerPanel</value>
+  </data>
+  <data name="&gt;&gt;readerPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;readerPanel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;readerPanel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
+    <value>6, 13</value>
+  </data>
+  <data name="$this.Size" type="System.Drawing.Size, System.Drawing">
+    <value>725, 775</value>
+  </data>
+  <data name="&gt;&gt;$this.Name" xml:space="preserve">
+    <value>ReaderUserControl</value>
+  </data>
+  <data name="&gt;&gt;$this.Type" xml:space="preserve">
+    <value>System.Windows.Forms.UserControl, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

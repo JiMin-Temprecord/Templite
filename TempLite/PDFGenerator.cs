@@ -90,9 +90,9 @@ namespace TempLite
             draw.DrawRectangle(pen, break1);
             lineCounter += PDFcoordinates.line_inc * 0.75;
 
-           /* if (pdfVariables.enabledChannels[0]) draw.DrawString("#1 - Temperature", font, XBrushes.Black, PDFcoordinates.second_column - 25, lineCounter);
-            if (pdfVariables.enabledChannels[1]) draw.DrawString("#2 - Humidity", font, XBrushes.Black, PDFcoordinates.third_column - 25, lineCounter);
-            lineCounter += PDFcoordinates.line_inc;*/
+            draw.DrawString("#1 - Temperature", font, XBrushes.Black, PDFcoordinates.second_column - 25, lineCounter);
+            if (channelTwoEnabled) draw.DrawString("#2 - Humidity", font, XBrushes.Black, PDFcoordinates.third_column - 25, lineCounter);
+            lineCounter += PDFcoordinates.line_inc;
 
             DrawChannelSection("Preset Upper Limit :", c => c.PresetUpperLimit.ToString("N2") + pdfVariables.TempUnit); //need to add the breached
             DrawChannelSection("Preset Lower Limit :", c => c.PresetLowerLimit.ToString("N2") + pdfVariables.TempUnit); // need to add the breached
@@ -120,9 +120,9 @@ namespace TempLite
             draw.DrawRectangle(pen, break2);
             lineCounter += PDFcoordinates.line_inc * 0.75;
 
-            /*if (pdfVariables.enabledChannels[0]) draw.DrawString("_ Temperature " + pdfVariables.TempUnit, font, XBrushes.DarkOliveGreen, PDFcoordinates.second_column, lineCounter);
-            if (pdfVariables.enabledChannels[1]) draw.DrawString("_ Humidity  %RH ", font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
-            lineCounter += PDFcoordinates.line_inc;*/
+            draw.DrawString("_ Temperature " + pdfVariables.TempUnit, font, XBrushes.DarkOliveGreen, PDFcoordinates.second_column, lineCounter);
+            if (channelTwoEnabled) draw.DrawString("_ Humidity  %RH ", font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
+            lineCounter += PDFcoordinates.line_inc;
 
             //Draw graph
             DrawGraph(decoder, pdfVariables ,draw, pen, font);
