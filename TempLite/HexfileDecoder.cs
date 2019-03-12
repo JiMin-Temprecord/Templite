@@ -9,8 +9,6 @@ namespace TempLite
 {
     public class HexfileDecoder
     {
-        string serialNumber;
-        string jsonFile;
         string loggerState;
         string batteryPercentage;
         string timeAtFirstSameple;
@@ -56,13 +54,18 @@ namespace TempLite
         double[] withinLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] belowLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] aboveLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        
-        public HexfileDecoder(CommunicationServices communicationServies)
+
+        public HexfileDecoder(LoggerInformation loggerInformation)
         {
-            serialNumber = communicationServies.serialnumber;
-            jsonFile = communicationServies.jsonfile;
+            this.loggerInformation = loggerInformation;
+            this.serialNumber = loggerInformation.SerialNumber;
+            this.jsonFile = loggerInformation.JsonFile;
+        }
+
+        public void ReadIntoJsonFileAndSetupDecoder()
+        {
             var jsonObject = GetJsonObject();
-            numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject,"SENSOR,SensorNumber"), 16);
+            numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
             userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
             loggerState = ReadFromJObject(jsonObject, "HEADER,State");
             batteryPercentage = ReadFromJObject(jsonObject, "BATTERY_INFO,Battery") + "%";
@@ -86,6 +89,10 @@ namespace TempLite
             upperLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit"));
             lowerLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit"));
         }
+
+        readonly LoggerInformation loggerInformation;
+        readonly string serialNumber;
+        readonly string jsonFile;
 
         public PDFvariables AssignPDFValue ()
         {

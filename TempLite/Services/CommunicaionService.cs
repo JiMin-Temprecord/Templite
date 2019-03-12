@@ -8,90 +8,69 @@ namespace TempLite.Services
 {
     public class CommunicationServices
     {
-        public bool reading = false;
-        public ushort crc16 = 0xFFFF;
-
-        public string serialnumber = "";
-        public string loggername = "";
-        public string jsonfile = "";
-
-        int[] memstart;
-        int[] memmax;
-        int byteData = 0;
-        int loggertype = 0;
+        int length = 0;
         int maxlenreading = 0x40;
-        int maxmemory = 0;
-        int memoryheaderpointer;
-        int requestmemorystartpointer;
-        int requestmemorymaxpointer;
-        int memnumber = 0;
-        int memoryadd;
-        int length;
+        byte[] recievemsg;
 
-        byte[] recievemsg = new byte[80];
-        byte memoryaddMSB;
-        byte memoryaddLSB;
-        byte lengthMSB;
-        byte lengthLSB;
-
-        List<Hex> hexes = new List<Hex>();
-        bool findLogger = false;
-        
-        public void ReadLogger(SerialPort serialPort, Command command)
+        public void FindLogger(SerialPort serialPort)
         {
-            var sendMessage = new byte[11];
+            var msg = new StringBuilder();
 
             if (serialPort.IsOpen == false)
                 serialPort.Open();
 
-            switch (command)
+            while (msg.Length < 3)
             {
-                case Command.WakeUp:
-                    while (FindLogger == false)
-                    {
-                        WriteBytes(command, serialPort, sendMessage);
-                        ReadBytes(command, serialPort, hexes);
-                        System.Threading.Thread.Sleep(1000);
-                    }
-                    break;
-
-                case Command.SetRead:
-                    WriteBytes(Command.SetRead, serialPort, sendMessage);
-                    ReadBytes(Command.SetRead, serialPort, hexes);
-                    ReadLogger(serialPort, Command.ReadLogger);
-                    break;
-
-                case Command.ReadLogger:
-                    while (memnumber < maxmemory)
-                    {
-                        WriteBytes(Command.ReadLogger, serialPort, sendMessage);
-                        ReadBytes(Command.ReadLogger, serialPort, hexes);
-                        GetNextAddress();
-                    }
-                    break;
+                WriteBytes(new WakeUpByteWritter(), serialPort);
+                msg = ReadBytes(serialPort);
+                System.Threading.Thread.Sleep(1000);
             }
-            var sw = new StreamWriter(serialnumber + ".hex");
-            foreach (var hex in hexes)
+        }
+        public void GenerateHexFile(SerialPort serialPort, LoggerInformation loggerInformation)
+        {
+            var Hexes = new List<Hex>();
+            Hexes = ReadLogger(serialPort, loggerInformation, Hexes);
+
+            var sw = new StreamWriter(loggerInformation.SerialNumber + ".hex");
+            foreach (var hex in Hexes)
             {
                 sw.WriteLine(hex.ToString());
             }
             sw.Close();
-            serialPort.Close();
         }
+        List<Hex> ReadLogger(SerialPort serialPort, LoggerInformation loggerInformation ,List<Hex> Hexes)
+        {
+            if (serialPort.IsOpen == false)
+                serialPort.Open();
 
-        private void ReadBytes(Command command, SerialPort serialPort, List<Hex> hexes)
+            WriteBytes(new WakeUpByteWritter(), serialPort);
+            var currentAddress = ReadBytesWakeUp(serialPort, loggerInformation,recievemsg, Hexes);
+
+            WriteBytes(new SetReadByteWritter(loggerInformation.LoggerType), serialPort);
+            ReadBytesSetRead(serialPort, currentAddress, loggerInformation);
+
+            while (currentAddress.MemoryNumber < loggerInformation.MaxMemory)
+            {
+                WriteBytes(new ReadLoggerByteWritter(currentAddress), serialPort);
+                ReadBytesReadLogger(serialPort, currentAddress, Hexes);
+                currentAddress = GetNextAddress(currentAddress, loggerInformation);
+            }
+
+            serialPort.Close();
+            return Hexes;
+
+        }
+        StringBuilder ReadBytes(SerialPort serialPort)
         {
             var msg = new StringBuilder();
             recievemsg = new byte[80];
-            int count = 0;
-
-            length = maxlenreading;
-
+            var count = 0;
+            
             try
             {
-                byteData = serialPort.ReadByte();
+                var byteData = serialPort.ReadByte();
 
-                while (byteData != 13)
+                while (byteData != 0x0d)
                 {
                     recievemsg[count] = (byte)byteData;
                     msg = msg.Append(byteData.ToString("x02"));
@@ -103,228 +82,181 @@ namespace TempLite.Services
             recievemsg[count] = 0x0d;
             recievemsg = RemoveEscChar(recievemsg);
             msg.Append("0D");
-
-            if(recievemsg.Length < 2)
-            {
-                FindLogger = false;
-                return;
-            }
-            else
-            {
-                FindLogger = true;
-            }
-
-            switch (command)
-            {
-                case Command.WakeUp:
-
-                    switch (recievemsg[2])
-                    {
-                        case 3:
-                            loggername = "Mon T";
-                            loggertype = 3;
-                            jsonfile = "MonT.json";
-                            maxmemory = 0x02;                                                 //MON-T
-                            memoryheaderpointer = 19;                                                   //MON-T
-                            memstart = new int[] { 0x0000, 0x0020, 0x0000, 0x0000, 0x0000 };    //MON-T
-                            memmax = new int[] { 0x2000, 0x0100, 0x0000, 0x0000, 0x2000 };    //MON-T
-                            requestmemorystartpointer = 3;
-                            requestmemorymaxpointer = 1;
-                            break;
-
-                        case 6:
-                            loggername = "G4";
-                            loggertype = 6;
-                            jsonfile = "G4.json";
-                            maxmemory = 0x04;                                                 //G4
-                            memoryheaderpointer = 13;                                                   //G4
-                            memstart = new int[] { 0x0000, 0x0020, 0x0000, 0x0000, 0x0000 };    //G4
-                            memmax = new int[] { 0x353C, 0x0100, 0x0000, 0x0000, 0x8000 };    //G4
-                            requestmemorystartpointer = 3;
-                            requestmemorymaxpointer = 1;
-                            break;
-                    }
-
-                    byte[] serial = { (byte)recievemsg[5], (byte)recievemsg[6], (byte)recievemsg[7], (byte)recievemsg[8] };
-                    serialnumber = GetSerialnumber(serial);
-
-                    memoryadd = (recievemsg[memoryheaderpointer + 1] & 0xFF) << 8 | (recievemsg[memoryheaderpointer] & 0xFF);
-                    memoryaddMSB = (byte)recievemsg[memoryheaderpointer + 1];
-                    memoryaddLSB = (byte)recievemsg[memoryheaderpointer];
-
-                    string timenow = "0000000000000000";
-                    long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000;
-                    string hextime = time.ToString("x02");
-                    timenow = timenow.Substring(0, (timenow.Length - hextime.Length)) + hextime;
-                    hexes.Add(new Hex("FF0000",timenow));
-                    hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
-
-                    break;
-
-                case Command.SetRead:
-                    switch (loggertype)
-                    {
-                        //MonT
-                        case 3:
-                            memstart[0] = 0x0000;
-                            memmax[0] = 0x2000;
-
-                            break;
-
-                        //G4
-                        case 6: 
-                            memstart[4] = (recievemsg[requestmemorystartpointer + 1] & 0xFF) << 8 | (recievemsg[requestmemorystartpointer] & 0xFF);
-                            memmax[4] = (recievemsg[requestmemorymaxpointer + 1] & 0xFF) << 8 | (recievemsg[requestmemorymaxpointer] & 0xFF);
-
-                            if (memmax[4] < 80)
-                            {
-                                memmax[4] = 80;
-                            }
-                            break;
-                    }
-                    break;
-
-                case Command.ReadLogger:
-                    if (recievemsg[0] == 0x00)
-                    {
-                        string finalmsg = "";
-                        if (memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02") == "0c4a")
-                        {
-                            finalmsg = msg.ToString(4, msg.Length - 10);
-                            hexes.Add(new Hex(("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")),finalmsg ));
-                        }
-
-                        else
-                        {
-                            finalmsg = msg.ToString(2, msg.Length - 8);
-                            hexes.Add(new Hex(("0" + memnumber + memoryaddMSB.ToString("x02") + memoryaddLSB.ToString("x02")), finalmsg));
-                        }
-                    }
-
-                    break;
-            }
-
-            lengthMSB = (byte)((length >> 8) & 0xFF);
-            lengthLSB = (byte)(length & 0xFF);
+            return msg;
 
         }
-
-        private void WriteBytes(Command command, SerialPort serialPort, byte[] sendMessage)
+        AddressSection ReadBytesWakeUp(SerialPort serialPort, LoggerInformation loggerInformation, byte[] messageReceived, List<Hex> hexes)
         {
+            SetLoggerInformation(messageReceived, loggerInformation);
+            return SetCurrentAddress(serialPort, loggerInformation,hexes);
+        }
+        void SetLoggerInformation(byte[] messageReceived, LoggerInformation loggerInformation)
+        {
+            byte[] serial = { (byte)messageReceived[5], (byte)messageReceived[6], (byte)messageReceived[7], (byte)messageReceived[8] };
+            loggerInformation.SerialNumber = GetSerialnumber(serial);
 
-            switch (command)
+            switch (messageReceived[2])
             {
-                case Command.WakeUp:
-                    sendMessage[0] = 0X00;
-                    sendMessage[1] = 0X55;
+                case 3:
+                    loggerInformation.LoggerName = "Mon T";
+                    loggerInformation.LoggerType = 3;
+                    loggerInformation.JsonFile = "MonT.json";
+                    loggerInformation.MaxMemory = 0x02;                                                 //MON-T
+                    loggerInformation.MemoryHeaderPointer = 19;                                                   //MON-T
+                    loggerInformation.MemoryStart = new int[] { 0x0000, 0x0020, 0x0000, 0x0000, 0x0000 };    //MON-T
+                    loggerInformation.MemoryMax = new int[] { 0x2000, 0x0100, 0x0000, 0x0000, 0x2000 };    //MON-T
+                    loggerInformation.RequestMemoryStartPointer = 3;
+                    loggerInformation.RequestMemoryMaxPointer = 1;
                     break;
 
-                case Command.SetRead:
-                    switch (loggertype)
-                    {
-                        case 3:
-                            sendMessage[0] = 0x02;
-                            sendMessage[1] = 0x06;
-                            sendMessage[2] = 0x00;
-                            sendMessage[3] = 0x01;
-                            sendMessage[4] = 0x46;
-                            sendMessage[5] = 0x00;
-                            sendMessage[6] = 0x00;
-                            sendMessage[7] = 0x00;
-                            sendMessage = AddCRC(8, sendMessage);
-                            break;
+                case 6:
+                    loggerInformation.LoggerName = "G4";
+                    loggerInformation.LoggerType = 6;
+                    loggerInformation.JsonFile = "G4.json";
+                    loggerInformation.MaxMemory = 0x04;                                                 //G4
+                    loggerInformation.MemoryHeaderPointer = 13;                                                   //G4
+                    loggerInformation.MemoryStart = new int[] { 0x0000, 0x0020, 0x0000, 0x0000, 0x0000 };    //G4
+                    loggerInformation.MemoryMax = new int[] { 0x353C, 0x0100, 0x0000, 0x0000, 0x8000 };    //G4
+                    loggerInformation.RequestMemoryStartPointer = 3;
+                    loggerInformation.RequestMemoryMaxPointer = 1;
+                    break;
+            }   
+        }
+        AddressSection SetCurrentAddress(SerialPort serialPort , LoggerInformation loggerInformation, List<Hex> hexes)
+        {
+            length = maxlenreading;
 
-                        case 6:
-                            sendMessage[0] = 0x02;
-                            sendMessage[1] = 0x06;
-                            sendMessage[2] = 0x00;
-                            sendMessage[3] = 0x01;
-                            sendMessage[4] = 0x63;
-                            sendMessage[5] = 0x00;
-                            sendMessage[6] = 0x00;
-                            sendMessage[7] = 0x00;
-                            sendMessage = AddCRC(8, sendMessage);
-                            break;
-                        default:
-                            break;
+            var msg = ReadBytes(serialPort);
+            var memoryAddress = (recievemsg[loggerInformation.MemoryHeaderPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.MemoryHeaderPointer] & 0xFF);
+            var memoryAddMSB = (byte)recievemsg[loggerInformation.MemoryHeaderPointer + 1];
+            var memoryAddLSB = (byte)recievemsg[loggerInformation.MemoryHeaderPointer];
+            
+            string timenow = "0000000000000000";
+            long time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000;
+            string hextime = time.ToString("x02");
+            timenow = timenow.Substring(0, (timenow.Length - hextime.Length)) + hextime;
+            hexes.Add(new Hex("FF0000", timenow));
+            hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
+
+
+            var lengthMSB = (byte)((length >> 8) & 0xFF);
+            var lengthLSB = (byte)(length & 0xFF);
+
+            return new AddressSection(lengthLSB, lengthMSB, 0, memoryAddLSB, memoryAddMSB, memoryAddress);
+        }
+        void ReadBytesSetRead(SerialPort serialPort, AddressSection currentAddress, LoggerInformation loggerInformation)
+        {
+            ReadBytes(serialPort);
+            switch (loggerInformation.LoggerType)
+            {
+                //MonT
+                case 3:
+                    loggerInformation.MemoryStart[0] = 0x0000;
+                    loggerInformation.MemoryMax[0] = 0x2000;
+                    break;
+
+                case 6:
+                    loggerInformation.MemoryStart[4] = (recievemsg[loggerInformation.RequestMemoryStartPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.RequestMemoryStartPointer] & 0xFF);
+                    loggerInformation.MemoryMax[4] = (recievemsg[loggerInformation.RequestMemoryMaxPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.RequestMemoryMaxPointer] & 0xFF);
+
+                    if (loggerInformation.MemoryMax[4] < 80)
+                    {
+                        loggerInformation.MemoryMax[4] = 80;
                     }
                     break;
-
-                case Command.ReadLogger:
-                    sendMessage[0] = 0x02;
-                    sendMessage[1] = lengthLSB;
-                    sendMessage[2] = lengthMSB;
-                    sendMessage[3] = (byte)memnumber;
-                    sendMessage[4] = memoryaddLSB;
-                    sendMessage[5] = memoryaddMSB;
-                    sendMessage[6] = (byte)0x00;
-                    sendMessage[7] = (byte)0x00;
-                    sendMessage = AddCRC(8, sendMessage);
-                    break;
-                default:
-                    break;
             }
+        }
+        void ReadBytesReadLogger(SerialPort serialPort, AddressSection currentAddress, List<Hex> Hexes)
+        {
+            var msg = ReadBytes(serialPort);
+            
+            if (recievemsg[0] == 0x00)
+            {
+                string finalmsg = string.Empty;
+                if (currentAddress.MemoryAddMSB.ToString("x02") + currentAddress.MemoryAddLSB.ToString("x02") == "0c4a")
+                {
+                    finalmsg = msg.ToString(4, msg.Length - 10);
+                    Hexes.Add(new Hex(("0" + currentAddress.MemoryNumber + currentAddress.MemoryAddMSB.ToString("x02") + currentAddress.MemoryAddLSB.ToString("x02")), finalmsg));
+                }
+
+                else
+                {
+                    finalmsg = msg.ToString(2, msg.Length - 8);
+                    Hexes.Add(new Hex(("0" + currentAddress.MemoryNumber + currentAddress.MemoryAddMSB.ToString("x02") + currentAddress.MemoryAddLSB.ToString("x02")), finalmsg));
+                }
+            }
+
+            currentAddress.LengthMSB = (byte)((length >> 8) & 0xFF);
+            currentAddress.LengthLSB = (byte)(length & 0xFF);
+
+        }
+        void WriteBytes(IByteWriter byteWriter, SerialPort serialPort)
+        {
+            var sendMessage = new byte[11];
+            byteWriter.WriteBytes(sendMessage);
 
             try
             {
                 serialPort.Write(sendMessage, 0, sendMessage.Length);
             }
-            catch (TimeoutException e) { }
-        }
-        
-        private void GetNextAddress()
-        {
-            if (length >= (memmax[memnumber] - memoryadd))
+            catch (TimeoutException e)
             {
-                length = memmax[memnumber] - memoryadd;
-                memoryadd = memmax[memnumber];
-                lengthMSB = (byte)((length >> 8) & 0xFF);
-                lengthLSB = (byte)(length & 0xFF);
+            }
+        }
+        AddressSection GetNextAddress(AddressSection currentAddress, LoggerInformation loggerInformation)
+        {
+            if (length >= (loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress))
+            {
+                length = loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress;
+                currentAddress.MemoryAddress = loggerInformation.MemoryMax[currentAddress.MemoryNumber];
+                currentAddress.LengthMSB = (byte)((length >> 8) & 0xFF);
+                currentAddress.LengthLSB = (byte)(length & 0xFF);
             }
 
-            if (memoryadd < memmax[memnumber])
+            if (currentAddress.MemoryAddress < loggerInformation.MemoryMax[currentAddress.MemoryNumber])
             {
-                memoryadd = ((memoryaddMSB & 0xFF) << 8) | (memoryaddLSB & 0xFF);
-                memoryadd += length;
-                
-                if (memoryadd >= memmax[memnumber])
+                currentAddress.MemoryAddress = ((currentAddress.MemoryAddMSB & 0xFF) << 8) | (currentAddress.MemoryAddLSB & 0xFF);
+                currentAddress.MemoryAddress += length;
+
+                if (currentAddress.MemoryAddress >= loggerInformation.MemoryMax[currentAddress.MemoryNumber])
                 {
-                    length = length - memoryadd + memmax[0];
-                    memoryaddMSB = (byte)((memmax[memnumber] >> 8) & 0xFF);
-                    memoryaddLSB = (byte)(memmax[memnumber] & 0xFF);
+                    length = length - currentAddress.MemoryAddress + loggerInformation.MemoryMax[0];
+                    currentAddress.MemoryAddMSB = (byte)((loggerInformation.MemoryMax[currentAddress.MemoryNumber] >> 8) & 0xFF);
+                    currentAddress.MemoryAddLSB = (byte)(loggerInformation.MemoryMax[currentAddress.MemoryNumber] & 0xFF);
                 }
                 else
                 {
-                    memoryaddMSB = (byte)((memoryadd >> 8) & 0xFF);
-                    memoryaddLSB = (byte)(memoryadd & 0xFF);
+                    currentAddress.MemoryAddMSB = (byte)((currentAddress.MemoryAddress >> 8) & 0xFF);
+                    currentAddress.MemoryAddLSB = (byte)(currentAddress.MemoryAddress & 0xFF);
                 }
             }
-
             else
             {
-                if (memnumber < maxmemory)
+                if (currentAddress.MemoryNumber < loggerInformation.MaxMemory)
                 {
-                    memnumber++;
+                    currentAddress.MemoryNumber++;
 
-                    if (memmax[memnumber] != 0)
+                    if (loggerInformation.MemoryMax[currentAddress.MemoryNumber] != 0)
                     {
-                        if (memmax[memnumber] > memstart[memnumber])
+                        if (loggerInformation.MemoryMax[currentAddress.MemoryNumber] > loggerInformation.MemoryStart[currentAddress.MemoryNumber])
                         {
                             length = maxlenreading;
-                            memoryadd = memstart[memnumber];
-                            memoryaddMSB = (byte)((memoryadd >> 8) & 0xFF);
-                            memoryaddLSB = (byte)(memoryadd & 0xFF);
+                            currentAddress.MemoryAddress = loggerInformation.MemoryStart[currentAddress.MemoryNumber];
+                            currentAddress.MemoryAddMSB = (byte)((currentAddress.MemoryAddress >> 8) & 0xFF);
+                            currentAddress.MemoryAddLSB = (byte)(currentAddress.MemoryAddress & 0xFF);
                         }
                     }
 
                 }
             }
+            return currentAddress;
         }
-
+        
         #region Byte Mainpulation 
-        private byte[] AddCRC(int len, byte[] sendMessage)
+
+        public static byte[] AddCRC(int len, byte[] sendMessage)
         {
-            crc16 = 0xFFFF;
+            var crc16 = 0xFFFF;
 
             for (int i = 0; i < 8; i++)
             {
@@ -348,8 +280,7 @@ namespace TempLite.Services
 
             return AddEscChar(len - 1, sendMessage);
         }
-
-        private byte[] AddEscChar(int Length, byte[] sendMessage)
+        static byte[] AddEscChar(int Length, byte[] sendMessage)
         {
             int mx = 0;
             byte[] temp = new byte[80];
@@ -387,30 +318,30 @@ namespace TempLite.Services
             Array.Copy(temp, sendMessage, Length + mx + 1);
             return sendMessage;
         }
-
-        private byte[] RemoveEscChar(byte[] message)
+        byte[] RemoveEscChar(byte[] message)
         {
             int i = 0;
             int mx = 0;
 
-            while ((i < message.Length) && (message[i] != 13))
+            while ((i < message.Length) && (message[i] != 0x0d))
             {
-                if (message[i] == 27) // 1B = 27
+                Console.WriteLine(message[i]);
+                if (message[i] == 0x1b) // 1B = 27
                 {
                     switch (message[i + 1])
                     {
                         case 0:
-                            message[mx] = 27; // 1B = 27
+                            message[mx] = 0x1b; // 1B = 27
                             i++;
                             break;
 
                         case 1:
-                            message[mx] = 29;  // 1D = 29
+                            message[mx] = 0x0d;  // 1D = 29
                             i++;
                             break;
 
                         case 2:
-                            message[mx] = 85; // 55 = 85
+                            message[mx] = 0x55; // 55 = 85
                             i++;
                             break;
                     }
@@ -425,15 +356,15 @@ namespace TempLite.Services
             }
             message[mx] = 0x0d;
 
-            recievemsg = new byte[mx + 1];
-            Array.Copy(message, recievemsg, mx + 1);
-            return recievemsg;
+            var temp = new byte[mx + 1];
+            Array.Copy(message, temp, mx + 1);
+            return temp;
         }
         #endregion
 
-        public string GetSerialnumber(byte[] msg)
+        string GetSerialnumber(byte[] msg)
         {
-            serialnumber = "";
+            var serialnumber = "";
 
             if ((msg[3] & 0xF0) == 0x50)
             {
@@ -490,17 +421,6 @@ namespace TempLite.Services
             return serialnumber;
         }
 
-        public bool FindLogger
-        {
-            get
-            {
-                return findLogger;
-            }
-            set
-            {
-                findLogger = value;
-            }
-        }
 
     }
 }

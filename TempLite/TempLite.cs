@@ -8,9 +8,10 @@ namespace TempLite
 {
     public partial class TempLite : Form
     {
-        PDFGenerator _pdfGenerator = new PDFGenerator();
-        CommunicationServices _communicationService = new CommunicationServices();
-        SerialPort _serialPort = new SerialPort();
+        PDFGenerator pdfGenerator = new PDFGenerator();
+        CommunicationServices communicationService = new CommunicationServices();
+        LoggerInformation loggerInformation = new LoggerInformation();
+        SerialPort serialPort = new SerialPort();
        
         BackgroundWorker readerBW;
         BackgroundWorker loggerBW;
@@ -41,15 +42,19 @@ namespace TempLite
 
         void readerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Reader _reader = new Reader();
-            var findReader = false;
-            
-            while (findReader == false)
+            Reader reader = new Reader();
+            var ftdiInfo = reader.FindFTDI();
+            if (ftdiInfo != null)
             {
-                findReader = _reader.FindFTDI();
-                if (findReader == true)
+                reader.SetUpCom(serialPort, ftdiInfo);
+            }
+
+            while (ftdiInfo == null)
+            {
+                ftdiInfo = reader.FindFTDI();
+                if (ftdiInfo != null)
                 {
-                    _reader.SetUpCom(_serialPort);
+                    reader.SetUpCom(serialPort, ftdiInfo);
                 }
             }
         }
@@ -75,10 +80,7 @@ namespace TempLite
 
         void loggerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (_communicationService.FindLogger == false)
-            {
-                _communicationService.ReadLogger(_serialPort,Command.WakeUp);
-            }
+                communicationService.FindLogger(serialPort);
         }
 
         void loggerBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -101,8 +103,8 @@ namespace TempLite
         }
         void progressBarBW_DoWork(object sender, DoWorkEventArgs e)
         {
-            _communicationService.ReadLogger(_serialPort, Command.SetRead);
-            _pdfGenerator.CreatePDF(_communicationService);
+            communicationService.GenerateHexFile(serialPort, loggerInformation);
+            pdfGenerator.CreatePDF(loggerInformation);
         }
 
         void progressBarBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -132,8 +134,8 @@ namespace TempLite
             Email _email = new Email();
             ExcelGenerator _excelGenerator = new ExcelGenerator();
 
-            _excelGenerator.CreateExcel(_communicationService);
-            _email.SetUpEmail(_communicationService.serialnumber);
+            _excelGenerator.CreateExcel(loggerInformation);
+            _email.SetUpEmail(loggerInformation.SerialNumber);
         }
 
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

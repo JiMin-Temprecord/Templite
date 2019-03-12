@@ -10,17 +10,18 @@ namespace TempLite
     {
         private PdfDocument _pdfDocument = new PdfDocument();
 
-        public void CreatePDF(CommunicationServices _communicationService)
+        public void CreatePDF(LoggerInformation loggerInformation)
         {
             double lineCounter = 80;
 
-            var decoder = new HexfileDecoder(_communicationService);
+            var decoder = new HexfileDecoder(loggerInformation);
+            decoder.ReadIntoJsonFileAndSetupDecoder();
             var pdfVariables = decoder.AssignPDFValue();
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
             var channelOne = pdfVariables.ChannelOne;
             var channelTwo = pdfVariables.ChannelTwo;
 
-            _pdfDocument.Info.Title = _communicationService.serialnumber;
+            _pdfDocument.Info.Title = loggerInformation.SerialNumber;
 
             //Create an empty page
             PdfPage page = _pdfDocument.AddPage();
@@ -76,7 +77,7 @@ namespace TempLite
             draw.DrawRectangle(pen, PDFcoordinates.box3_X1, PDFcoordinates.box3_Y1, PDFcoordinates.box3_X2 - PDFcoordinates.box3_X1, PDFcoordinates.box3_Y2 - PDFcoordinates.box3_Y1);
 
             //Draw the Text
-            DrawSection("Model :", _communicationService.loggername);
+            DrawSection("Model :", loggerInformation.LoggerName);
             DrawSection("Logger State :", pdfVariables.LoggerState);
             DrawSection("Battery :", pdfVariables.BatteryPercentage);
             DrawSection("Sample Period :", pdfVariables.SameplePeriod + " (hh:mm:ss)");
@@ -129,7 +130,7 @@ namespace TempLite
 
             //Header/Footer
             draw.DrawString("Logger Report", serialfont, XBrushes.Blue, 10, 50);
-            draw.DrawString("S/N: " + _communicationService.serialnumber, serialfont, XBrushes.Blue, 550, 50);
+            draw.DrawString("S/N: " + loggerInformation.SerialNumber, serialfont, XBrushes.Blue, 550, 50);
             draw.DrawRectangle(headerpen, new XRect(10, 60, 680, 0));
             draw.DrawString("Comment ", font, XBrushes.Black, PDFcoordinates.commentX, PDFcoordinates.commentY);
             draw.DrawString("Signature ", font, XBrushes.Black, PDFcoordinates.sigX, PDFcoordinates.sigY);
@@ -138,7 +139,7 @@ namespace TempLite
             draw.DrawString(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC"), font, XBrushes.Black, PDFcoordinates.dateX, PDFcoordinates.dateY);
             draw.DrawString("0.1.9.1", font, XBrushes.Black, PDFcoordinates.versionX, PDFcoordinates.versionY);
 
-            string filename = _communicationService.serialnumber + ".pdf";
+            string filename = loggerInformation.SerialNumber + ".pdf";
             _pdfDocument.Save(filename);
             Process.Start(filename); //Previews PDF
         }

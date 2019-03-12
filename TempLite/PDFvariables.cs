@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TempLite
 {
     public class PDFvariables
     {
         ArrayList time = new ArrayList();
-        ChannelConfig channelOne;
-        ChannelConfig channelTwo;
-
+       
         public bool[] EnabledChannels { get; set; }
         public int RecordedSamples { get; set; }
         public String SerialNumber { get; set; }
@@ -27,29 +21,11 @@ namespace TempLite
         public String UserData { get; set; }
         public ArrayList Time { get { return time; } set { time = value; } }
 
-        public ChannelConfig ChannelOne
-        {
-            get
-            {
-                if (channelOne == null)
-                {
-                    channelOne = new ChannelConfig();
-                }
-                return channelOne;
-            }
-        }
 
-        public ChannelConfig ChannelTwo
-        {
-            get
-            {
-                if (channelTwo == null)
-                {
-                    channelTwo = new ChannelConfig();
-                }
-                return channelTwo;
-            }
-        }
+        ChannelConfig channelOne;
+        public ChannelConfig ChannelOne => channelOne ?? (channelOne = new ChannelConfig());
+        ChannelConfig channelTwo;
+        public ChannelConfig ChannelTwo => channelTwo ?? (channelTwo = new ChannelConfig());
         public Boolean IsChannelTwoEnabled { get; set; }
     }
 }

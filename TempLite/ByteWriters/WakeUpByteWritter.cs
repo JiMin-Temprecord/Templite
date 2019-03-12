@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace TempLite
+{
+    class WakeUpByteWritter : IByteWriter
+    {
+        public void WriteBytes(byte[] sendMessage)
+        {
+            sendMessage[0] = 0X00;
+            sendMessage[1] = 0X55;
+        }
+    }
+}

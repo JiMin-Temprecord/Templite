@@ -7,9 +7,10 @@ namespace TempLite
 {
     public class ExcelGenerator
     {
-        public void CreateExcel(CommunicationServices _communicationService)
+        public void CreateExcel(LoggerInformation loggerInformation)
         {
-            var decoder = new HexfileDecoder(_communicationService);
+            var decoder = new HexfileDecoder(loggerInformation);
+            decoder.ReadIntoJsonFileAndSetupDecoder();
             var pdfVariables = decoder.AssignPDFValue();
 
             var excelApp = new Excel.Application();
@@ -20,11 +21,11 @@ namespace TempLite
 
             excelWorkbook = excelApp.Workbooks.Add(misValue);
             excelWorksheet = (Excel.Worksheet)excelWorkbook.Worksheets.get_Item(1);
-            excelWorksheet.Name = _communicationService.serialnumber;
+            excelWorksheet.Name = loggerInformation.SerialNumber;
 
-            CreateLayout(excelWorksheet, pdfVariables, _communicationService.loggername);
+            CreateLayout(excelWorksheet, pdfVariables, loggerInformation.LoggerName);
 
-            excelWorkbook.SaveAs(_communicationService.serialnumber + ".xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+            excelWorkbook.SaveAs(loggerInformation.SerialNumber + ".xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
             excelWorkbook.Close(true, misValue, misValue);
             excelApp.Quit();
 

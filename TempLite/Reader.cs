@@ -5,14 +5,11 @@ namespace TempLite
 {
     public class Reader
     {
-        private string portName = string.Empty;
-        private uint devID = 0;
-
-        public void SetUpCom(SerialPort serial)
+        public void SetUpCom(SerialPort serial, FTDIInfo ftdiInfo)
         {
 
             serial.DiscardNull = false;
-            serial.PortName = PortName;
+            serial.PortName = ftdiInfo.PortName;
             serial.BaudRate = 19200;
             serial.Parity = Parity.None;
             serial.DataBits = 8;
@@ -23,43 +20,55 @@ namespace TempLite
             serial.WriteTimeout = 100;
         }
 
-        public bool FindFTDI()
+        public FTDIInfo FindFTDI()
         {
             try
             {
-                FTDI.FT_STATUS stat;
-                FTDI ft = new FTDI();
+                var ft = new FTDI();
 
                 uint deviceCount = 0;
-                stat = ft.GetNumberOfDevices(ref deviceCount);
+                uint deviceID = 0;
+
+                var stat = ft.GetNumberOfDevices(ref deviceCount);
                 FTDI.FT_DEVICE_INFO_NODE[] devices = new FTDI.FT_DEVICE_INFO_NODE[deviceCount];
                 stat = ft.GetDeviceList(devices);
 
-                foreach (FTDI.FT_DEVICE_INFO_NODE dev in devices)
+                foreach (var dev in devices)
                 {
                     try
                     {
                         stat = ft.OpenByLocation(dev.LocId);
                         if (stat == FTDI.FT_STATUS.FT_OK)
                         {
-                            ft.GetCOMPort(out portName);
-                            ft.GetDeviceID(ref devID);
+                            ft.GetCOMPort(out var portName);
+                            ft.GetDeviceID(ref deviceID);
                             ft.Close();
 
-                            return true;
+                            return new FTDIInfo(portName, deviceID);
                         }
                     }
                     catch
                     {
-                        try { if (ft.IsOpen) { ft.Close(); } } catch { }
+                        try
+                        {
+                            if (ft.IsOpen)
+                            {
+                                ft.Close();
+                            }
+                        } 
+                        finally
+                        {
+                            if(ft.IsOpen)
+                            {
+                                ft.Close();
+                            }
+                        }
                     }
                 }
             }
             catch { }
 
-            return false;
+            return null;
         }
-
-        public string PortName { get { return portName; } set{ portName = value; }}
     }
 }

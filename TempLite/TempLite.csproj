@@ -61,9 +61,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddressSection.cs" />
     <Compile Include="ChannelConfig.cs" />
     <Compile Include="Email.cs" />
     <Compile Include="ExcelGenerator.cs" />
+    <Compile Include="FTDIInfo.cs" />
+    <Compile Include="ByteWriters\ReadLoggerByteWritter.cs" />
+    <Compile Include="ByteWriters\SetReadByteWritter.cs" />
+    <Compile Include="LoggerInformation.cs" />
     <Compile Include="UserControl\EmailDoneUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -91,7 +96,6 @@
     <Compile Include="PDFvariables.cs" />
     <Compile Include="PDFGenerator.cs" />
     <Compile Include="HexfileDecoder.cs" />
-    <Compile Include="Enum\Command.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="PDFcoordinates.cs" />
     <Compile Include="UserControl\ReaderUserControl.cs">
@@ -110,6 +114,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ByteWriters\WakeUpByteWritter.cs" />
+    <Compile Include="ByteWriters\WriteByteInterface.cs" />
     <EmbeddedResource Include="UserControl\EmailDoneUserControl.resx">
       <DependentUpon>EmailDoneUserControl.cs</DependentUpon>
     </EmbeddedResource>
