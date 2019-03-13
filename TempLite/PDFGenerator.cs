@@ -141,7 +141,7 @@ namespace TempLite
 
             string filename = loggerInformation.SerialNumber + ".pdf";
             pdfDocument.Save(filename);
-            Process.Start(filename); //Previews PDF
+            //Process.Start(filename); //Previews PDF
         }
 
         private void DrawGraph(HexfileDecoder decoder,PDFvariables pdfVariables, XGraphics draw, XPen pen, XFont font)

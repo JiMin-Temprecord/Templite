@@ -9,6 +9,7 @@ namespace TempLite
     {
         public void CreateExcel(LoggerInformation loggerInformation)
         {
+            //Must I re-read this? 
             var decoder = new HexfileDecoder(loggerInformation);
             decoder.ReadIntoJsonFileAndSetupDecoder();
             var pdfVariables = decoder.AssignPDFValue();
@@ -36,37 +37,29 @@ namespace TempLite
 
         private void CreateLayout(Excel.Worksheet excelWorksheet, PDFvariables pdfVariables, string loggername)
         {
+            var row = 3;
+
             excelWorksheet.Cells[1, 5] = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC");
             excelWorksheet.Cells[2, 1] = "Logger Report";
             excelWorksheet.Cells[2, 5] = "S/N: " + pdfVariables.SerialNumber;
 
-            excelWorksheet.Cells[3, 1] = "Model : ";
-            excelWorksheet.Cells[3, 2] = loggername;
+            FillCells(excelWorksheet, row, "Model : ", loggername);
+            FillCells(excelWorksheet, row, "Logger State : ", pdfVariables.LoggerState);
+            FillCells(excelWorksheet, row, "Battery : ", pdfVariables.BatteryPercentage + "%");
+            FillCells(excelWorksheet, row, "Sample Period : ", pdfVariables.SameplePeriod);
+            FillCells(excelWorksheet, row, "Start Delay : ", pdfVariables.StartDelay);
+            FillCells(excelWorksheet, row, "First Sample : ", pdfVariables.FirstSample);
+            FillCells(excelWorksheet, row, "Last Sample : ", pdfVariables.LoggerState);
+            FillCells(excelWorksheet, row, "Recorder Samples : ", pdfVariables.RecordedSamples.ToString());
+            FillCells(excelWorksheet, row, "Tags Placed : ", loggername);
 
-            excelWorksheet.Cells[4, 1] = "Logger State : ";
-            excelWorksheet.Cells[4, 2] = pdfVariables.LoggerState;
+        }
 
-            excelWorksheet.Cells[5, 1] = "Battery : ";
-            excelWorksheet.Cells[5, 2] = pdfVariables.BatteryPercentage + "%";
-
-            excelWorksheet.Cells[6, 1] = "Sample Period : ";
-            excelWorksheet.Cells[6, 2] = pdfVariables.SameplePeriod;
-
-            excelWorksheet.Cells[7, 1] = "Start Delay : ";
-            excelWorksheet.Cells[7, 2] = pdfVariables.StartDelay;
-
-            excelWorksheet.Cells[8, 1] = "First Sample : ";
-            excelWorksheet.Cells[8, 2] = pdfVariables.FirstSample;
-
-            excelWorksheet.Cells[9, 1] = "Last Sample : ";
-            excelWorksheet.Cells[9, 2] = pdfVariables.LoggerState;
-
-            excelWorksheet.Cells[10, 1] = "Recorder Samples : ";
-            excelWorksheet.Cells[10, 2] = pdfVariables.RecordedSamples;
-
-            excelWorksheet.Cells[11, 1] = "Tags Placed : ";
-            excelWorksheet.Cells[11, 2] = pdfVariables.TagsPlaced;
-
+        void FillCells (Excel.Worksheet excelWorksheet,int row, string label, string value)
+        {
+            excelWorksheet.Cells[row, 1] = label;
+            excelWorksheet.Cells[row, 2] = value;
+            row++;
         }
     }
 }
