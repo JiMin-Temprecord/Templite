@@ -8,7 +8,7 @@ namespace TempLite
 {
     public class PDFGenerator
     {
-        private PdfDocument _pdfDocument = new PdfDocument();
+        private PdfDocument pdfDocument = new PdfDocument();
 
         public void CreatePDF(LoggerInformation loggerInformation)
         {
@@ -21,10 +21,10 @@ namespace TempLite
             var channelOne = pdfVariables.ChannelOne;
             var channelTwo = pdfVariables.ChannelTwo;
 
-            _pdfDocument.Info.Title = loggerInformation.SerialNumber;
+            pdfDocument.Info.Title = loggerInformation.SerialNumber;
 
             //Create an empty page
-            PdfPage page = _pdfDocument.AddPage();
+            PdfPage page = pdfDocument.AddPage();
             page.Height = 1000;
             page.Width = 700;
 
@@ -140,7 +140,7 @@ namespace TempLite
             draw.DrawString("0.1.9.1", font, XBrushes.Black, PDFcoordinates.versionX, PDFcoordinates.versionY);
 
             string filename = loggerInformation.SerialNumber + ".pdf";
-            _pdfDocument.Save(filename);
+            pdfDocument.Save(filename);
             Process.Start(filename); //Previews PDF
         }
 

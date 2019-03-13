@@ -8,10 +8,11 @@ namespace TempLite
 {
     class WakeUpByteWritter : IByteWriter
     {
-        public void WriteBytes(byte[] sendMessage)
+        public byte[] WriteBytes(byte[] sendMessage)
         {
             sendMessage[0] = 0X00;
             sendMessage[1] = 0X55;
+            return sendMessage;
         }
     }
 }

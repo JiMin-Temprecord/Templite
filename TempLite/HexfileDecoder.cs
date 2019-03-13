@@ -16,7 +16,7 @@ namespace TempLite
 
         bool loopOverwrite = false;
         bool Fahrenheit = false;
-
+        
         double Kelvin_Dec = 273.15;
         double lowestTemp = 0;
         double Resolution = 0;
@@ -35,7 +35,7 @@ namespace TempLite
         int userDataLength = 0;
         int startDelay = 0;
         int totalRTCticks = 0;
-        int totalSamplingEvents = 0;
+        int totalSamplingEvents = 0 ;
         int totalUses = 0;
 
         int[] highestPosition = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -82,12 +82,12 @@ namespace TempLite
             ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
             timeAtFirstSameple = ReadFromJObject(jsonObject, "DATA_INFO,Time_FirstSample_MonT");
             ticksAtLastSample = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksAtLastSample"), 16);
-            recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"));
             lowestTemp = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,LowestTemp"));
             Resolution = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,ResolutionRatio")) / 100;
-            ReadFromJObject(jsonObject, "SENSOR,Decode_MonT_Data");
+            recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"));
             upperLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit"));
             lowerLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit"));
+            ReadFromJObject(jsonObject, "SENSOR,Decode_MonT_Data");
         }
 
         readonly LoggerInformation loggerInformation;
@@ -105,6 +105,7 @@ namespace TempLite
             pdfVariables.SameplePeriod = HHMMSS(samplePeriod);
             pdfVariables.StartDelay = HHMMSS(startDelay);
             pdfVariables.FirstSample = timeAtFirstSameple;
+            pdfVariables.LastSample = timeAtFirstSameple;
             pdfVariables.TagsPlaced = "0";
             pdfVariables.UserData = userData;
 
@@ -113,9 +114,12 @@ namespace TempLite
                 pdfVariables.Time.Add(timeFirstSample);
                 timeFirstSample = timeFirstSample + samplePeriod;
             }
-
-            var timeLastSample = Convert.ToInt32(pdfVariables.Time[(pdfVariables.Time.Count - 1)]);
-            pdfVariables.LastSample = UNIXtoUTC(timeLastSample);
+            
+            if (recordedSamples > 0)
+            {
+                var timeLastSample = Convert.ToInt32(pdfVariables.Time[(pdfVariables.Time.Count - 1)]);
+                pdfVariables.LastSample = UNIXtoUTC(timeLastSample);
+            }
 
             if (Fahrenheit)
                 pdfVariables.TempUnit = " °F";
@@ -268,7 +272,6 @@ namespace TempLite
         {
             bool bitbool = false;
             var decodeByte = ReadHex(stringArrayInfo);
-
             switch (stringArrayInfo[2])
             {
 

@@ -8,6 +8,6 @@ namespace TempLite
 {
     interface IByteWriter
     {
-        void WriteBytes(byte[] sendMessage);
+        byte[] WriteBytes(byte[] sendMessage);
     }
 }

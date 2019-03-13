@@ -23,8 +23,8 @@ namespace TempLite
 
 
         ChannelConfig channelOne;
-        public ChannelConfig ChannelOne => channelOne ?? (channelOne = new ChannelConfig());
         ChannelConfig channelTwo;
+        public ChannelConfig ChannelOne => channelOne ?? (channelOne = new ChannelConfig());
         public ChannelConfig ChannelTwo => channelTwo ?? (channelTwo = new ChannelConfig());
         public Boolean IsChannelTwoEnabled { get; set; }
     }

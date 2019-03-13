@@ -8,7 +8,6 @@ namespace TempLite
 {
     public partial class TempLite : Form
     {
-        PDFGenerator pdfGenerator = new PDFGenerator();
         CommunicationServices communicationService = new CommunicationServices();
         LoggerInformation loggerInformation = new LoggerInformation();
         SerialPort serialPort = new SerialPort();
@@ -104,7 +103,6 @@ namespace TempLite
         void progressBarBW_DoWork(object sender, DoWorkEventArgs e)
         {
             communicationService.GenerateHexFile(serialPort, loggerInformation);
-            pdfGenerator.CreatePDF(loggerInformation);
         }
 
         void progressBarBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -131,11 +129,13 @@ namespace TempLite
 
         void sendingEmailBW_DoWork(object sender, DoWorkEventArgs e)
         {
-            Email _email = new Email();
-            ExcelGenerator _excelGenerator = new ExcelGenerator();
+            var pdfGenerator = new PDFGenerator();
+            var excelGenerator = new ExcelGenerator();
+            var email = new Email();
 
-            _excelGenerator.CreateExcel(loggerInformation);
-            _email.SetUpEmail(loggerInformation.SerialNumber);
+            pdfGenerator.CreatePDF(loggerInformation);
+            excelGenerator.CreateExcel(loggerInformation);
+            email.SetUpEmail(loggerInformation.SerialNumber);
         }
 
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

@@ -11,7 +11,7 @@ namespace TempLite
 
         readonly int loggerType;
 
-        public void WriteBytes(byte[] sendMessage)
+        public byte[] WriteBytes(byte[] sendMessage)
         {
             switch (loggerType)
             {
@@ -24,8 +24,7 @@ namespace TempLite
                     sendMessage[5] = 0x00;
                     sendMessage[6] = 0x00;
                     sendMessage[7] = 0x00;
-                    sendMessage = CommunicationServices.AddCRC(8, sendMessage);
-                    break;
+                    return CommunicationServices.AddCRC(8, sendMessage);
 
                 case 6:
                     sendMessage[0] = 0x02;
@@ -36,8 +35,9 @@ namespace TempLite
                     sendMessage[5] = 0x00;
                     sendMessage[6] = 0x00;
                     sendMessage[7] = 0x00;
-                    sendMessage = CommunicationServices.AddCRC(8, sendMessage);
-                    break;
+                    return CommunicationServices.AddCRC(8, sendMessage);
+                default:
+                    return null;
             }
         }
     }
