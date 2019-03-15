@@ -604,7 +604,7 @@ namespace TempLite
             return VALUE;
         }
 
-        private string UNIXtoUTC(long now)
+        public string UNIXtoUTC(long now)
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);

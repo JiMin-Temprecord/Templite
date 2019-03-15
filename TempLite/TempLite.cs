@@ -131,11 +131,11 @@ namespace TempLite
         {
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
-            var email = new Email();
+            //var email = new Email();
 
             pdfGenerator.CreatePDF(loggerInformation);
             excelGenerator.CreateExcel(loggerInformation);
-            email.SetUpEmail(loggerInformation.SerialNumber);
+            //email.SetUpEmail(loggerInformation.SerialNumber);
         }
 
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

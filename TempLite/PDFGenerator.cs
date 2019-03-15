@@ -1,8 +1,6 @@
 ﻿using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using System;
-using System.Diagnostics;
-using TempLite.Services;
 
 namespace TempLite
 {
@@ -159,8 +157,8 @@ namespace TempLite
             double ch1_lower_L = pdfVariables.ChannelOne.PresetLowerLimit;
             double ch1_max = pdfVariables.ChannelOne.Max;
             double ch1_min = pdfVariables.ChannelOne.Min;
-            double ch1_highest = 0;
-            double ch1_lowest = 0;
+            double ch1_highest = ch1_max;
+            double ch1_lowest = ch1_min;
             double ch1_upper_Y = 0;
             double ch1_lower_Y = 0;
 
@@ -194,69 +192,15 @@ namespace TempLite
             {
                 gap = i;
             }
-            
-            if (ch1_upper_L > ch1_max)
-            {
-                ch1_highest = ch1_upper_L;
-            }
-            else
-            {
-                ch1_highest = ch1_max;
-            }
-
-            if (ch1_lower_L < ch1_min)
-            {
-                ch1_lowest = ch1_lower_L;
-            }
-            else
-            {
-                ch1_lowest = ch1_min;
-            }
 
             if (pdfVariables.IsChannelTwoEnabled) //Second Sensor
             {
-
                 ch2_upper_L = pdfVariables.ChannelTwo.PresetUpperLimit;
                 ch2_lower_L = pdfVariables.ChannelTwo.PresetLowerLimit;
                 ch2_max = pdfVariables.ChannelTwo.Max;
                 ch2_min = pdfVariables.ChannelTwo.Min;
-
-                if (ch2_upper_L > ch2_max)
-                {
-                    ch2_highest = ch2_upper_L;
-                }
-                else
-                {
-                    ch2_highest = ch2_max;
-                }
-
-                if (ch2_lower_L < ch2_min)
-                {
-                    ch2_lowest = ch2_lower_L;
-                }
-                else
-                {
-                    ch2_lowest = ch2_min;
-                }
-
-
-                if (ch1_highest > ch2_highest)
-                {
-                    ch_highest = ch1_highest;
-                }
-                else
-                {
-                    ch_highest = ch2_highest;
-                }
-
-                if (ch1_lowest < ch2_lowest)
-                {
-                    ch_lowest = ch1_lowest;
-                }
-                else
-                {
-                    ch_lowest = ch2_lowest;
-                }
+                ch2_highest = ch2_max;
+                ch2_lowest = ch2_min;
             }
             else
             {
@@ -290,7 +234,7 @@ namespace TempLite
                 draw.DrawString(ch2_upper_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch2_upper_Y);
                 draw.DrawString(" %RH Lower Limit ", font, XBrushes.Black, PDFcoordinates.third_column, (float)ch2_lower_Y + PDFcoordinates.graph_limit_label + 5);
                 draw.DrawString(ch2_lower_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch2_lower_Y);
-                draw.DrawString(pdfVariables.ChannelTwo.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - (((pdfVariables.ChannelTwo.Mean - ch_lowest) * graph_y_scale))) + PDFcoordinates.graph_topY);
+                //draw.DrawString(pdfVariables.ChannelTwo.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - (((pdfVariables.ChannelTwo.Mean - ch_lowest) * graph_y_scale))) + PDFcoordinates.graph_topY);
                 draw.DrawLine(pen, PDFcoordinates.graph_l_lineX_start, (float)ch2_lower_Y, PDFcoordinates.graph_l_lineX_end, (float)ch2_lower_Y);
                 draw.DrawLine(pen, PDFcoordinates.graph_l_lineX_start, (float)ch2_upper_Y, PDFcoordinates.graph_l_lineX_end, (float)ch2_upper_Y);
                 draw.DrawLine(ch1, PDFcoordinates.graph_l_lineX_start, ch2_max, PDFcoordinates.graph_l_lineX_end, ch2_max);
@@ -310,7 +254,9 @@ namespace TempLite
                 draw.DrawString(ch1_upper_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch1_upper_Y);
                 draw.DrawString(pdfVariables.TempUnit + " Lower Limit ", font, XBrushes.CornflowerBlue, PDFcoordinates.third_column, (float)ch1_lower_Y + PDFcoordinates.graph_limit_label + 5);
                 draw.DrawString(ch1_lower_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch1_lower_Y);
-                draw.DrawString(pdfVariables.ChannelOne.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Mean - ch_lowest) * graph_y_scale)) + PDFcoordinates.graph_topY);
+                draw.DrawString(ch_lowest.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, ch1_min);
+                draw.DrawString(ch_highest.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, ch1_max);
+                //draw.DrawString(pdfVariables.ChannelOne.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Mean - ch_lowest) * graph_y_scale)) + PDFcoordinates.graph_topY);
                 draw.DrawLine(belowlimit, PDFcoordinates.graph_l_lineX_start, (float)ch1_lower_Y, PDFcoordinates.graph_l_lineX_end, (float)ch1_lower_Y);
                 draw.DrawLine(abovelimit, PDFcoordinates.graph_l_lineX_start, (float)ch1_upper_Y, PDFcoordinates.graph_l_lineX_end, (float)ch1_upper_Y);
                 draw.DrawLine(withinlimits, PDFcoordinates.graph_l_lineX_start, ch1_max, PDFcoordinates.graph_l_lineX_end, ch1_max);
