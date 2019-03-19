@@ -19,6 +19,7 @@ namespace TempLite
             MailMessage mail = new MailMessage("jiminjang96@gmail.com", "jimin@temprecord.com");
             mail.Subject = "Temprecod Logger Read";
             mail.Attachments.Add(new Attachment(serialNumber+".pdf"));
+            mail.Attachments.Add(new Attachment(serialNumber+".xls"));
             mail.BodyEncoding = UTF8Encoding.UTF8;
             mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
             client.Send(mail);

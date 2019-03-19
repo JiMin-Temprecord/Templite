@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace TempLite
@@ -22,7 +23,7 @@ namespace TempLite
             CreateLayout(excelWorksheet, loggerInformation, loggerInformation.LoggerName);
           
             excelWorksheet.Columns.ColumnWidth = 26;
-            excelWorkbook.SaveAs(loggerInformation.SerialNumber + ".xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
+            excelWorkbook.SaveAs(Application.StartupPath+"\\" +loggerInformation.SerialNumber + ".xls", Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
             excelWorkbook.Close(true, misValue, misValue);
             excelApp.Quit();
 
@@ -44,7 +45,7 @@ namespace TempLite
             var imageRange = excelWorksheet.Cells[5,5];
             if (channelOne.OutsideLimits ==0 && channelTwo.OutsideLimits == 0)
             {
-                excelWorksheet.Shapes.AddPicture("D:\\greentick.png", Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, imageRange.Left+26 , imageRange.Top, 90, 80);
+                excelWorksheet.Shapes.AddPicture(Application.StartupPath + "\\greentick.png", Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, imageRange.Left+26 , imageRange.Top, 90, 80);
                 excelWorksheet.Cells[12, 5].Style.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 excelWorksheet.Cells[12, 5] = "Within Limits";
                 excelWorksheet.Cells[12, 5].Font.Bold = true;
@@ -53,7 +54,7 @@ namespace TempLite
             }
             else
             {
-                excelWorksheet.Shapes.AddPicture("D:\\redwarning.png", Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, imageRange.Left+26, imageRange.Top, 90, 80);
+                excelWorksheet.Shapes.AddPicture(Application.StartupPath +"\\redwarning.png", Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, imageRange.Left+26, imageRange.Top, 90, 80);
                 excelWorksheet.Cells[12, 5].Style.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
                 excelWorksheet.Cells[12, 5] = "Outside Limits";
                 excelWorksheet.Cells[12, 5].Font.Bold = true;
@@ -61,7 +62,7 @@ namespace TempLite
             }
 
             var logoRange = excelWorksheet.Cells[1, 3];
-            excelWorksheet.Shapes.AddPicture("D:\\logo.png", Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, logoRange.Left+26, logoRange.Top, 65, 40);
+            excelWorksheet.Shapes.AddPicture(Application.StartupPath + "\\logo.png", Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoCTrue, logoRange.Left+26, logoRange.Top, 65, 40);
 
             void FillCells(string label, string value)
             {
@@ -87,7 +88,7 @@ namespace TempLite
 
             void FillValueCells(int start, int end)
             {
-                var length = channelOne.Data.Length;
+                var length = channelOne.Data.Count;
                 var dataObject = new double[length, 1];
                 var timeObject = new string[length, 1];
 

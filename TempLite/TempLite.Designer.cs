@@ -35,13 +35,16 @@ namespace TempLite
             this.ReadingTextBox = new System.Windows.Forms.TextBox();
             this.ReadingProgressBar = new System.Windows.Forms.ProgressBar();
             this.ReadingLabel = new System.Windows.Forms.Label();
+            this.bg = new System.Windows.Forms.Panel();
+            this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
+            this.emailUserControl = new UserControls.EmailUserControl();
+            this.ReadLoggerButton = new System.Windows.Forms.Button();
             this.loggerProgressBarUserControl = new UserControls.LoggerProgressBarUserControl();
+            this.generateDocumentUserControl = new UserControls.GenerateDocumentUserControl();
             this.readerUserControl = new UserControls.ReaderUserControl();
             this.loggerUserControl = new UserControls.LoggerUserControl();
-            this.emailUserControl = new UserControls.EmailUserControl();
-            this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
-            this.bg = new System.Windows.Forms.Panel();
             this.Reading.SuspendLayout();
+            this.bg.SuspendLayout();
             this.SuspendLayout();
             // 
             // Reading
@@ -73,12 +76,52 @@ namespace TempLite
             resources.ApplyResources(this.ReadingLabel, "ReadingLabel");
             this.ReadingLabel.Name = "ReadingLabel";
             // 
+            // bg
+            // 
+            this.bg.BackColor = System.Drawing.Color.White;
+            this.bg.Controls.Add(this.emailDoneUserControl);
+            this.bg.Controls.Add(this.emailUserControl);
+            this.bg.Controls.Add(this.ReadLoggerButton);
+            this.bg.Controls.Add(this.loggerProgressBarUserControl);
+            this.bg.Controls.Add(this.generateDocumentUserControl);
+            this.bg.Controls.Add(this.readerUserControl);
+            this.bg.Controls.Add(this.loggerUserControl);
+            resources.ApplyResources(this.bg, "bg");
+            this.bg.Name = "bg";
+            // 
+            // emailDoneUserControl
+            // 
+            resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
+            this.emailDoneUserControl.Name = "emailDoneUserControl";
+            // 
+            // emailUserControl
+            // 
+            this.emailUserControl.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.emailUserControl, "emailUserControl");
+            this.emailUserControl.Name = "emailUserControl";
+            this.emailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
+            // 
+            // ReadLoggerButton
+            // 
+            this.ReadLoggerButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            resources.ApplyResources(this.ReadLoggerButton, "ReadLoggerButton");
+            this.ReadLoggerButton.Name = "ReadLoggerButton";
+            this.ReadLoggerButton.UseVisualStyleBackColor = true;
+            this.ReadLoggerButton.Click += new System.EventHandler(this.ReadLoggerButton_Click);
+            // 
             // loggerProgressBarUserControl
             // 
             this.loggerProgressBarUserControl.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.loggerProgressBarUserControl, "loggerProgressBarUserControl");
             this.loggerProgressBarUserControl.Name = "loggerProgressBarUserControl";
-            this.loggerProgressBarUserControl.Load += new System.EventHandler(this.loggerProgressBarUserControl_Load);
+            this.loggerProgressBarUserControl.VisibleChanged += new System.EventHandler(this.loggerProgressBarUserControl_VisibleChanged);
+            // 
+            // generateDocumentUserControl
+            // 
+            this.generateDocumentUserControl.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.generateDocumentUserControl, "generateDocumentUserControl");
+            this.generateDocumentUserControl.Name = "generateDocumentUserControl";
+            this.generateDocumentUserControl.VisibleChanged += new System.EventHandler(this.generateDocumentUserControl_VisibleChanged);
             // 
             // readerUserControl
             // 
@@ -94,39 +137,17 @@ namespace TempLite
             this.loggerUserControl.Name = "loggerUserControl";
             this.loggerUserControl.VisibleChanged += new System.EventHandler(this.loggerUserControl_VisibleChanged);
             // 
-            // emailUserControl
-            // 
-            this.emailUserControl.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.emailUserControl, "emailUserControl");
-            this.emailUserControl.Name = "emailUserControl";
-            this.emailUserControl.Load += new System.EventHandler(this.emailUserControl_Load);
-            // 
-            // emailDoneUserControl
-            // 
-            resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
-            this.emailDoneUserControl.Name = "emailDoneUserControl";
-            // 
-            // panel1
-            // 
-            this.bg.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.bg, "panel1");
-            this.bg.Name = "panel1";
-            // 
             // TempLite
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.emailDoneUserControl);
-            this.Controls.Add(this.emailUserControl);
-            this.Controls.Add(this.loggerProgressBarUserControl);
-            this.Controls.Add(this.readerUserControl);
-            this.Controls.Add(this.loggerUserControl);
             this.Controls.Add(this.bg);
             this.ForeColor = System.Drawing.Color.Black;
             this.IsMdiContainer = true;
             this.Name = "TempLite";
             this.Reading.ResumeLayout(false);
             this.Reading.PerformLayout();
+            this.bg.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -139,9 +160,11 @@ namespace TempLite
         private ReaderUserControl readerUserControl;
         private LoggerUserControl loggerUserControl;
         private LoggerProgressBarUserControl loggerProgressBarUserControl;
+        private System.Windows.Forms.Panel bg;
+        private GenerateDocumentUserControl generateDocumentUserControl;
+        private System.Windows.Forms.Button ReadLoggerButton;
         private EmailUserControl emailUserControl;
         private EmailDoneUserControl emailDoneUserControl;
-        private System.Windows.Forms.Panel bg;
     }
 }
 

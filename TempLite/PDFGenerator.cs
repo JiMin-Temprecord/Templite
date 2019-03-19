@@ -10,7 +10,7 @@ namespace TempLite
 
         public void CreatePDF(LoggerInformation loggerInformation)
         {
-            double lineCounter = 80;
+            double lineCounter = 80; 
 
             var decoder = new HexfileDecoder(loggerInformation);
             decoder.ReadIntoJsonFileAndSetupDecoder();
@@ -137,7 +137,7 @@ namespace TempLite
             draw.DrawString(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC"), font, XBrushes.Black, PDFcoordinates.dateX, PDFcoordinates.dateY);
             draw.DrawString("0.1.9.1", font, XBrushes.Black, PDFcoordinates.versionX, PDFcoordinates.versionY);
 
-            string filename = loggerInformation.SerialNumber + ".pdf";
+            var filename = loggerInformation.SerialNumber + ".pdf";
             pdfDocument.Save(filename);
             //Process.Start(filename); //Previews PDF
         }

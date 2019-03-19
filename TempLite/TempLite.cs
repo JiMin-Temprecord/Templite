@@ -15,6 +15,7 @@ namespace TempLite
         BackgroundWorker readerBW;
         BackgroundWorker loggerBW;
         BackgroundWorker progressBarBW;
+        BackgroundWorker documentBW;
         BackgroundWorker sendingEmailBW;
 
 
@@ -67,6 +68,8 @@ namespace TempLite
         #region Find Logger
         void loggerUserControl_VisibleChanged(object sender, EventArgs e)
         {
+            emailDoneUserControl.Visible = false;
+            ReadLoggerButton.Visible = false;
             loggerBW = new BackgroundWorker();
             loggerBW.DoWork += loggerBackgroundWorker_DoWork;
             loggerBW.RunWorkerCompleted += loggerBackgroundWorker_RunWorkerCompleted;
@@ -89,7 +92,7 @@ namespace TempLite
         }
         #endregion
         #region Reading Logger
-        private void loggerProgressBarUserControl_Load(object sender, EventArgs e)
+        void loggerProgressBarUserControl_VisibleChanged(object sender, EventArgs e)
         {
             progressBarBW = new BackgroundWorker();
             progressBarBW.DoWork += progressBarBW_DoWork;
@@ -107,14 +110,44 @@ namespace TempLite
 
         void progressBarBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            loggerUserControl.Visible = false;
             loggerProgressBarUserControl.Visible = false;
-            emailUserControl.Visible = true;
+            generateDocumentUserControl.Visible = true;
             progressBarBW.Dispose();
         }
         #endregion
+        #region Generating Documents
+        void generateDocumentUserControl_VisibleChanged(object sender, EventArgs e)
+        {
+            documentBW = new BackgroundWorker();
+            documentBW.DoWork += documentBW_DoWork;
+            documentBW.RunWorkerCompleted += documentBW_RunWorkerCompleted;
+            documentBW.WorkerReportsProgress = true;
+            documentBW.WorkerSupportsCancellation = true;
+
+            if (generateDocumentUserControl.Visible)
+                documentBW.RunWorkerAsync();
+
+        }
+
+        void documentBW_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var pdfGenerator = new PDFGenerator();
+            var excelGenerator = new ExcelGenerator();
+
+            pdfGenerator.CreatePDF(loggerInformation);
+            excelGenerator.CreateExcel(loggerInformation);
+        }
+
+        void documentBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            generateDocumentUserControl.Visible = false;
+            emailUserControl.Visible = true;
+            documentBW.Dispose();
+        }
+        #endregion
+
         #region Sending Email
-        void emailUserControl_Load(object sender, EventArgs e)
+        void emailUserControl_VisibleChanged(object sender, EventArgs e)
         {
             sendingEmailBW = new BackgroundWorker();
             sendingEmailBW.DoWork += sendingEmailBW_DoWork;
@@ -129,21 +162,23 @@ namespace TempLite
 
         void sendingEmailBW_DoWork(object sender, DoWorkEventArgs e)
         {
-            var pdfGenerator = new PDFGenerator();
-            var excelGenerator = new ExcelGenerator();
-            //var email = new Email();
-
-            pdfGenerator.CreatePDF(loggerInformation);
-            excelGenerator.CreateExcel(loggerInformation);
-            //email.SetUpEmail(loggerInformation.SerialNumber);
+            var email = new Email();
+            email.SetUpEmail(loggerInformation.SerialNumber);
         }
 
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            loggerUserControl.Visible = false;
             emailUserControl.Visible = false;
             emailDoneUserControl.Visible = true;
+            ReadLoggerButton.Visible = true;
             sendingEmailBW.Dispose();
         }
         #endregion
+
+        private void ReadLoggerButton_Click(object sender, EventArgs e)
+        {
+            loggerUserControl.Visible = true;
+        }
     }
 }

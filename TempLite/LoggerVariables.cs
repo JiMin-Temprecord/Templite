@@ -20,8 +20,7 @@ namespace TempLite
         public String TempUnit { get; set; }
         public String UserData { get; set; }
         public ArrayList Time { get { return time; } set { time = value; } }
-
-
+        
         ChannelConfig channelOne;
         ChannelConfig channelTwo;
         public ChannelConfig ChannelOne => channelOne ?? (channelOne = new ChannelConfig());

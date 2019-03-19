@@ -8,7 +8,7 @@ namespace TempLite
 {
     public class ChannelConfig
     {
-        public double[] Data { get; set; }
+        public List<double> Data { get; set; }
         public double PresetUpperLimit { get; set; }
         public double PresetLowerLimit { get; set; }
         public double Mean { get; set; }

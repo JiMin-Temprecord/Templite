@@ -10,7 +10,7 @@ namespace TempLite.Services
     {
         int length = 0;
         int maxlenreading = 0x40;
-        byte[] recievemsg;
+        List<byte> recievemsg;
 
         public void FindLogger(SerialPort serialPort)
         {
@@ -63,39 +63,37 @@ namespace TempLite.Services
         StringBuilder ReadBytes(SerialPort serialPort)
         {
             var msg = new StringBuilder();
-            recievemsg = new byte[80];
-            var count = 0;
+            recievemsg = new List<byte>();
 
             try
             {
                 var byteData = serialPort.ReadByte();
-
                 while (byteData != 0x0d)
                 {
-                    recievemsg[count] = (byte)byteData;
-                    count++;
+                    Console.WriteLine(byteData.ToString("x02"));
+                    recievemsg.Add((byte)byteData);
                     byteData = serialPort.ReadByte();
                 }
             }
             catch (TimeoutException e) { }
-            recievemsg[count] = 0x0d;
+            recievemsg.Add(0x0d);
             recievemsg = RemoveEscChar(recievemsg);
 
-            for (int i = 0; i < recievemsg.Length; i++)
+            for (int i = 0; i < recievemsg.Count; i++)
             {
                 msg = msg.Append(recievemsg[i].ToString("x02"));
             }
             return msg;
 
         }
-        AddressSection ReadBytesWakeUp(SerialPort serialPort, LoggerInformation loggerInformation, byte[] messageReceived, List<Hex> hexes)
+        AddressSection ReadBytesWakeUp(SerialPort serialPort, LoggerInformation loggerInformation, List<byte> messageReceived, List<Hex> hexes)
         {
             SetLoggerInformation(messageReceived, loggerInformation);
             return SetCurrentAddress(serialPort, loggerInformation, hexes);
         }
-        void SetLoggerInformation(byte[] messageReceived, LoggerInformation loggerInformation)
+        void SetLoggerInformation(List<byte> messageReceived, LoggerInformation loggerInformation)
         {
-            byte[] serial = { (byte)messageReceived[5], (byte)messageReceived[6], (byte)messageReceived[7], (byte)messageReceived[8] };
+            byte[] serial = { messageReceived[5], messageReceived[6], messageReceived[7], messageReceived[8] };
             loggerInformation.SerialNumber = GetSerialnumber(serial);
 
             switch (messageReceived[2])
@@ -161,7 +159,13 @@ namespace TempLite.Services
                     loggerInformation.MemoryStart[4] = (recievemsg[loggerInformation.RequestMemoryStartPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.RequestMemoryStartPointer] & 0xFF);
                     loggerInformation.MemoryMax[4] = (recievemsg[loggerInformation.RequestMemoryMaxPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.RequestMemoryMaxPointer] & 0xFF);
 
-                    if (loggerInformation.MemoryMax[4] < 80)
+                    if (loggerInformation.MemoryStart[4] > loggerInformation.MemoryMax[4])
+                    {
+                        loggerInformation.MemoryStart[4] = 0x00;
+                        loggerInformation.MemoryMax[4] = 0x8000;
+                    }
+
+                    if(loggerInformation.MemoryMax[4] < 80)
                     {
                         loggerInformation.MemoryMax[4] = 80;
                     }
@@ -320,12 +324,12 @@ namespace TempLite.Services
             
             return sendMessage;
         }
-        byte[] RemoveEscChar(byte[] message)
+        List<byte> RemoveEscChar(List<byte> message)
         {
             int i = 0;
             int mx = 0;
 
-            while ((i < message.Length) && (message[i] != 0x0d))
+            while ((i < message.Count) && (message[i] != 0x0d))
             {
                 if (message[i] == 0x1B) // 1B = 27
                 {
@@ -357,8 +361,7 @@ namespace TempLite.Services
             }
             message[mx] = 0x0d;
 
-            var temp = new byte[mx + 1];
-            Array.Copy(message, temp, mx + 1);
+            var temp = message;
 
             return temp;
         }
