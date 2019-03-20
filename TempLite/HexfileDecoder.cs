@@ -446,7 +446,7 @@ namespace TempLite
             }
             else
             {
-                decodeByte[0] = (byte)(decodeByte[0] & 0xff);
+                decodeByte[0] = (byte)(decodeByte[0]);
                 return ToBigEndian(decodeByte);
             }
         }
