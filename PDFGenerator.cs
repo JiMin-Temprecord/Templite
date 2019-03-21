@@ -44,8 +44,8 @@ namespace TempLite
             //TODO CHECK SYSTEM OS
             //---------------------------------//
             fontResolver.AddFont("Roboto", XFontStyle.Regular, @"fonts/roboto_medium.ttf");
-            XFont font = new XFont("Roboto", 11, XFontStyle.Regular);
-            XFont serialfont = new XFont("Roboto", 18, XFontStyle.Regular);
+            XFont font = new XFont("Roboto", 10, XFontStyle.Regular);
+            XFont serialfont = new XFont("Roboto", 12, XFontStyle.Regular);
 
             //create pen
             XPen pen = new XPen(XColors.Black, 1);

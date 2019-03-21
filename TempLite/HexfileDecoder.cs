@@ -195,12 +195,12 @@ namespace TempLite
                         {
                             diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
 
-                            if (diff >= 0 && diff < 64) // reader can only send 64bytes at a time
+                            if (diff >= 0 && diff < 58) // reader can only send 64bytes at a time
                             {
                                 int infolength = Convert.ToInt32(currentinfo[1]);
-                                if (infolength > 64)
+                                if (infolength > 58)
                                 {
-                                    int readinfo = 64 - diff;
+                                    int readinfo = 58 - diff;
                                     while (infolength > 0)
                                     {
                                         temp += data.Substring(diff * 2, readinfo * 2);
@@ -208,10 +208,10 @@ namespace TempLite
                                         data = line.Substring(7, line.Length - 7);
                                         infolength = infolength - readinfo;
 
-                                        if (infolength > 64)
+                                        if (infolength > 58)
                                         {
                                             diff = 0;
-                                            readinfo = 64;
+                                            readinfo = 58;
                                         }
                                         else
                                         {
@@ -250,6 +250,7 @@ namespace TempLite
         #region Reading Json File
         private string ReadFromJObject(JObject jsonObject, string info)
         {
+            Console.WriteLine("NAME : " + info);
             var decodeInfo = JsontoString(jsonObject, info);
             return CallDecodeFunctions(decodeInfo);
         }

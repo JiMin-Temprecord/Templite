@@ -27,7 +27,7 @@ namespace TempLite
             var builder = new BodyBuilder();
 
             message.From.Add(new MailboxAddress("Temprecord Logger Read", "temprecordapp@temprecord.com"));
-            message.To.Add(new MailboxAddress("yasiru@temprecord.com"));
+            message.To.Add(new MailboxAddress("jimin@temprecord.com"));
             message.Subject = "Temprecord Logger Read";
             
             var PDF = serialNumber + ".pdf";
