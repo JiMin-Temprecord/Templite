@@ -1,5 +1,4 @@
 ﻿using System;
-
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using EZFontResolver1;
@@ -13,11 +12,9 @@ namespace TempLite
 
         public void CreatePDF(LoggerInformation loggerInformation)
         {
-            Console.WriteLine("CreatePDF 1");
-
             double lineCounter = 80;
 
-            var decoder = new HexfileDecoder(loggerInformation);
+            var decoder = new G4HexDecoder(loggerInformation);
             decoder.ReadIntoJsonFileAndSetupDecoder();
             var pdfVariables = decoder.AssignPDFValue();
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
@@ -159,7 +156,7 @@ namespace TempLite
         }
 
 
-        private void DrawGraph(HexfileDecoder decoder, PDFvariables pdfVariables, XGraphics draw, XPen pen, XFont font)
+        private void DrawGraph(G4HexDecoder decoder, PDFvariables pdfVariables, XGraphics draw, XPen pen, XFont font)
         {
             XPen ch0 = new XPen(XColors.DarkGreen);
             XPen ch1 = new XPen(XColors.Lavender);

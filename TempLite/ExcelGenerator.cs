@@ -34,7 +34,7 @@ namespace TempLite
 
         private void CreateLayout(Excel.Worksheet excelWorksheet, LoggerInformation loggerInformation, string loggername)
         {
-            var decoder = new HexfileDecoder(loggerInformation);
+            var decoder = new G4HexDecoder(loggerInformation);
             decoder.ReadIntoJsonFileAndSetupDecoder();
             var pdfVariables = decoder.AssignPDFValue();
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
