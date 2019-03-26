@@ -122,8 +122,6 @@ namespace TempLite
             lineCounter += (PDFcoordinates.line_inc * 0.5);
             DrawChannelSection("Samples below Lower Limit :", c => c.BelowLimits.ToString("N1"));
             DrawChannelSection("Time below Lower Limit :", c => c.TimeBelowLimits);
-            lineCounter += (PDFcoordinates.line_inc * 0.5);
-
             DrawSection("User Comments :", string.Empty);
             DrawSection(pdfVariables.UserData, string.Empty, 0.5);
 

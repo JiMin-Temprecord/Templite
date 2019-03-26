@@ -185,11 +185,9 @@ namespace TempLite
 
                         if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
                             addtoread = address;
-                        Console.WriteLine("ADDRESS : " + address);
                         if (addtoread == address)
                         {
                             diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
-                            Console.WriteLine("DIFF : " + diff);
                             if (diff >= 0 && diff < 58) // reader can only send 64bytes at a time
                             {
                                 int infolength = Convert.ToInt32(currentinfo[1]);
