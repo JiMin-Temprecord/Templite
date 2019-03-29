@@ -8,6 +8,7 @@ namespace TempLite
 {
     public class ChannelConfig
     {
+        public string SensorName { get; set; }
         public List<double> Data { get; set; }
         public double PresetUpperLimit { get; set; }
         public double PresetLowerLimit { get; set; }

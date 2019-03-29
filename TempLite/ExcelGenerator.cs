@@ -16,7 +16,6 @@ namespace TempLite
         {
             var excel = new ExcelPackage();
             var workSheet = excel.Workbook.Worksheets.Add("newSheet");
-            
             CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName);
 
             excel.SaveAs(new FileInfo(Application.StartupPath + "\\" + loggerInformation.SerialNumber + ".xlsx"));
@@ -36,8 +35,9 @@ namespace TempLite
             if (channelOne.OutsideLimits == 0 && channelTwo.OutsideLimits == 0)
             {
                 var tickImage = Image.FromFile(Application.StartupPath + "\\greentick.png");
-                workSheet.Drawings.AddPicture("Within Limitis" , tickImage);
-                workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                var setPosition = workSheet.Drawings.AddPicture("Within Limitis" , tickImage);
+                setPosition.SetSize(145, 128);
+                setPosition.SetPosition(80, 275);
                 workSheet.Cells[12, 5].Value = "Within Limits";
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -46,8 +46,9 @@ namespace TempLite
             else
             {
                 var warningImage = Image.FromFile(Application.StartupPath + "\\redwarning.png");
-                workSheet.Drawings.AddPicture("Outside Limits" , warningImage);
-                workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                var setPosition = workSheet.Drawings.AddPicture("Outside Limits" , warningImage);
+                setPosition.SetSize(145, 128);
+                setPosition.SetPosition(80, 275);
                 workSheet.Cells[12, 5].Value = "Outside Limits";
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -55,17 +56,19 @@ namespace TempLite
 
             var logoRange = workSheet.Cells[1, 3];
             var logoImage = Image.FromFile(Application.StartupPath + "\\logo.png");
-            workSheet.Drawings.AddPicture(string.Empty, logoImage);
+            var setLogoPosition = workSheet.Drawings.AddPicture(string.Empty, logoImage);
+            setLogoPosition.SetSize(103, 63);
+            setLogoPosition.SetPosition(10, 130);
 
-            workSheet.Cells[2,15,3,15].Style.Font.Bold = true;
-            workSheet.Cells[2,50,3,50].Style.Font.Bold = true;
-            workSheet.Cells[1,2,5,2].Style.Font.Size = 20;
-            workSheet.Cells[1,2,5,2].Style.Font.Color.SetColor (Color.Blue);
-            workSheet.Cells[1, 2, 5, 2].Style.Font.Bold = true;
-            workSheet.Cells[1, 4, 5, 4].Style.Border.Top.Style = ExcelBorderStyle.Double;
-            workSheet.Cells[1, 4, 5, 4].Style.Border.Top.Color.SetColor(Color.Blue);
+            workSheet.Cells[15,2,15,3].Style.Font.Bold = true;
+            workSheet.Cells[50,2,50,3].Style.Font.Bold = true;
+            workSheet.Cells[2,1,2,5].Style.Font.Size = 20;
+            workSheet.Cells[2,1,2,5].Style.Font.Color.SetColor (Color.Blue);
+            workSheet.Cells[2,1 ,5,2].Style.Font.Bold = true;
+            workSheet.Cells[4,1,4,5].Style.Border.Top.Style = ExcelBorderStyle.Double;
+            workSheet.Cells[4,1,4,5].Style.Border.Top.Color.SetColor(Color.Blue);
 
-            workSheet.Cells[1, 5].Value = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC");
+            workSheet.Cells[1, 5].Value = DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm:sss UTC");
             workSheet.Cells[2, 1].Value = "Logger Report";
             workSheet.Cells[2, 5].Value = "S/N: " + pdfVariables.SerialNumber;
 
@@ -104,13 +107,16 @@ namespace TempLite
             FillCells(workSheet, pdfVariables.UserData, string.Empty);
 
             row = 50;
+            if (channelTwoEnabled)
+                workSheet.Cells[row, 3].Value = "#2 Humidity";
             FillCells(workSheet, "Date Time", " #1 Temperature");
             row++;
 
             var startRange = row;
             var endRange = (row + pdfVariables.RecordedSamples);
             FillValueCells(workSheet, decoder, pdfVariables, channelOne, channelTwo, startRange, endRange);
-            CreateGraph(workSheet, channelOne, startRange, endRange);
+            CreateGraph(workSheet, pdfVariables, channelOne, channelTwo, startRange, endRange);
+            workSheet.Cells[workSheet.Dimension.Address].AutoFitColumns();
         }
 
         void FillCells(ExcelWorksheet worksheet, string label, string value)
@@ -138,30 +144,36 @@ namespace TempLite
         void FillValueCells(ExcelWorksheet worksheet, G4HexDecoder decoder, PDFvariables pdfVariables, ChannelConfig channelOne, ChannelConfig channelTwo, int start, int end)
         {
             var length = channelOne.Data.Count;
-            var dataObject = new double[length, 1];
-            var timeObject = new string[length, 1];
 
             for (int i = 0; i < length; i++)
             {
-                timeObject[i, 0] = decoder.UNIXtoUTC(Convert.ToInt32(pdfVariables.Time[i]));
-                dataObject[i, 0] = channelOne.Data[i];
-            }
+                worksheet.Cells[start+i,1].Value = decoder.UNIXtoUTC(Convert.ToInt32(pdfVariables.Time[i]));
+                worksheet.Cells[start +i,2].Value = channelOne.Data[i];
 
-            var timeRange = worksheet.Cells[1,start, 1, (end - 1)];
-            timeRange.Value = timeObject;
-            var dataRange = worksheet.Cells[2 ,start, 2, (end - 1)];
-            dataRange.Value = dataObject;
+                if (pdfVariables.IsChannelTwoEnabled == true)
+                    worksheet.Cells[start + i, 3].Value = channelTwo.Data[i];
+            }
+            
         }
 
-        void CreateGraph(ExcelWorksheet worksheet, ChannelConfig channelOne, int start, int end)
+        void CreateGraph(ExcelWorksheet worksheet, PDFvariables pdfVariables, ChannelConfig channelOne, ChannelConfig channelTwo, int start, int end)
         {
             var graph = worksheet.Drawings.AddChart("newGraph", OfficeOpenXml.Drawing.Chart.eChartType.Line);
-            graph.SetPosition(0, 475);
-            graph.SetSize(240, 240);
+            graph.SetPosition(675,0);
+            graph.SetSize(500, 300);
 
-            var xSeries = worksheet.Cells[1,start,1,end];
-            var ySeries = worksheet.Cells[2,start,2,end];
-            graph.Series.Add(xSeries, ySeries);
+            var xSeries = worksheet.Cells[start,1,end-1,1];
+            var ySeries = worksheet.Cells[start,2,end-1,2];
+            graph.Series.Add(ySeries,xSeries);
+ 
+            if (pdfVariables.IsChannelTwoEnabled)
+            {
+                var ySeries2 = worksheet.Cells[start, 3, end - 1, 3];
+                graph.Series.Add(ySeries2, xSeries);
+            }
+
+            graph.Series[0].Header = "Temperature"; // change to channelOne.sensorName
+            graph.Series[1].Header = "Humditiy"; // change to channelTwo.sensorName
         }
     }
 }

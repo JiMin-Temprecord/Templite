@@ -11,10 +11,9 @@ namespace TempLite
     {
         string loggerState;
         string batteryPercentage;
-        string timeAtFirstSameple;
         string userData;
 
-        bool loopOverwrite = false;
+        bool loopAtOverwrite = false;
         bool fahrenheit = false;
 
         long samplePeriod = 0;
@@ -57,7 +56,7 @@ namespace TempLite
         List<List<double>> Data = new List<List<double>>();
         List<int> Tag = new List<int>();
 
-        readonly double Kelvin = 27315;
+        readonly int Kelvin = 27315;
         readonly double KelvinDec = 273.15;
         readonly long Year2000 = 946684800000L;
         readonly long Year2010 = 1262304000000L;
@@ -74,6 +73,7 @@ namespace TempLite
         {
             var jsonObject = GetJsonObject();
             numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
+            userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_DATA,UserDataLen"),16);
             userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
             loggerState = ReadFromJObject(jsonObject, "HEADER,State");
             loopOverwriteStartAddress = Convert.ToInt32(ReadFromJObject(jsonObject, "LoopOverWriteAddress"),16);
@@ -91,8 +91,10 @@ namespace TempLite
             timeFirstSample = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TimeStarted"));
             ReadFromJObject(jsonObject, "SENSOR,SENSOR");
             ReadFromJObject(jsonObject, "TABLE,CompressionTable");
-            Console.WriteLine("LOWER LIMIT : " + ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit"));
-            Console.WriteLine("UPPER LIMIT : " + ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit"));
+            var limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit").Split(',');
+            lowerLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
+            limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit").Split(',');
+            upperLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
             dataAddress = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,DataEndPointer"),16);
             ReadFromJObject(jsonObject, "SENSOR,Decode_Delta_Data");
         }
@@ -168,7 +170,8 @@ namespace TempLite
             if (Channel.BelowLimits > 0)
                 Channel.BreachedBelow = " (breached)";
 
-            Channel.Data = Data[i];
+            if(Data.Count > 0)
+                Channel.Data = Data[i];
         }
 
         byte[] ReadHex(string[] currentinfo)
@@ -190,6 +193,7 @@ namespace TempLite
 
                         if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
                             addtoread = address;
+
                         if (addtoread == address)
                         {
                             diff = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
@@ -197,7 +201,7 @@ namespace TempLite
                             {
                                 int infolength = Convert.ToInt32(currentinfo[1]);
 
-                                if (infolength == 32768)
+                                if (infolength == 32768) // if we are reading DATA
                                 {
                                     infolength = dataAddress;
 
@@ -209,21 +213,24 @@ namespace TempLite
                                     int readinfo = 58 - diff;
                                     while (infolength > 0)
                                     {
-                                        Console.WriteLine("DATA LENGTH : " + infolength);
                                         temp += data.Substring(diff * 2, readinfo * 2);
                                         line = sr.ReadLine();
-                                        data = line.Substring(7, line.Length - 7);
-                                        infolength = infolength - readinfo;
-                                        diff = 0;
+                                        if (line != null)
+                                        {
+                                            data = line.Substring(7, line.Length - 7);
+                                            infolength = infolength - readinfo;
+                                            diff = 0;
 
-                                        if (infolength > 58)
-                                        {
-                                            readinfo = data.Length/2;
+                                            if (infolength > (data.Length / 2))
+                                            {
+                                                readinfo = data.Length / 2;
+                                            }
+                                            else
+                                            {
+                                                readinfo = infolength;
+                                            }
                                         }
-                                        else
-                                        {
-                                            readinfo = infolength;
-                                        }
+                                        else { break; }
                                     }
                                     int totallength = temp.Length;
                                     bytes = new byte[totallength / 2];
@@ -257,6 +264,7 @@ namespace TempLite
         #region Reading Json File
         string ReadFromJObject(JObject jsonObject, string info)
         {
+            Console.WriteLine("DECODE : " + info);
             var decodeInfo = JsontoString(jsonObject, info);
             return CallDecodeFunctions(decodeInfo);
         }
@@ -292,7 +300,7 @@ namespace TempLite
                     return _1ByteToBoolean(decodeByte);
 
                 case "_1_Byte_to_Decimal":
-                    return _1ByteToDecimal(stringArrayInfo, decodeByte);
+                    return _1ByteToDecimal(decodeByte);
 
                 case "_2_Byte_to_Decimal":
                     return (((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)).ToString();
@@ -369,10 +377,7 @@ namespace TempLite
                     if (GetBit(decodeByte[0], 7) != 0)
                         bitbool = true;
                     return bitbool.ToString();
-                    
-                case "Battery_Type":
-                    break;
-                    
+
                 case "CompressionTable":
                     compressionTable = CompressionTable(decodeByte);
                     break;
@@ -400,6 +405,10 @@ namespace TempLite
                 case "*Logger_State":
                     return LoggerState(decodeByte);
 
+                case "SENSOR_Decoding":
+                    SensorDecoding(decodeByte);
+                    break;
+
                 case "String":
                     return String(decodeByte);
 
@@ -420,38 +429,31 @@ namespace TempLite
                 return "true";
             }
         }
-        string _1ByteToDecimal(string[] stringArrayInfo, byte[] decodeByte)
+        string _1ByteToDecimal(byte[] decodeByte)
         {
-            if (decodeByte.Length > 1)
-            {
-                for (int i = 0; i < decodeByte.Length; i++)
-                    decodeByte[i] = (byte)(decodeByte[i] & 0xff);
-
-                if (stringArrayInfo[3] == "0")
-                    return ToBigEndian(decodeByte);
-                else
-                    return string.Empty;
-            }
-            else
-            {
-                decodeByte[0] = (byte)(decodeByte[0]);
-                return ToBigEndian(decodeByte);
-            }
+            return decodeByte[0].ToString("x02");
         }
         string _3BytetoTemperatureArray(byte[] decodeByte)
         {
             var offset = 9;
             var limitArray = new double[numberChannel];
+            var limitString = string.Empty;
 
             for (int i = 0; i < numberChannel; i++)
             {
-                double element = ((((decodeByte[(offset * i) + 2]) & 0xFF) << 16) | (((decodeByte[(offset * i) + 1]) & 0xFF) << 8) | (decodeByte[(offset * i)] & 0xFF));
-                element += Kelvin;
+                var element = ((((decodeByte[(offset * i) + 2]) & 0xFF) << 16) | (((decodeByte[(offset * i) + 1]) & 0xFF) << 8) | (decodeByte[(offset * i)] & 0xFF));
+                element -= Kelvin;
                 element /= 100;
                 limitArray[i] += element;
             }
 
-            var limitString = string.Join("", limitArray);
+            for (int i = 0; i < limitArray.Length; i++)
+            {
+                if ((i + 1) == limitArray.Length)
+                    limitString += limitArray[i].ToString();
+                else limitString += limitArray[i].ToString() + ',';
+            }
+
             return limitString;
         }
         string _4ByteBuilt(byte[] decodeByte)
@@ -499,18 +501,23 @@ namespace TempLite
             var totalNumberofTicks = ((G4MemorySize - 9) - (6 * numberChannel - 1)) / numberChannel; // what are these numbers 
             var totalLoggingTime = totalNumberofTicks * samplePeriod;
 
-            if (timeStarted == (946684800 + startDelay)) // also what is this number
+            if (loopOverwriteStartAddress == 0)
+                timeStarted = utcReferenceTime - ticksSinceStart + startDelay;
+            else
+                timeStarted = utcReferenceTime - totalLoggingTime - ticksSinceStop;
+
+            /*if (timeStarted == (946684800 + startDelay)) // also what is this number  || means button started 
             {
                 if (loopOverwriteStartAddress == 0)
                     timeStarted = utcReferenceTime - ticksSinceStart + startDelay;
                 else
                     timeStarted = utcReferenceTime - totalLoggingTime - ticksSinceStop;
             }
-            else
+            else 
             {
-                if (timeStarted != 0)
+                if (loopOverwriteStartAddress != 0)
                     timeStarted = utcReferenceTime - totalLoggingTime - ticksSinceStop;
-            }
+            }*/
 
             return timeStarted;
         }
@@ -529,18 +536,14 @@ namespace TempLite
                 var VaddLSB = (memoryStart + (2 * currentSensor) + (2*numberChannel)) & G4MemorySize;
 
                 startValue[currentSensor] = (((decodeByte[addMSB]) & 0xff) << 8) | (decodeByte[addLSB] & 0xff);
-                var verifyValue = (((decodeByte[VaddMSB] & 0xff) << 8) | (decodeByte[VaddLSB] & 0xff));
-                Console.WriteLine("verifyValue : " + verifyValue);
+                var verifyValue = ((decodeByte[VaddMSB] & 0xff) << 8) | (decodeByte[VaddLSB] & 0xff);
                 if (startValue[currentSensor] != verifyValue)
                 {
                     check = false;
                 }
-
-                Console.WriteLine("sensorStartValue : " + sensorStartingValue[currentSensor]);
+                
                 sensorStartingValue[currentSensor] -= verifyValue;
-                Console.WriteLine("sensorStartValue : " + sensorStartingValue[currentSensor]);
                 sensorStartingValue[currentSensor] *= -1;
-                Console.WriteLine("sensorStartValue : " + sensorStartingValue[currentSensor]);
 
                 currentSensor++;
             }
@@ -575,8 +578,7 @@ namespace TempLite
                     memoryStart += ((6 * numberChannel) + 1);
                     memoryStart &= G4MemorySize;
                     memoryStart = FindStartSentinel(memoryStart, (8 * numberChannel), decodeByte); 
-
-
+                    
                     if (memoryStart != 0xFFFF)
                     {
                         memoryStart++;
@@ -616,7 +618,7 @@ namespace TempLite
 
             if (maxI > memoryStart)
             {
-                while (memoryStart < maxI)
+                while (maxI > memoryStart)
                 {
                     if ((decodeByte[memoryStart] == 0x7F) || (decodeByte[memoryStart] & 0xff) == 0xff) //???????????????????????
                     {
@@ -681,13 +683,13 @@ namespace TempLite
         }
         void ReadStoreData(byte[] decodeByte, int memoryStart)
         {
-            var channelList = new List<double>();
             var tagList = new List<int>();
 
             var MaxReadingLength = (G4MemorySize - (6 * numberChannel) - 2) / numberChannel;
 
             for (int i = 0; i < numberChannel; i++)
-            { 
+            {
+                var channelList = new List<double>();
                 var arrayPointer = 0;
                 var dataPointer = (memoryStart + i) & G4MemorySize;                  //& 0x007FFF is to allow buffer rotation
                 var totalSameples = 0;
@@ -700,20 +702,20 @@ namespace TempLite
                     {
                         if (i == 0)
                         {
-                            tagList[tagNumbers++] = arrayPointer;
+                            tagList.Add(arrayPointer);
                         }
                     }
                     else
                     {
-                        if (decodeByte[dataPointer] > 0x7F)
+                        if (decodeByte[dataPointer] > 0x7f)
                         {
-                            sensorStartingValue[i] -= compressionTable[(decodeByte[dataPointer] & 0x7F)];
+                            sensorStartingValue[i] -= decodeByte[dataPointer] & 0x7f;
                         }
                         else
                         {
-                            sensorStartingValue[i] += compressionTable[(decodeByte[dataPointer])];
+                            sensorStartingValue[i] += decodeByte[dataPointer];
                         }
-
+                        
                         channelList.Add((double)sensorStartingValue[i] / 100);
                         TemperatureStatistics(i, ((double)sensorStartingValue[i] / 100), arrayPointer);
                         totalSameples++;
@@ -732,36 +734,42 @@ namespace TempLite
         }
         void SensorDecoding(byte[] decodeByte)
         {
-            /*var offset = 11;
+            var offset = 11;
             var sensorType = new int[8];
+            var sensorAddressArray = new string[2];
 
             for ( int i = 0; i < numberChannel; i++)
             {
                 var pointer = i * offset;
-                var TempData =
-                sensorType[i] = decodeByte[pointer + 7]; // why this number
+                sensorType[i] = decodeByte[pointer + 7]; // byte 7 is where the sensorType is stored
+
+                sensorAddressArray[0] = decodeByte[10].ToString("x02") + decodeByte[9].ToString("x02");
+                sensorAddressArray[1] = "21"; // size of the sensor information 
+
+                var sensorInfoArray = ReadHex(sensorAddressArray);
                 
-                if(sensorType[i] == 0)
+                if (sensorInfoArray.Length != 0)
                 {
-                    sensorStartingValue[i] = Kelvin - TempData;
-                    TempData -= Kelvin;
+                    var TempData = sensorInfoArray[20] << 16 | sensorInfoArray[19] << 8 | sensorInfoArray[18];
+
+                    if (sensorType[i] == 0)
+                    {
+                        sensorStartingValue[i] = Kelvin - TempData;
+                    }
+                    else
+                    {
+                        sensorStartingValue[i] = 0x100000 - TempData;
+                    }
                 }
-                else
-                {
-                    sensorStartingValue[i] = 0x100000 - TempData;
-                    TempData = sensorStartingValue[i];
-                }
-            }*/
+            }
         }
         string String(byte[] decodeByte)
-        {
-            var userdatastring = string.Empty;
-            for (int i = 0; i < decodeByte.Length; i++)
-            {
-                userdatastring += (char)(decodeByte[i] & 0xFF);
-            }
-
-            return userdatastring.Substring(0, userDataLength);
+        { 
+            var UserDataString = Encoding.ASCII.GetString(decodeByte);
+            if (UserDataString.Length > 0)
+                return UserDataString.Substring(0, userDataLength);
+            else
+                return string.Empty;
         }
         string ToLittleEndian(byte[] decodebyte)
         {

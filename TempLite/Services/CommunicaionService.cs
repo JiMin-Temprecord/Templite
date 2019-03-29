@@ -171,7 +171,7 @@ namespace TempLite.Services
 
                     if (loggerInformation.MemoryStart[4] > loggerInformation.MemoryMax[4])
                     {
-                        hexes.Add(new Hex("FD0000", loggerInformation.MemoryStart[4].ToString("X02")));
+                        hexes.Add(new Hex("FD0000", loggerInformation.MemoryStart[4].ToString("X04")));
                         loggerInformation.MemoryStart[4] = 0x0000;
                         loggerInformation.MemoryMax[4] = 0x8000;
                     }
@@ -194,13 +194,12 @@ namespace TempLite.Services
         {
             length = maxlenreading;
             var msg = ReadBytes(serialPort);
-            //Console.WriteLine("RECIEVE : " + msg);
             var addressRead = "0" + currentAddress.MemoryNumber + currentAddress.MemoryAddMSB.ToString("x02") + currentAddress.MemoryAddLSB.ToString("x02");
 
-            if ((recievemsg[0] == 0x00) || (recievemsg.Count > 8))
+            if ((recievemsg[0] == 0x00) && (recievemsg.Count > 8))
             {
                 var finalmsg = string.Empty;
-                finalmsg = msg.ToString(2, msg.Length-6);
+                finalmsg = msg.ToString(2, msg.Length-8);
                 Hexes.Add(new Hex(addressRead, finalmsg));
             }
 
@@ -212,20 +211,12 @@ namespace TempLite.Services
         {
             var sendMessage = new byte[11];
             sendMessage = byteWriter.WriteBytes(sendMessage);
-
-            /*Console.Write("SEND : ");
-            foreach (byte bt in sendMessage)
-                Console.Write(bt.ToString("x02") + "-");
-            Console.WriteLine("");*/
-
-            try
-            { 
-                    serialPort.Write(sendMessage, 0, sendMessage.Length);
-            }
-            catch (TimeoutException)
-            {
-            }
             
+            try
+            {
+                serialPort.Write(sendMessage, 0, sendMessage.Length);
+            }
+            catch (TimeoutException) { }
         }
         AddressSection GetNextAddress(AddressSection currentAddress, LoggerInformation loggerInformation)
         {

@@ -106,10 +106,10 @@ namespace TempLite
 
             DrawChannelSection("Preset Upper Limit :", c => c.PresetUpperLimit.ToString("N2") + pdfVariables.TempUnit); //need to add the breached
             DrawChannelSection("Preset Lower Limit :", c => c.PresetLowerLimit.ToString("N2") + pdfVariables.TempUnit); // need to add the breached
-            DrawChannelSection("Mean Value :", c => c.Mean.ToString("N2"));
-            DrawChannelSection("MKT Value :", c => c.MKT_C.ToString("N2"));
-            DrawChannelSection("Max Recorded :", c => c.Max.ToString("N2"));
-            DrawChannelSection("Min Recorded :", c => c.Min.ToString("N2"));
+            DrawChannelSection("Mean Value :", c => c.Mean.ToString("N2") + pdfVariables.TempUnit);
+            DrawChannelSection("MKT Value :", c => c.MKT_C.ToString("N2") + pdfVariables.TempUnit);
+            DrawChannelSection("Max Recorded :", c => c.Max.ToString("N2") + pdfVariables.TempUnit);
+            DrawChannelSection("Min Recorded :", c => c.Min.ToString("N2") + pdfVariables.TempUnit);
             lineCounter += (PDFcoordinates.line_inc * 0.5);
             DrawChannelSection("Total Samples within Limits :", c => c.WithinLimits.ToString("N1"));
             DrawChannelSection("Total Time within Limits :", c => c.TimeWithinLimits);
@@ -144,7 +144,7 @@ namespace TempLite
             draw.DrawString("Signature ", font, XBrushes.Black, PDFcoordinates.sigX, PDFcoordinates.sigY);
             draw.DrawString("Page 1/1 ", font, XBrushes.Black, 600, 980);
             draw.DrawString("www.temprecord.com", font, XBrushes.Black, PDFcoordinates.siteX, PDFcoordinates.siteY);
-            draw.DrawString(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:sss UTC"), font, XBrushes.Black, PDFcoordinates.dateX, PDFcoordinates.dateY);
+            draw.DrawString(DateTime.UtcNow.ToString("dd/MM/yyy HH:mm:sss UTC"), font, XBrushes.Black, PDFcoordinates.dateX, PDFcoordinates.dateY);
             draw.DrawString("0.1.9.1", font, XBrushes.Black, PDFcoordinates.versionX, PDFcoordinates.versionY);
 
             string filename = loggerInformation.SerialNumber + ".pdf";
@@ -246,7 +246,6 @@ namespace TempLite
                 draw.DrawString(ch2_upper_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch2_upper_Y);
                 draw.DrawString(" %RH Lower Limit ", font, XBrushes.Black, PDFcoordinates.third_column, (float)ch2_lower_Y + PDFcoordinates.graph_limit_label + 5);
                 draw.DrawString(ch2_lower_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch2_lower_Y);
-                //draw.DrawString(pdfVariables.ChannelTwo.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - (((pdfVariables.ChannelTwo.Mean - ch_lowest) * graph_y_scale))) + PDFcoordinates.graph_topY);
                 draw.DrawLine(pen, PDFcoordinates.graph_l_lineX_start, (float)ch2_lower_Y, PDFcoordinates.graph_l_lineX_end, (float)ch2_lower_Y);
                 draw.DrawLine(pen, PDFcoordinates.graph_l_lineX_start, (float)ch2_upper_Y, PDFcoordinates.graph_l_lineX_end, (float)ch2_upper_Y);
                 draw.DrawLine(ch1, PDFcoordinates.graph_l_lineX_start, ch2_max, PDFcoordinates.graph_l_lineX_end, ch2_max);
@@ -268,7 +267,7 @@ namespace TempLite
                 draw.DrawString(ch1_lower_L.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)ch1_lower_Y);
                 draw.DrawString(ch_lowest.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, ch1_min);
                 draw.DrawString(ch_highest.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, ch1_max);
-                //draw.DrawString(pdfVariables.ChannelOne.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Mean - ch_lowest) * graph_y_scale)) + PDFcoordinates.graph_topY);
+                draw.DrawString(pdfVariables.ChannelOne.Mean.ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Mean - ch_lowest) * graph_y_scale)) + PDFcoordinates.graph_topY);
                 draw.DrawLine(belowlimit, PDFcoordinates.graph_l_lineX_start, (float)ch1_lower_Y, PDFcoordinates.graph_l_lineX_end, (float)ch1_lower_Y);
                 draw.DrawLine(abovelimit, PDFcoordinates.graph_l_lineX_start, (float)ch1_upper_Y, PDFcoordinates.graph_l_lineX_end, (float)ch1_upper_Y);
                 draw.DrawLine(withinlimits, PDFcoordinates.graph_l_lineX_start, ch1_max, PDFcoordinates.graph_l_lineX_end, ch1_max);

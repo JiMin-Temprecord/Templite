@@ -101,7 +101,7 @@
     <Compile Include="FTDIInfo.cs" />
     <Compile Include="ByteWriters\ReadLoggerByteWritter.cs" />
     <Compile Include="ByteWriters\SetReadByteWritter.cs" />
-    <Compile Include="UserControl\EZFontResolver.cs" />
+    <Compile Include="EZFontResolver.cs" />
     <Compile Include="UserControl\GenerateDocumentUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
