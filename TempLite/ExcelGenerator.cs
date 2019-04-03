@@ -24,7 +24,7 @@ namespace TempLite
 
         private void CreateLayout(ExcelWorksheet workSheet, LoggerInformation loggerInformation, string loggername)
         {
-            var decoder = new G4HexDecoder(loggerInformation);
+            var decoder = new HexFileDecoder(loggerInformation);
             decoder.ReadIntoJsonFileAndSetupDecoder();
             var pdfVariables = decoder.AssignPDFValue();
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
@@ -34,7 +34,7 @@ namespace TempLite
             var imageRange = workSheet.Cells[5, 5];
             if (channelOne.OutsideLimits == 0 && channelTwo.OutsideLimits == 0)
             {
-                var tickImage = Image.FromFile(Application.StartupPath + "\\greentick.png");
+                var tickImage = Image.FromFile("..\\..\\Images\\greentick.png");
                 var setPosition = workSheet.Drawings.AddPicture("Within Limitis" , tickImage);
                 setPosition.SetSize(145, 128);
                 setPosition.SetPosition(80, 275);
@@ -45,7 +45,7 @@ namespace TempLite
             }
             else
             {
-                var warningImage = Image.FromFile(Application.StartupPath + "\\redwarning.png");
+                var warningImage = Image.FromFile("..\\..\\Images\\redwarning.png");
                 var setPosition = workSheet.Drawings.AddPicture("Outside Limits" , warningImage);
                 setPosition.SetSize(145, 128);
                 setPosition.SetPosition(80, 275);
@@ -55,7 +55,7 @@ namespace TempLite
             }
 
             var logoRange = workSheet.Cells[1, 3];
-            var logoImage = Image.FromFile(Application.StartupPath + "\\logo.png");
+            var logoImage = Image.FromFile("..\\..\\Images\\logo.png");
             var setLogoPosition = workSheet.Drawings.AddPicture(string.Empty, logoImage);
             setLogoPosition.SetSize(103, 63);
             setLogoPosition.SetPosition(10, 130);
@@ -141,7 +141,7 @@ namespace TempLite
             row++;
         }
 
-        void FillValueCells(ExcelWorksheet worksheet, G4HexDecoder decoder, PDFvariables pdfVariables, ChannelConfig channelOne, ChannelConfig channelTwo, int start, int end)
+        void FillValueCells(ExcelWorksheet worksheet, HexFileDecoder decoder, PDFvariables pdfVariables, ChannelConfig channelOne, ChannelConfig channelTwo, int start, int end)
         {
             var length = channelOne.Data.Count;
 
@@ -170,10 +170,10 @@ namespace TempLite
             {
                 var ySeries2 = worksheet.Cells[start, 3, end - 1, 3];
                 graph.Series.Add(ySeries2, xSeries);
+                graph.Series[1].Header = "Humditiy"; // change to channelTwo.sensorName
             }
 
             graph.Series[0].Header = "Temperature"; // change to channelOne.sensorName
-            graph.Series[1].Header = "Humditiy"; // change to channelTwo.sensorName
         }
     }
 }

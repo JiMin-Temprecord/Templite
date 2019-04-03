@@ -8,7 +8,6 @@ namespace TempLite
 {
     public class ChannelConfig
     {
-        public string SensorName { get; set; }
         public List<double> Data { get; set; }
         public double PresetUpperLimit { get; set; }
         public double PresetLowerLimit { get; set; }
@@ -20,11 +19,13 @@ namespace TempLite
         public double OutsideLimits { get; set; }
         public double AboveLimits { get; set; }
         public double BelowLimits { get; set; }
-        public String BreachedAbove { get; set; }
-        public String BreachedBelow { get; set; }
-        public String TimeWithinLimits { get; set; }
-        public String TimeOutLimits { get; set; }
-        public String TimeAboveLimits { get; set; }
-        public String TimeBelowLimits { get; set; }
+        public string BreachedAbove { get; set; }
+        public string BreachedBelow { get; set; }
+        public string TimeWithinLimits { get; set; }
+        public string TimeOutLimits { get; set; }
+        public string TimeAboveLimits { get; set; }
+        public string TimeBelowLimits { get; set; }
+        public string SensorName { get; set; }
+        public string Unit { get; set; }
     }
 }

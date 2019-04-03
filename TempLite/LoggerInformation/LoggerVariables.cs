@@ -17,7 +17,7 @@ namespace TempLite
         public String FirstSample { get; set; }
         public String LastSample { get; set; }
         public String TagsPlaced { get; set; }
-        public String TempUnit { get; set; }
+        public string TotalTrip { get; set; }
         public String UserData { get; set; }
         public ArrayList Time { get { return time; } set { time = value; } }
         

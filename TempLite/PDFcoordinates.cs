@@ -12,7 +12,7 @@ namespace TempLite
     {
         public static readonly int first_column = 20;
         public static readonly int second_column = 275;
-        public static readonly int third_column = 550;
+        public static readonly int third_column = 530;
 
         public static readonly double line_counter = 80;
         public static readonly double line_inc = 17;
