@@ -195,11 +195,13 @@ namespace TempLite.Services
             length = maxlenreading;
             var msg = ReadBytes(serialPort);
             var addressRead = "0" + currentAddress.MemoryNumber + currentAddress.MemoryAddMSB.ToString("x02") + currentAddress.MemoryAddLSB.ToString("x02");
-
             if ((recievemsg[0] == 0x00) && (recievemsg.Count > 8))
             {
                 var finalmsg = string.Empty;
-                finalmsg = msg.ToString(2, msg.Length-8);
+                if (msg.Length > 124)
+                    finalmsg = msg.ToString(2, 116);
+                else
+                    finalmsg = msg.ToString(2, msg.Length-8);
                 Hexes.Add(new Hex(addressRead, finalmsg));
             }
 

@@ -9,16 +9,16 @@ namespace TempLite
        
         public bool[] EnabledChannels { get; set; }
         public int RecordedSamples { get; set; }
-        public String SerialNumber { get; set; }
-        public String LoggerState { get; set; }
-        public String BatteryPercentage { get; set; }
-        public String SameplePeriod { get; set; }
-        public String StartDelay { get; set; }
-        public String FirstSample { get; set; }
-        public String LastSample { get; set; }
-        public String TagsPlaced { get; set; }
+        public string SerialNumber { get; set; }
+        public string LoggerState { get; set; }
+        public string BatteryPercentage { get; set; }
+        public string SameplePeriod { get; set; }
+        public string StartDelay { get; set; }
+        public string FirstSample { get; set; }
+        public string LastSample { get; set; }
+        public string TagsPlaced { get; set; }
         public string TotalTrip { get; set; }
-        public String UserData { get; set; }
+        public string UserData { get; set; }
         public ArrayList Time { get { return time; } set { time = value; } }
         
         ChannelConfig channelOne;

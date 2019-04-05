@@ -12,5 +12,6 @@
         public int[] MemoryMax { get; set; }
         public int RequestMemoryStartPointer { get; set; }
         public int RequestMemoryMaxPointer { get; set; }
+        public string EmailId { get; set; }
     }
 }

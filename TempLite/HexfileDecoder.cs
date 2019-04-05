@@ -5,59 +5,73 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using TempLite.Services;
-
 namespace TempLite
 {
-    public class HexfileDecoder
+    public class HexFileDecoder
     {
         string loggerState;
         string batteryPercentage;
-        string timeAtFirstSameple;
         string userData;
+        string emailID;
 
         bool loopOverwrite = false;
-        bool Fahrenheit = false;
-        
-        double Kelvin_Dec = 273.15;
-        double lowestTemp = 0;
-        double Resolution = 0;
+        bool fahrenheit = false;
 
-        long Y_2000 = 946684800000L;
-        long timeFirstSample = 0;
         long samplePeriod = 0;
-        long UTCreferenceTime = 0;
+        long secondsTimer = 0;
+        long utcReferenceTime = 0;
+        long timeAtFirstSameple = 0;
         long ticksAtLastSample = 0;
         long ticksSinceStart = 0;
-        long secondsTimer = 0;
         long manufactureDate = 0;
         
-        int recordedSamples = 0;
         int numberChannel = 0;
         int userDataLength = 0;
         int startDelay = 0;
         int totalRTCticks = 0;
         int totalSamplingEvents = 0;
         int totalUses = 0;
-
-        int[] highestPosition = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        int[] lowestPosition = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        int loopOverwriteStartAddress = 0;
+        int dataAddress = 32767;
+        int recordedSamples = 0;
+        int tagNumbers = 0;
+        
+        int[] highestPosition = new int[8];
+        int[] lowestPosition = new int[8];
+        int[] sensorStartingValue = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        int[] sensorTablePointer = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        int[] sensorType = { 0, 0, 0, 0, 0, 0, 0, 0 };
         int[] compressionTable = new int[128];
+        
+        double lowestTemp = 0;
+        double resolution = 0;
 
-        double Delta_H = 83.14472; //Delta H   is the Activation Energy:   83.14472    kJ/mole
-        double R = 8.314472; //R is the Gas Constant: 0.008314472 J/mole/degree
+        double[] upperLimit = new double[8];
+        double[] lowerLimit = new double[8];
+        double[] sensorMin = new double[8];
+        double[] sensorMax = new double[8];
+        double[] mean = new double[8];
+        double[] mkt = new double[8];
+        double[] withinLimit = new double[8];
+        double[] belowLimit = new double[8];
+        double[] aboveLimit = new double[8];
 
-        List<double> Data;
-        double[] upperLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] lowerLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] sensorMin = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] sensorMax = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] Mean = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] MKT = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] withinLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] belowLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[] aboveLimit = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        List<List<double>> Data = new List<List<double>>();
+        List<int> Tag = new List<int>();
 
-        public HexfileDecoder(LoggerInformation loggerInformation)
+        readonly int Kelvin = 27315;
+        readonly double KelvinDec = 273.15;
+        readonly double Delta_H = 83.14472;     //Delta H   is the Activation Energy:   83.14472    kJ/mole
+        readonly double R = 8.314472;           //R is the Gas Constant: 0.008314472 J/mole/degree
+        readonly long Year2000 = 946684800000L;
+        readonly long Year2010 = 1262304000000L;
+        readonly int G4MemorySize = 32767;
+
+        readonly LoggerInformation loggerInformation;
+        readonly string serialNumber;
+        readonly string jsonFile;
+
+        public HexFileDecoder(LoggerInformation loggerInformation)
         {
             this.loggerInformation = loggerInformation;
             this.serialNumber = loggerInformation.SerialNumber;
@@ -66,35 +80,68 @@ namespace TempLite
 
         public void ReadIntoJsonFileAndSetupDecoder()
         {
+            string[] limit;
             var jsonObject = GetJsonObject();
-            numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
-            userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
-            loggerState = ReadFromJObject(jsonObject, "HEADER,State");
-            Fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, "USER_SETTINGS,Fahrenheit"));
-            UTCreferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, "UTCReferenceTime"), 16);
-            totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalRTCTicks"), 16);
-            manufactureDate = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,ManufactureDate"));
-            totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalSamplingEvents"), 16);
-            totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalUses"), 16);
-            batteryPercentage = ReadFromJObject(jsonObject, "BATTERY_INFO,Battery") + "%";
-            loopOverwrite = Convert.ToBoolean(ReadFromJObject(jsonObject, "DATA_INFO,Overwritten"));
-            startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,StartDelay"), 16);
-            samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,SamplingPeriod"), 16);
-            secondsTimer = Convert.ToInt32(ReadFromJObject(jsonObject, "SecondsTimer"), 16);
-            ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
-            timeAtFirstSameple = ReadFromJObject(jsonObject, "DATA_INFO,Time_FirstSample_MonT");
-            ticksAtLastSample = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksAtLastSample"), 16);
-            lowestTemp = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,LowestTemp"));
-            Resolution = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,ResolutionRatio")) / 100;
-            recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"));
-            upperLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit"));
-            lowerLimit[0] = Convert.ToDouble(ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit"));
-            ReadFromJObject(jsonObject, "SENSOR,Decode_MonT_Data");
-        }
 
-        readonly LoggerInformation loggerInformation;
-        readonly string serialNumber;
-        readonly string jsonFile;
+            if (loggerInformation.LoggerName == "G4")
+            {
+                numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
+                userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_DATA,UserDataLen"), 16);
+                emailID = ReadFromJObject(jsonObject, "USER_SETTINGS,Owner");
+                userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
+                loggerState = ReadFromJObject(jsonObject, "HEADER,State");
+                batteryPercentage = Convert.ToInt32(ReadFromJObject(jsonObject, "BATTERY_INFO,Battery"), 16) + "%";
+                loopOverwriteStartAddress = Convert.ToInt32(ReadFromJObject(jsonObject, "LoopOverWriteAddress"), 16);
+                fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, "USER_SETTINGS,Fahrenheit"));
+                utcReferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, "UTCReferenceTime"), 16);
+                totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalRTCTicks"), 16);
+                totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalSamplingEvents"), 16);
+                totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalUses"), 16);
+                startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,StartDelay"), 16);
+                samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,SamplingPeriod"), 16);
+                ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
+                ticksAtLastSample = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksAtLastSample"), 16);
+                recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"), 16);
+                timeAtFirstSameple = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TimeStarted"));
+                ReadFromJObject(jsonObject, "TABLE,CompressionTable");
+                ReadFromJObject(jsonObject, "SENSOR,SENSOR");
+                dataAddress = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,DataEndPointer"), 16);
+                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit").Split(',');
+                lowerLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
+                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit").Split(',');
+                upperLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
+                ReadFromJObject(jsonObject, "SENSOR,Decode_Delta_Data");
+            }
+
+            if (loggerInformation.LoggerName == "Mon T")
+            {
+                numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
+                userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_DATA,UserDataLen"), 16);
+                userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
+                loggerState = ReadFromJObject(jsonObject, "HEADER,State");
+                fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, "USER_SETTINGS,Fahrenheit"));
+                utcReferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, "UTCReferenceTime"), 16);
+                totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalRTCTicks"), 16);
+                manufactureDate = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,ManufactureDate"));
+                totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalSamplingEvents"), 16);
+                totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalUses"), 16);
+                batteryPercentage = Convert.ToInt32(ReadFromJObject(jsonObject, "BATTERY_INFO,Battery"), 16) + "%";
+                loopOverwrite = Convert.ToBoolean(ReadFromJObject(jsonObject, "DATA_INFO,Overwritten"));
+                startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,StartDelay"), 16);
+                samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,SamplingPeriod"), 16);
+                secondsTimer = Convert.ToInt32(ReadFromJObject(jsonObject, "SecondsTimer"), 16);
+                ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
+                timeAtFirstSameple = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,Time_FirstSample_MonT"));
+                lowestTemp = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,LowestTemp"));
+                resolution = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,ResolutionRatio")) / 100;
+                recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"));
+                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit").Split(',');
+                lowerLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
+                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit").Split(',');
+                upperLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
+                ReadFromJObject(jsonObject, "SENSOR,Decode_MonT_Data");
+            }
+        }
 
         public PDFvariables AssignPDFValue()
         {
@@ -106,15 +153,23 @@ namespace TempLite
             pdfVariables.BatteryPercentage = batteryPercentage;
             pdfVariables.SameplePeriod = HHMMSS(samplePeriod);
             pdfVariables.StartDelay = HHMMSS(startDelay);
-            pdfVariables.FirstSample = timeAtFirstSameple;
-            pdfVariables.LastSample = timeAtFirstSameple;
-            pdfVariables.TagsPlaced = "0";
-            pdfVariables.UserData = userData;
+            pdfVariables.FirstSample = UNIXtoUTC(timeAtFirstSameple);
+            pdfVariables.LastSample = UNIXtoUTC(timeAtFirstSameple);
+            pdfVariables.TagsPlaced = tagNumbers.ToString();
+            pdfVariables.TotalTrip = totalUses.ToString();
+            pdfVariables.UserData = userData.Substring(0,userDataLength);
+            
+            loggerInformation.EmailId = emailID; 
+
+            if (batteryPercentage == "255%")
+            {
+                pdfVariables.BatteryPercentage = "100%";
+            }
 
             for (int i = 0; i < pdfVariables.RecordedSamples; i++)
             {
-                pdfVariables.Time.Add(timeFirstSample);
-                timeFirstSample = timeFirstSample + samplePeriod;
+                pdfVariables.Time.Add(timeAtFirstSameple);
+                timeAtFirstSameple = timeAtFirstSameple + samplePeriod;
             }
 
             if (recordedSamples > 0)
@@ -122,13 +177,7 @@ namespace TempLite
                 var timeLastSample = Convert.ToInt32(pdfVariables.Time[(pdfVariables.Time.Count - 1)]);
                 pdfVariables.LastSample = UNIXtoUTC(timeLastSample);
             }
-
-            if (Fahrenheit)
-                pdfVariables.TempUnit = " °F";
-
-            else
-                pdfVariables.TempUnit = " °C";
-
+            
             AssignChannelValues(pdfVariables.ChannelOne, 0);
 
             if (numberChannel > 1)
@@ -140,12 +189,12 @@ namespace TempLite
             return pdfVariables;
         }
 
-        private void AssignChannelValues(ChannelConfig Channel, int i)
+        void AssignChannelValues(ChannelConfig Channel, int i)
         {
             Channel.PresetLowerLimit = lowerLimit[i];
             Channel.PresetUpperLimit = upperLimit[i];
-            Channel.Mean = Mean[i];
-            Channel.MKT_C = MKT[i] - Kelvin_Dec;
+            Channel.Mean = mean[i];
+            Channel.MKT_C = mkt[i] - KelvinDec;
             Channel.Max = sensorMax[i];
             Channel.Min = sensorMin[i];
             Channel.WithinLimits = withinLimit[i];
@@ -163,10 +212,24 @@ namespace TempLite
             if (Channel.BelowLimits > 0)
                 Channel.BreachedBelow = " (breached)";
 
-            Channel.Data = Data;
+            if (Data.Count > 0)
+                Channel.Data = Data[i];
+
+            if (sensorType[i] == 0 || sensorType[i] == 6)
+            {
+                if (fahrenheit)
+                    Channel.Unit = " °F";
+
+                else
+                    Channel.Unit = " °C";
+            }
+            else
+            {
+                Channel.Unit = " % ";
+            }
         }
 
-        private byte[] ReadHex(string[] currentinfo)
+        byte[] ReadHex(string[] currentinfo)
         {
             byte[] bytes = { };
             string addtoread = "";
@@ -185,12 +248,21 @@ namespace TempLite
 
                         if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
                             addtoread = address;
+
                         if (addtoread == address)
                         {
-                            diff = int.Parse(currentinfo[0], NumberStyles.HexNumber) - int.Parse(address, NumberStyles.HexNumber);
+                            diff = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
                             if (diff >= 0 && diff < 58) // reader can only send 64bytes at a time
                             {
                                 int infolength = Convert.ToInt32(currentinfo[1]);
+
+                                if (infolength == 32768) // if we are reading DATA
+                                {
+                                    infolength = dataAddress;
+
+                                    if (loopOverwriteStartAddress > 0)
+                                        infolength = G4MemorySize + 1;
+                                }
                                 if (infolength > 58)
                                 {
                                     int readinfo = 58 - diff;
@@ -198,18 +270,22 @@ namespace TempLite
                                     {
                                         temp += data.Substring(diff * 2, readinfo * 2);
                                         line = sr.ReadLine();
-                                        data = line.Substring(7, line.Length - 7);
-                                        infolength = infolength - readinfo;
-
-                                        if (infolength > 58)
+                                        if (line != null)
                                         {
+                                            data = line.Substring(7, line.Length - 7);
+                                            infolength = infolength - readinfo;
                                             diff = 0;
-                                            readinfo = 58;
+
+                                            if (infolength > (data.Length / 2))
+                                            {
+                                                readinfo = data.Length / 2;
+                                            }
+                                            else
+                                            {
+                                                readinfo = infolength;
+                                            }
                                         }
-                                        else
-                                        {
-                                            readinfo = infolength;
-                                        }
+                                        else { break; }
                                     }
                                     int totallength = temp.Length;
                                     bytes = new byte[totallength / 2];
@@ -219,7 +295,16 @@ namespace TempLite
                                 }
                                 else
                                 {
-                                    temp = data.Substring(diff * 2, infolength * 2);
+                                    if(data.Length < diff*2 + infolength*2)
+                                    {
+                                        var readNextLine = (diff * 2 + infolength * 2) - 58*2;
+                                        temp = data.Substring(diff * 2, infolength * 2 - readNextLine);
+                                        line = sr.ReadLine();
+                                        data = line.Substring(7, line.Length - 7);
+                                        temp += data.Substring(0, readNextLine);
+                                    }
+                                    else
+                                        temp = data.Substring(diff * 2, infolength * 2);
                                     int totallength = temp.Length;
                                     bytes = new byte[totallength / 2];
                                     for (int i = 0; i < totallength; i += 2)
@@ -233,6 +318,7 @@ namespace TempLite
             }
             catch (Exception e)
             {
+                // Let the user know what went wrong.
                 Console.WriteLine("The file could not be read:");
                 Console.WriteLine(e.Message);
             }
@@ -240,21 +326,21 @@ namespace TempLite
         }
 
         #region Reading Json File
-        private string ReadFromJObject(JObject jsonObject, string info)
+        string ReadFromJObject(JObject jsonObject, string info)
         {
             var decodeInfo = JsontoString(jsonObject, info);
             return CallDecodeFunctions(decodeInfo);
         }
 
-        private JObject GetJsonObject()
+        JObject GetJsonObject()
         {
-            using (var sr = new StreamReader(jsonFile))
+            using (var sr = new StreamReader("..\\..\\Json\\"+ jsonFile))
             {
                 return JObject.Parse(sr.ReadToEnd());
             }
         }
 
-        private string[] JsontoString(JObject jsonObject, string info)
+        string[] JsontoString(JObject jsonObject, string info)
         {
             var add = jsonObject.GetValue(info).First.Last.ToString();
             var len = jsonObject.GetValue(info).First.Next.Last.ToString();
@@ -273,14 +359,29 @@ namespace TempLite
             var decodeByte = ReadHex(stringArrayInfo);
             switch (stringArrayInfo[2])
             {
+                case "_1_Byte_to_Boolean":
+                    return _1ByteToBoolean(decodeByte);
+
                 case "_1_Byte_to_Decimal":
-                    return _1ByteToDecimal(stringArrayInfo, decodeByte);
+                    return _1ByteToDecimal(decodeByte);
 
                 case "_2_Byte_to_Decimal":
                     return (((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)).ToString();
 
+                case "_2_Byte_to_Decimal_Big_Endian":
+                    return ToBigEndian(decodeByte);
+
                 case "_2_Byte_to_Temperature_MonT":
                     return _2ByteToTemperatureMonT(decodeByte);
+
+                case "_3_Byte_to_Decimal":
+                    return ToLittleEndian(decodeByte);
+
+                case "_3_Byte_to_Temperature_ARRAY":
+                    return _3BytetoTemperatureArray(decodeByte);
+
+                case "_4_Byte_Built":
+                    return _4ByteBuilt(decodeByte);
 
                 case "_4_Byte_to_Decimal":
                     return ToLittleEndian(decodeByte);
@@ -346,11 +447,16 @@ namespace TempLite
                 case "Battery_MonT":
                     return BatteryMonT(decodeByte);
 
-                case "Battery_Type":
+                case "CompressionTable":
+                    compressionTable = CompressionTable(decodeByte);
                     break;
 
                 case "Channel_1_MonT":
                     return "1";
+                    
+                case "Decode_Delta_Data":
+                    DecodeDeltaData(decodeByte);
+                    break;
 
                 case "Decode_MonT_Data":
                     DecodeMonTData(decodeByte);
@@ -360,57 +466,109 @@ namespace TempLite
                     decodeByte[1]--;
                     return ToLittleEndian(decodeByte);
 
+                case "DJNZ_2_Byte_Type_2":
+                    return DJNZ2ByteType2(decodeByte);
+
+                case "DJNZ_4_Byte_Type_1":
+                    return DJNZ4ByteType1(decodeByte);
+
                 case "DJNZ_4_Byte_Type_2":
                     return DJNZ4ByteType_2(decodeByte);
-                    
+
+                case "LoggingSelection":
+                    return LoggingSelection(decodeByte);
+
                 case "*Logger_State":
                     return LoggerState(decodeByte);
 
                 case "SampleNumber_logged_MonT":
                     return SampleNumberLoggedMonT(decodeByte);
 
+                case "SENSOR_Decoding":
+                    SensorDecoding(decodeByte);
+                    break;
+
                 case "String":
                     return String(decodeByte);
 
                 case "Time_FirstSample_MonT":
                     return TimeFirstSampleMonT(decodeByte);
-
+                    
                 default:
                     break;
             }
 
             return string.Empty;
         }
-        string _1ByteToDecimal(string[] stringArrayInfo, byte[] decodeByte)
+        string _1ByteToBoolean(byte[] decodeByte)
         {
-            if (decodeByte.Length > 1)
+            if ((decodeByte[0] & 0xff) == 0)
             {
-                for (int i = 0; i < decodeByte.Length; i++)
-                    decodeByte[i] = (byte)(decodeByte[i] & 0xff);
-
-                if (stringArrayInfo[3] == "0")
-                    return ToBigEndian(decodeByte);
-                else
-                    return string.Empty;
+                return "false";
             }
             else
             {
-                decodeByte[0] = (byte)(decodeByte[0]);
-                return ToBigEndian(decodeByte);
+                return "true";
             }
+        }
+        string _1ByteToDecimal(byte[] decodeByte)
+        {
+            return decodeByte[0].ToString("x02");
         }
         string _2ByteToTemperatureMonT(byte[] decodeByte)
         {
+
             var value = (((decodeByte[1]) & 0xFF) << 8) | (decodeByte[0] & 0xFF);
             value -= 4000;
             var V = ((double)value / 100);
-            return V.ToString("F");
+            return V.ToString("N2");
+        }
+        string _3BytetoTemperatureArray(byte[] decodeByte)
+        {
+            var offset = 9;
+            var limitArray = new double[numberChannel];
+            var limitString = string.Empty;
+
+            for (int i = 0; i < numberChannel; i++)
+            {
+                var element = ((((decodeByte[(offset * i) + 2]) & 0xFF) << 16) | (((decodeByte[(offset * i) + 1]) & 0xFF) << 8) | (decodeByte[(offset * i)] & 0xFF));
+                if (sensorType[i] == 0 || sensorType[i] == 6)
+                {
+                    element -= Kelvin;
+                }
+
+                limitArray[i] = element/100;
+            }
+
+            for (int i = 0; i < limitArray.Length; i++)
+            {
+                if ((i + 1) == limitArray.Length)
+                    limitString += limitArray[i].ToString();
+                else limitString += limitArray[i].ToString() + ',';
+            }
+
+            return limitString;
+        }
+        string _4ByteBuilt(byte[] decodeByte)
+        {
+            long value = Convert.ToInt32(ToLittleEndian(decodeByte)) * 1000;
+
+            if (value > 0)
+            {
+                value += Year2000;
+                value -= Year2010;
+                value /= 21600000;
+                return value.ToString();
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
         string _4ByteToUNIX(byte[] decodeByte)
         {
-            long _4byteUnix = (Convert.ToInt32(ToLittleEndian(decodeByte), 16) * (long)1000);
-            manufactureDate = ((long)_4byteUnix + Y_2000) / (long)1000;
-            return manufactureDate.ToString();
+            long _4byteUnix = (Convert.ToInt32(ToLittleEndian(decodeByte), 16) * 1000);
+            return CalculateTimeStarted(_4byteUnix).ToString();
         }
         string _4ByteSectoDec(byte[] decodeByte)
         {
@@ -418,7 +576,7 @@ namespace TempLite
 
             if (_4sectobyte > 0)
             {
-                _4sectobyte += Y_2000;
+                _4sectobyte += Year2000;
                 DateTime date = new DateTime(_4sectobyte);
                 return date.ToString("dd/MM/yyyy HH:mm:sss");
             }
@@ -442,13 +600,106 @@ namespace TempLite
 
             var INITAL_BATTERY = (int)((1.0 - RCLBatteryMargin) * 0.56 * 60 * 60 * 1000000); //mAHr
             var BatteryUsed =
-            (((UTCreferenceTime - manufactureDate) * RCLSelfDischargeCurrentuA) +
+            (((utcReferenceTime - manufactureDate) * RCLSelfDischargeCurrentuA) +
             (totalRTCticks * RCLQuiescentDischargeCurrentuA) +
             ((totalSamplingEvents + 4681) * RCLConversionDurationS * RCLConversionDischargeCurrentuA) +
             (RCLAssumedDownloadsPerTrip * totalUses * RCLDownloadDurationS * RCLDownloadDischargeCurrentuA));
+
             var batteryPercentage = (int)(((INITAL_BATTERY - BatteryUsed) / INITAL_BATTERY) * 100);
-            return batteryPercentage.ToString();
+            return batteryPercentage.ToString("x02");
         }
+        long CalculateTimeStarted(long timeFirstSample)
+        {
+            var timeStarted = ((timeFirstSample + Year2000) / 1000) + startDelay;
+            var ticksSinceStop = ticksSinceStart - ticksAtLastSample;
+            var totalNumberofTicks = ((G4MemorySize - 9) - (6 * numberChannel - 1)) / numberChannel; // what are these numbers 
+            var totalLoggingTime = totalNumberofTicks * samplePeriod;
+
+            if (loopOverwriteStartAddress == 0)
+                timeStarted = utcReferenceTime - ticksSinceStart + startDelay;
+            else
+                timeStarted = utcReferenceTime - totalLoggingTime - ticksSinceStop;
+
+            /*if (timeStarted == (946684800 + startDelay)) // also what is this number  || means button started 
+            {
+                if (loopOverwriteStartAddress == 0)
+                    timeStarted = utcReferenceTime - ticksSinceStart + startDelay;
+                else
+                    timeStarted = utcReferenceTime - totalLoggingTime - ticksSinceStop;
+            }
+            else 
+            {
+                if (loopOverwriteStartAddress != 0)
+                    timeStarted = utcReferenceTime - totalLoggingTime - ticksSinceStop;
+            }*/
+
+            return timeStarted;
+        }
+        Boolean CheckStartSentinel(byte[] decodeByte, int memoryStart)
+        {
+            var startValue = new int[8];
+            var currentSensor = 0;
+            var check = true;
+
+            while ((currentSensor < numberChannel) && check)
+            {
+                var addMSB = (memoryStart + (2 * currentSensor) + 1) & G4MemorySize;
+                var addLSB = (memoryStart + (2 * currentSensor)) & G4MemorySize;
+
+                var VaddMSB = (memoryStart + (2 * currentSensor) + (2 *numberChannel) + 1) & G4MemorySize;
+                var VaddLSB = (memoryStart + (2 * currentSensor) + (2*numberChannel)) & G4MemorySize;
+
+                startValue[currentSensor] = (((decodeByte[addMSB]) & 0xff) << 8) | (decodeByte[addLSB] & 0xff);
+                var verifyValue = ((decodeByte[VaddMSB] & 0xff) << 8) | (decodeByte[VaddLSB] & 0xff);
+                if (startValue[currentSensor] != verifyValue)
+                {
+                    check = false;
+                }
+                
+                sensorStartingValue[currentSensor] -= verifyValue;
+                sensorStartingValue[currentSensor] *= -1;
+
+                currentSensor++;
+            }
+
+            return check;
+        }
+        int[] CompressionTable(byte[] decodeByte)
+        {
+            var value = new int[decodeByte.Length / 2];
+
+            for (int i = 0; i < decodeByte.Length; i += 2)
+            {
+                compressionTable[i / 2] = (((decodeByte[i / 2] & 0xff) << 8) | (decodeByte[i + 1] & 0xff));
+                value[i / 2] = compressionTable[i / 2];
+            }
+
+            return value;
+        }
+        void DecodeDeltaData(byte[] decodeByte)
+        {
+            var memoryStart = loopOverwriteStartAddress;
+            if (memoryStart > 0)
+            {
+                memoryStart = FindStartSentinel(memoryStart - 1, 16, decodeByte);
+                memoryStart++;
+            }
+            if (decodeByte.Length > 0)
+            {
+                if (CheckStartSentinel(decodeByte, memoryStart))
+                {
+                    memoryStart += ((6 * numberChannel) + 1);
+                    memoryStart &= G4MemorySize;
+                    memoryStart = FindStartSentinel(memoryStart, (8 * numberChannel), decodeByte);
+                    if (memoryStart != 0xFFFF)
+                    {
+                        memoryStart++;
+                        ReadStoreData(decodeByte, memoryStart);
+                    }
+                }
+            }
+        }
+
         void DecodeMonTData(byte[] decodeByte)
         {
             int a = 0;
@@ -458,7 +709,7 @@ namespace TempLite
 
             if (recordedSamples > 0)
             {
-                var Data = new List<double>(recordedSamples);
+                var channelList = new List<double>();
                 InitSensorStatisticsField(0);
 
                 if (loopOverwrite)
@@ -475,8 +726,8 @@ namespace TempLite
                     b++;  //Go to the index after the 0xFF
                     while ((b < decodeByte.Length)) //reads the data after the 0xFF
                     {
-                        TemperatureStatistics(0, lowestTemp + ((decodeByte[b] & 0xFF) * Resolution), array_pointer);
-                        Data.Add(lowestTemp + ((decodeByte[b] & 0xFF) * Resolution));
+                        TemperatureStatistics(0, lowestTemp + ((decodeByte[b] & 0xFF) * resolution), array_pointer);
+                        channelList.Add(lowestTemp + ((decodeByte[b] & 0xFF) * resolution));
                         b++;
                     }
 
@@ -490,14 +741,30 @@ namespace TempLite
                     }
                     else
                     {
-                        TemperatureStatistics(0, lowestTemp + ((decodeByte[a] & 0xFF) * Resolution), array_pointer);
-                        Data.Add(lowestTemp + ((decodeByte[a] & 0xFF) * Resolution));
+                        TemperatureStatistics(0, lowestTemp + ((decodeByte[a] & 0xFF) * resolution), array_pointer);
+                        channelList.Add(lowestTemp + ((decodeByte[a] & 0xFF) * resolution));
                     }
                     a++;
                 }
-                this.Data = Data;
+                Data.Add(channelList);
             }
             FinalizeStatistics(0);
+        }
+        string DJNZ2ByteType2(byte[] decodeByte)
+        {
+            for (int i = 0; i < decodeByte.Length; i++)
+            {
+                decodeByte[i] = (byte)(0x100 - (decodeByte[i] & 0xFF));
+            }
+            return ToLittleEndian(decodeByte);
+        }
+        string DJNZ4ByteType1(byte[] decodeByte)
+        {
+            for (int i = 1; i < decodeByte.Length; i++)
+            {
+                decodeByte[i]--;
+            }
+            return ToLittleEndian(decodeByte);
         }
         string DJNZ4ByteType_2(byte[] decodeByte)
         {
@@ -508,6 +775,126 @@ namespace TempLite
             }
             return ToLittleEndian(decodeByte);
         }
+        int FindStartSentinel(int memoryStart, int max, byte[] decodeByte)
+        {
+            var maxI = (memoryStart + max);
+
+            if (maxI > memoryStart)
+            {
+                while (maxI > memoryStart)
+                {
+                    if ((decodeByte[memoryStart] == 0x7F) || (decodeByte[memoryStart] == 0xff)) //???????????????????????
+                    {
+                        return memoryStart;
+                    }
+                    memoryStart++;
+                    memoryStart &= G4MemorySize; // 0x007fff is to allow buffer rotation in case of Header in middle of end buffer?????????????
+                }
+            }
+            else
+            {
+                memoryStart = 0;
+                while (memoryStart <= maxI)
+                {
+                    if ((decodeByte[memoryStart] == 0x7f) || (decodeByte[memoryStart] & 0xff) == 0xff) // ????????
+                    {
+                        return memoryStart;
+                    }
+                    memoryStart++;
+                    memoryStart &= G4MemorySize;
+                }
+            }
+            return 0xffff;
+            }
+        public string HHMMSS(double mseconds)
+        {
+            int hours = (int)(mseconds / 3600);
+            int minutes = (int)((mseconds % 3600) / 60);
+            int seconds = (int)(mseconds % 60);
+
+            return $"{hours.ToString("00")}:{minutes.ToString("00")}:{seconds.ToString("00")}";
+        }
+        string LoggingSelection(byte[] decodeByte)
+        {
+            switch (decodeByte[0])
+            {
+                case 1:
+                    return "Temperature";
+                case 2:
+                    return "Humidity";
+                case 3:
+                    return "Temperature-Humidity";
+                default:
+                    return "Undefined";
+            }
+        }
+        string LoggerState(byte[] decodeByte)
+        {
+            switch (decodeByte[0])
+            {
+                case 0:
+                    return "Ready";
+                case 1:
+                    return "Delay";
+                case 2:
+                    return "Running";
+                case 3:
+                    return "Stopped";
+                default:
+                    return "Undefined";
+            }
+        }
+        void ReadStoreData(byte[] decodeByte, int memoryStart)
+        {
+            var MaxReadingLength = (G4MemorySize - (6 * numberChannel) - 2) / numberChannel;
+
+            for (int i = 0; i < numberChannel; i++)
+            {
+                var tagList = new List<int>();
+                var channelList = new List<double>();
+                var arrayPointer = 0;
+                var dataPointer = (memoryStart + i) & G4MemorySize;                  //& 0x007FFF is to allow buffer rotation
+                var totalSameples = 0;
+
+                InitSensorStatisticsField(i);
+
+                while ((dataPointer < decodeByte.Length) && (decodeByte[dataPointer] != 0x7F) && ((decodeByte[dataPointer]&0xFF) != 0xFF) && (totalSameples < MaxReadingLength))
+                {
+                    if ((decodeByte[dataPointer] & 0xFF) == 0x80)
+                    {
+                        if (i == 0)
+                        {
+                            tagList.Add(arrayPointer);
+                            tagNumbers++;
+                        }
+                    }
+                    else
+                    {
+                        if (decodeByte[dataPointer] > 0x7f) //> 0x7f
+                        {
+                            sensorStartingValue[i] -= (decodeByte[dataPointer] & 0x7f); //compressionTable[(decodeByte[dataPointer] & 0x7f)];
+                        }
+                        else
+                        {
+                            sensorStartingValue[i] += (decodeByte[dataPointer]);
+                        }
+                        
+                        channelList.Add((double)sensorStartingValue[i] / 100);
+                        TemperatureStatistics(i, ((double)sensorStartingValue[i] / 100), arrayPointer);
+                        totalSameples++;
+                    }
+
+                    dataPointer += numberChannel;
+                    dataPointer &= G4MemorySize;                                                           //& 0x007FFF is to allow buffer rotation
+                }
+
+                FinalizeStatistics(i);
+
+                Data.Add(channelList);
+                Tag = tagList;
+            }
+        }
+
         string SampleNumberLoggedMonT(byte[] decodeByte)
         {
             if (loopOverwrite)
@@ -518,37 +905,63 @@ namespace TempLite
                 return samplenumber.ToString();
             }
         }
+
+        void SensorDecoding(byte[] decodeByte)
+        {
+            var offset = 11;
+            var sensorAddressArray = new string[2];
+
+            for ( int i = 0; i < numberChannel; i++)
+            {
+                var pointer = i * offset;
+                sensorType[i] = decodeByte[pointer + 7]; // byte 7 is where the sensorType is stored
+                sensorAddressArray[0] = decodeByte[10].ToString("x02") + decodeByte[9].ToString("x02");
+                sensorAddressArray[1] = "21"; // size of the sensor information 
+
+                var sensorInfoArray = ReadHex(sensorAddressArray);
+                
+                if (sensorInfoArray.Length != 0)
+                {
+                    var sensorData = sensorInfoArray[20] << 16 | sensorInfoArray[19] << 8 | sensorInfoArray[18];
+
+                    if (sensorType[i] == 0 || sensorType[i] == 6) // get yasiru to explain why
+                    {
+                        sensorStartingValue[i] = Kelvin - sensorData;
+                    }
+                    else
+                    {
+                        sensorStartingValue[i] = 0x1000000 - sensorData; 
+                    }
+                }
+            }
+        }
         string String(byte[] decodeByte)
         {
-            var userdatastring = string.Empty;
-            for (int i = 0; i < decodeByte.Length; i++)
-            {
-                userdatastring += (char)(decodeByte[i] & 0xFF);
-            }
+            string UserDataString = string.Empty;
 
-            return userdatastring.Substring(0, userDataLength);
+            for(int i = 0; i < decodeByte.Length; i++)
+            {
+                if (decodeByte[i] > 12 && decodeByte[i] < 127)
+                    UserDataString += Convert.ToChar(decodeByte[i]);
+            }
+            
+           return UserDataString;
         }
+
         string TimeFirstSampleMonT(byte[] decodeByte)
         {
             if (loopOverwrite)
             {
-                timeFirstSample = ((UTCreferenceTime) - (4680 * samplePeriod) - (ticksSinceStart - ticksAtLastSample));
-                return UNIXtoUTC(timeFirstSample);
+                timeAtFirstSameple = ((utcReferenceTime) - (4680 * samplePeriod) - (ticksSinceStart - ticksAtLastSample));
+                return timeAtFirstSameple.ToString();
             }
             else
             {
-                timeFirstSample = ((UTCreferenceTime - ticksSinceStart) + startDelay);
-                return UNIXtoUTC(timeFirstSample);
+                timeAtFirstSameple = ((utcReferenceTime - ticksSinceStart) + startDelay);
+                return timeAtFirstSameple.ToString();
             }
         }
-        public string HHMMSS(double mseconds)
-        {
-            int hours = (int)(mseconds / 3600);
-            int minutes = (int)((mseconds % 3600) / 60);
-            int seconds = (int)(mseconds % 60);
-
-            return $"{hours.ToString("00")}:{minutes.ToString("00")}:{seconds.ToString("00")}";
-        }
+        
         string ToLittleEndian(byte[] decodebyte)
         {
             var sb = new StringBuilder();
@@ -567,45 +980,23 @@ namespace TempLite
             }
             return sb.ToString();
         }
-        string LoggerState(byte[] decodebyte)
-        {
-            switch (decodebyte[0])
-            {
-                case 0:
-                    return "Ready";
-                case 1:
-                    return "Delay";
-                case 2:
-                    return "Running";
-                case 3:
-                    return "Stopped";
-                default:
-                    return "Undefined";
-            }
-        }
         public string UNIXtoUTC(long now)
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            var simpledate = date.ToString("yyyy-MM-dd HH:mm:sss UTC");
-            return simpledate;
+            return date.ToUniversalTime().ToString("dd/MM/yyyy HH:mm:sss UTC");
         }
         public string UNIXtoUTCDate(long now)
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            var simpledate = date.ToString("yyyy-MM-dd");
-            return simpledate;
+            return date.ToUniversalTime().ToString("dd/MM/yyyy");
         }
         public string UNIXtoUTCTime(long now)
         {
             var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var date = epoch.AddMilliseconds(now * 1000);
-            date = date.ToUniversalTime();
-            var simpledate = date.ToString("HH:mm:sss UTC");
-            return simpledate;
+            return date.ToUniversalTime().ToString("HH:mm:sss");
         }
         void InitSensorStatisticsField(int currentChannel)
         {
@@ -617,8 +1008,8 @@ namespace TempLite
             highestPosition[currentChannel] = 0;
             lowestPosition[currentChannel] = 0;
 
-            Mean[currentChannel] = 0;
-            MKT[currentChannel] = 0;
+            mean[currentChannel] = 0;
+            mkt[currentChannel] = 0;
 
             withinLimit[currentChannel] = 0;
             belowLimit[currentChannel] = 0;
@@ -651,16 +1042,17 @@ namespace TempLite
                 withinLimit[currentChannel]++;
             }
 
-            MKT[currentChannel] += Math.Exp((-Delta_H) / ((Value + Kelvin_Dec) * R));
-            Mean[currentChannel] += Value;
+            mkt[currentChannel] += Math.Exp((-Delta_H) / ((Value + KelvinDec) * R));
+            mean[currentChannel] += Value;
             recordedSamples++;
         }
         void FinalizeStatistics(int currentChannel)
         {
-            Mean[currentChannel] /= recordedSamples;
-            MKT[currentChannel] = (Delta_H / R) / (-Math.Log(MKT[currentChannel] / recordedSamples));
+            mean[currentChannel] /= recordedSamples;
+            mkt[currentChannel] = (Delta_H / R) / (-Math.Log(mkt[currentChannel] / recordedSamples));
         }
         #endregion
-        
+
     }
 }
+

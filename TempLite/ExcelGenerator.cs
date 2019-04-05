@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -143,9 +142,7 @@ namespace TempLite
 
         void FillValueCells(ExcelWorksheet worksheet, HexFileDecoder decoder, PDFvariables pdfVariables, ChannelConfig channelOne, ChannelConfig channelTwo, int start, int end)
         {
-            var length = channelOne.Data.Count;
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < pdfVariables.RecordedSamples; i++)
             {
                 worksheet.Cells[start+i,1].Value = decoder.UNIXtoUTC(Convert.ToInt32(pdfVariables.Time[i]));
                 worksheet.Cells[start +i,2].Value = channelOne.Data[i];

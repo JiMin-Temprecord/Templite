@@ -4,7 +4,7 @@ namespace TempLite
 {
     public class Email
     {
-        public void SetUpEmail(string serialNumber)
+        public void SetUpEmail(string serialNumber, string emailID)
         {
             /*SmtpClient client = new SmtpClient();
             client.Port = 587;
@@ -26,8 +26,10 @@ namespace TempLite
             var message = new MimeMessage();
             var builder = new BodyBuilder();
 
+            var emailTo = GetSenderEmail(emailID);
+
             message.From.Add(new MailboxAddress("Temprecord Logger Read", "temprecordapp@temprecord.com"));
-            message.To.Add(new MailboxAddress("jimin@temprecord.com"));
+            message.To.Add(new MailboxAddress(emailTo));
             message.Subject = "Temprecord Logger Read";
             
             var PDF = serialNumber + ".pdf";
@@ -48,6 +50,31 @@ namespace TempLite
                 client.Authenticate("temprecordapp@temprecord.com", "bEw7a!EtYRv@z6Q");
                 client.Send(message);
                 client.Disconnect(true);
+            }
+        }
+
+        string GetSenderEmail (string emailID)
+        {
+            switch (emailID)
+            {
+                case "TBS-NSW":
+                    return "jimin@temprecord.com";
+                case "TBS-SA":
+                    return "SADataLoggerCommunication@arcbs.redcross.org.au";
+                case "TBS-TAS":
+                    return "TASDataLoggerCommunication@arcbs.redcross.org.au";
+                case "TBS-VIC":
+                    return "jimin@temprecord.com";
+                case "TBS-QLD":
+                    return "QLDDataLoggerCommunication@arcbs.redcross.org.au";
+                case "TBS-WA":
+                    return "WADataLoggerCommunication@arcbs.redcross.org.au";
+                case "TBS-NT":
+                    return "NSWDataLoggerCommunication@arcbs.redcross.org.au";
+                case "TBS-TEST":
+                    return "yasiru@temprecord.com";
+                default:
+                    return "jimin@temprecord.com";
             }
         }
     }

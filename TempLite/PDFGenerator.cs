@@ -1,7 +1,6 @@
 ﻿using System;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
-using PdfSharp.Fonts;
 using System.Collections.Generic;
 
 namespace TempLite
@@ -31,7 +30,17 @@ namespace TempLite
             pdfDocument.Info.Title = loggerInformation.SerialNumber;
             var draw = CreateNewPage(font, loggerInformation.SerialNumber);
 
-            void DrawChannelSection(string Label, Func<ChannelConfig, string> getString, double lineConterMultiplier = 1.0)
+            void DrawChannelStatistics(string Label, Func<ChannelConfig, string> getString, double lineConterMultiplier = 1.0)
+            {
+                draw.DrawString(Label, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                draw.DrawString(getString(channelOne) + channelOne.Unit , font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
+                if ((channelTwoEnabled) && Label != "MKT Value :")
+                    draw.DrawString(getString(channelTwo) + channelTwo.Unit, font, XBrushes.Black, PDFcoordinates.third_column, lineCounter);
+
+                lineCounter += PDFcoordinates.line_inc * lineConterMultiplier;
+            }
+
+            void DrawChannelLimits(string Label, Func<ChannelConfig, string> getString, double lineConterMultiplier = 1.0)
             {
                 draw.DrawString(Label, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
                 draw.DrawString(getString(channelOne), font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
@@ -87,34 +96,48 @@ namespace TempLite
             if (channelTwoEnabled) draw.DrawString("#2 - Humidity", font, XBrushes.Black, PDFcoordinates.third_column - 25, lineCounter);
             lineCounter += PDFcoordinates.line_inc;
 
-            DrawChannelSection("Preset Upper Limit :", c => c.PresetUpperLimit.ToString("N2") + channelOne.Unit); //need to add the breached
-            DrawChannelSection("Preset Lower Limit :", c => c.PresetLowerLimit.ToString("N2") + channelOne.Unit); // need to add the breached
-            DrawChannelSection("Mean Value :", c => c.Mean.ToString("N2") + channelOne.Unit);
-            DrawChannelSection("MKT Value :", c => c.MKT_C.ToString("N2") + channelOne.Unit);
-            DrawChannelSection("Max Recorded :", c => c.Max.ToString("N2") + channelOne.Unit);
-            DrawChannelSection("Min Recorded :", c => c.Min.ToString("N2") + channelOne.Unit);
+            DrawChannelStatistics("Preset Upper Limit :", c => c.PresetUpperLimit.ToString("N2")); //need to add the breached
+            DrawChannelStatistics("Preset Lower Limit :", c => c.PresetLowerLimit.ToString("N2")); // need to add the breached
+            DrawChannelStatistics("Mean Value :", c => c.Mean.ToString("N2"));
+            DrawChannelStatistics("MKT Value :", c => c.MKT_C.ToString("N2"));
+            DrawChannelStatistics("Max Recorded :", c => c.Max.ToString("N2"));
+            DrawChannelStatistics("Min Recorded :", c => c.Min.ToString("N2"));
             lineCounter += (PDFcoordinates.line_inc * 0.5);
-            DrawChannelSection("Total Samples within Limits :", c => c.WithinLimits.ToString("N1"));
-            DrawChannelSection("Total Time within Limits :", c => c.TimeWithinLimits);
+            DrawChannelLimits("Total Samples within Limits :", c => c.WithinLimits.ToString("N1"));
+            DrawChannelLimits("Total Time within Limits :", c => c.TimeWithinLimits);
             lineCounter += (PDFcoordinates.line_inc * 0.5);
-            DrawChannelSection("Total Samples out of Limits :", c => c.OutsideLimits.ToString("N1"));
-            DrawChannelSection("Total Time out of Limits :", c => c.TimeOutLimits);
+            DrawChannelLimits("Total Samples out of Limits :", c => c.OutsideLimits.ToString("N1"));
+            DrawChannelLimits("Total Time out of Limits :", c => c.TimeOutLimits);
             lineCounter += (PDFcoordinates.line_inc * 0.5);
-            DrawChannelSection("Samples above upper Limit :", c => c.AboveLimits.ToString("N1"));
-            DrawChannelSection("Time above Upper Limit :", c => c.TimeAboveLimits);
+            DrawChannelLimits("Samples above upper Limit :", c => c.AboveLimits.ToString("N1"));
+            DrawChannelLimits("Time above Upper Limit :", c => c.TimeAboveLimits);
             lineCounter += (PDFcoordinates.line_inc * 0.5);
-            DrawChannelSection("Samples below Lower Limit :", c => c.BelowLimits.ToString("N1"));
-            DrawChannelSection("Time below Lower Limit :", c => c.TimeBelowLimits);
+            DrawChannelLimits("Samples below Lower Limit :", c => c.BelowLimits.ToString("N1"));
+            DrawChannelLimits("Time below Lower Limit :", c => c.TimeBelowLimits);
             DrawSection("User Comments :", string.Empty);
-            draw.DrawString(pdfVariables.UserData, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
-            lineCounter += PDFcoordinates.line_inc;
+
+            if (pdfVariables.UserData.Length > 120)
+            {
+                var firstLine = pdfVariables.UserData.Substring(0, pdfVariables.UserData.Length/2);
+                var secondLine = pdfVariables.UserData.Substring(pdfVariables.UserData.Length / 2);
+
+                draw.DrawString(firstLine, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                lineCounter += PDFcoordinates.line_inc;
+                draw.DrawString(secondLine, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                lineCounter += PDFcoordinates.line_inc*0.5;
+            }
+            else
+            {
+                draw.DrawString(pdfVariables.UserData, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                lineCounter += PDFcoordinates.line_inc;
+            }
 
             XRect break2 = new XRect(10, lineCounter, 680, 0);
             draw.DrawRectangle(pen, break2);
             lineCounter += PDFcoordinates.line_inc * 0.75;
 
             draw.DrawString("_ Temperature " + channelOne.Unit, font, XBrushes.DarkOliveGreen, PDFcoordinates.second_column, lineCounter);
-            if (channelTwoEnabled) draw.DrawString("_ Humidity  %RH ", font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
+            if (channelTwoEnabled) draw.DrawString("_ Humidity  " + channelTwo.Unit, font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
             lineCounter += PDFcoordinates.line_inc;
 
             //Draw graph
@@ -220,23 +243,23 @@ namespace TempLite
                 draw.DrawString(chMin[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chYMin[1]);
                 draw.DrawString(chMax[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chYMax[1]);
 
-                if (chLowerLimit[1] > chMin[1])
+                if (chLowerLimit[1] < chMin[1])
                 {
-                    draw.DrawString(pdfVariables.ChannelOne.Unit + " Upper Limit ", font, XBrushes.Coral, PDFcoordinates.third_column, chUpperYLimit[1] - 5);
+                    draw.DrawString(pdfVariables.ChannelTwo.Unit + " Upper Limit ", font, XBrushes.Coral, PDFcoordinates.third_column, chUpperYLimit[1] - 5);
                     draw.DrawString(chUpperLimit[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chUpperYLimit[1]);
                     draw.DrawLine(abovelimit, PDFcoordinates.graph_l_lineX_start, chUpperYLimit[1], PDFcoordinates.graph_l_lineX_end, chUpperYLimit[1]);
                 }
 
-                if (chUpperLimit[1] < chMax[1])
+                if (chUpperLimit[1] > chMax[1])
                 {
-                    draw.DrawString(pdfVariables.ChannelOne.Unit + " Lower Limit ", font, XBrushes.CornflowerBlue, PDFcoordinates.third_column, chUpperYLimit[1] + 5); 
+                    draw.DrawString(pdfVariables.ChannelTwo.Unit + " Lower Limit ", font, XBrushes.CornflowerBlue, PDFcoordinates.third_column, chLowerYLimit[1] + 5); 
                     draw.DrawString(chLowerLimit[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chLowerYLimit[1]);
                     draw.DrawLine(belowlimit, PDFcoordinates.graph_l_lineX_start, chLowerYLimit[1], PDFcoordinates.graph_l_lineX_end, chLowerYLimit[1]);
                 }
             }
 
 
-            if (pdfVariables.RecordedSamples > 0)
+            if (pdfVariables.ChannelOne.Data != null)
             {
                 temp_next_y = (float)(PDFcoordinates.graph_H - (pdfVariables.ChannelOne.Data[0] -graphLowest) * graph_y_scale) + PDFcoordinates.graph_topY;
                 chUpperYLimit[0] = (float)(PDFcoordinates.graph_H - ((chUpperLimit[0] - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
@@ -258,14 +281,14 @@ namespace TempLite
 
                 if (chLowerLimit[0] > chMin[0])
                 {
-                    draw.DrawString(pdfVariables.ChannelOne.Unit + " Lower Limit ", font, XBrushes.CornflowerBlue, PDFcoordinates.third_column, chUpperYLimit[0] + 5);
+                    draw.DrawString(pdfVariables.ChannelOne.Unit + " Lower Limit ", font, XBrushes.CornflowerBlue, PDFcoordinates.third_column, chLowerYLimit[0] + 5);
                     draw.DrawString(chLowerLimit[0].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chLowerYLimit[0]);
                     draw.DrawLine(belowlimit, PDFcoordinates.graph_l_lineX_start, chLowerYLimit[0], PDFcoordinates.graph_l_lineX_end, chLowerYLimit[0]);
                 }
             }
 
             int i = 0;
-            while (i < pdfVariables.RecordedSamples)
+            while (i < pdfVariables.RecordedSamples && (pdfVariables.ChannelOne.Data != null))
             {
                 draw.DrawLine(ch0, graph_topX, temp_next_y, graph_topX + graph_x_scale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (graphLowest)) * graph_y_scale)) + PDFcoordinates.graph_topY);
                 temp_next_y = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (graphLowest)) * graph_y_scale)) + PDFcoordinates.graph_topY;
