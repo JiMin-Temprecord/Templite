@@ -323,6 +323,10 @@ namespace TempLite
             var tempPen = new XPen(XColors.Black, 1);
             var humPen = new XPen(XColors.Gray, 1);
 
+            XPen abovelimit = new XPen(XColors.Coral);
+            XPen belowlimit = new XPen(XColors.CornflowerBlue);
+
+
             var time = new List<string>();
             var date = new List<string>();
 
@@ -370,11 +374,21 @@ namespace TempLite
                     valueDraw.DrawString(time[i], boldFont, XBrushes.Black, timeColumn, row);
                 }
 
-                valueDraw.DrawString(pdfVariables.ChannelOne.Data[i].ToString("N2")+ pdfVariables.ChannelOne.Unit, font, XBrushes.Black, currentColumn, row);
+                if(pdfVariables.ChannelOne.Data[i] > pdfVariables.ChannelOne.PresetUpperLimit)
+                    valueDraw.DrawString(pdfVariables.ChannelOne.Data[i].ToString("N2")+ pdfVariables.ChannelOne.Unit, font, XBrushes.Coral, currentColumn, row);
+                else if (pdfVariables.ChannelOne.Data[i] < pdfVariables.ChannelOne.PresetLowerLimit)
+                    valueDraw.DrawString(pdfVariables.ChannelOne.Data[i].ToString("N2") + pdfVariables.ChannelOne.Unit, font, XBrushes.CornflowerBlue, currentColumn, row);
+                else
+                    valueDraw.DrawString(pdfVariables.ChannelOne.Data[i].ToString("N2") + pdfVariables.ChannelOne.Unit, font, XBrushes.Black, currentColumn, row);
 
                 if (pdfVariables.IsChannelTwoEnabled)
                 {
-                    valueDraw.DrawString(pdfVariables.ChannelTwo.Data[i].ToString("N2") + pdfVariables.ChannelTwo.Unit , font, XBrushes.Gray, currentColumn, row + rowIncrement);
+                    if (pdfVariables.ChannelTwo.Data[i] > pdfVariables.ChannelTwo.PresetUpperLimit)
+                        valueDraw.DrawString(pdfVariables.ChannelTwo.Data[i].ToString("N2") + pdfVariables.ChannelTwo.Unit, font, XBrushes.Coral, currentColumn, row + rowIncrement);
+                    else if (pdfVariables.ChannelTwo.Data[i] < pdfVariables.ChannelTwo.PresetLowerLimit)
+                        valueDraw.DrawString(pdfVariables.ChannelTwo.Data[i].ToString("N2") + pdfVariables.ChannelTwo.Unit, font, XBrushes.CornflowerBlue, currentColumn, row + rowIncrement);
+                    else
+                        valueDraw.DrawString(pdfVariables.ChannelTwo.Data[i].ToString("N2") + pdfVariables.ChannelTwo.Unit, font, XBrushes.Black, currentColumn, row + rowIncrement);
                 }
 
                 currentColumn += columnIncrement;

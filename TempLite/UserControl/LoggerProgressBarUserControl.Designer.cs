@@ -44,11 +44,13 @@
             // 
             // progressBarText
             // 
+            this.progressBarText.BackColor = System.Drawing.Color.White;
             this.progressBarText.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.progressBarText.Font = new System.Drawing.Font("Myriad Pro", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.progressBarText.Location = new System.Drawing.Point(48, 86);
             this.progressBarText.Multiline = true;
             this.progressBarText.Name = "progressBarText";
+            this.progressBarText.ReadOnly = true;
             this.progressBarText.Size = new System.Drawing.Size(234, 46);
             this.progressBarText.TabIndex = 4;
             this.progressBarText.Text = "Do not unplug the reader or remove the logger";
@@ -68,11 +70,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
+            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.progressBarText);
             this.Controls.Add(this.progressBarLabel);
             this.Name = "LoggerProgressBarUserControl";
-            this.Size = new System.Drawing.Size(325, 200);
+            this.Size = new System.Drawing.Size(323, 198);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -70,6 +70,7 @@
             // 
             // EmailImage
             // 
+            this.EmailImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.EmailImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.EmailImage.Image = global::TempLite.Properties.Resources.email;
             this.EmailImage.Location = new System.Drawing.Point(0, 0);

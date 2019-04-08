@@ -38,15 +38,16 @@
             // 
             // loggerText
             // 
+            this.loggerText.BackColor = System.Drawing.Color.White;
             this.loggerText.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.loggerText.Font = new System.Drawing.Font("Myriad Pro", 12F);
             this.loggerText.Location = new System.Drawing.Point(100, 675);
             this.loggerText.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.loggerText.Name = "loggerText";
+            this.loggerText.ReadOnly = true;
             this.loggerText.Size = new System.Drawing.Size(533, 20);
             this.loggerText.TabIndex = 7;
-            this.loggerText.Text = "Insert a G4 or MonT logger into the reader. \n Readering should start automaticall" +
-    "y";
+            this.loggerText.Text = "Insert a G4 or MonT logger into the reader. \n Reading should start automatically";
             // 
             // loggerLabel
             // 
@@ -72,7 +73,7 @@
             // loggerImage
             // 
             this.loggerImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.loggerImage.Image = global::TempLite.Properties.Resources.loggers_l;
+            this.loggerImage.Image = global::TempLite.Properties.Resources.logger_01;
             this.loggerImage.Location = new System.Drawing.Point(0, 0);
             this.loggerImage.Name = "loggerImage";
             this.loggerImage.Size = new System.Drawing.Size(725, 600);

@@ -14,10 +14,11 @@ namespace TempLite
         public void CreateExcel(LoggerInformation loggerInformation)
         {
             var excel = new ExcelPackage();
-            var workSheet = excel.Workbook.Worksheets.Add("newSheet");
+            var workSheet = excel.Workbook.Worksheets.Add(loggerInformation.SerialNumber);
             CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName);
 
             excel.SaveAs(new FileInfo(Application.StartupPath + "\\" + loggerInformation.SerialNumber + ".xlsx"));
+            Console.WriteLine("EXCEL Created !");
 
         }
 
@@ -54,7 +55,7 @@ namespace TempLite
             }
 
             var logoRange = workSheet.Cells[1, 3];
-            var logoImage = Image.FromFile("..\\..\\Images\\logo.png");
+            var logoImage = Image.FromFile(AppDomain.CurrentDomain.BaseDirectory+ "..\\..\\Images\\logo.png");
             var setLogoPosition = workSheet.Drawings.AddPicture(string.Empty, logoImage);
             setLogoPosition.SetSize(103, 63);
             setLogoPosition.SetPosition(10, 130);
@@ -103,7 +104,15 @@ namespace TempLite
             FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, "Time below Lower Limit :", c => c.TimeBelowLimits);
 
             FillCells(workSheet, "User Comments :", string.Empty);
-            FillCells(workSheet, pdfVariables.UserData, string.Empty);
+
+            if (pdfVariables.UserData.Length > 120)
+            {
+                var firstLine = pdfVariables.UserData.Substring(0, pdfVariables.UserData.Length / 2);
+                var secondLine = pdfVariables.UserData.Substring(pdfVariables.UserData.Length / 2);
+
+                FillCells(workSheet, firstLine, string.Empty);
+                FillCells(workSheet, secondLine, string.Empty);
+            }
 
             row = 50;
             if (channelTwoEnabled)
@@ -155,7 +164,7 @@ namespace TempLite
 
         void CreateGraph(ExcelWorksheet worksheet, PDFvariables pdfVariables, ChannelConfig channelOne, ChannelConfig channelTwo, int start, int end)
         {
-            var graph = worksheet.Drawings.AddChart("newGraph", OfficeOpenXml.Drawing.Chart.eChartType.Line);
+            var graph = worksheet.Drawings.AddChart(pdfVariables.SerialNumber, OfficeOpenXml.Drawing.Chart.eChartType.Line);
             graph.SetPosition(675,0);
             graph.SetSize(500, 300);
 

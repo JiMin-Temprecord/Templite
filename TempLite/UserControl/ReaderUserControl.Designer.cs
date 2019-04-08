@@ -62,7 +62,6 @@
             // readerImage
             // 
             resources.ApplyResources(this.readerImage, "readerImage");
-            this.readerImage.Image = global::TempLite.Properties.Resources.reader_l;
             this.readerImage.Name = "readerImage";
             this.readerImage.TabStop = false;
             // 

@@ -163,7 +163,7 @@ namespace TempLite
         void sendingEmailBW_DoWork(object sender, DoWorkEventArgs e)
         {
             var email = new Email();
-            email.SetUpEmail(loggerInformation.SerialNumber);
+            email.SetUpEmail(loggerInformation.SerialNumber, loggerInformation.EmailId);
         }
 
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

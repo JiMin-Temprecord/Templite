@@ -55,10 +55,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
+            this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.GeneratingDocumentLabel);
             this.Name = "GenerateDocumentUserControl";
-            this.Size = new System.Drawing.Size(325, 200);
+            this.Size = new System.Drawing.Size(323, 198);
             this.ResumeLayout(false);
 
         }

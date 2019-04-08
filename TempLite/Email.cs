@@ -1,4 +1,6 @@
 ﻿using MimeKit;
+using System;
+using System.IO;
 
 namespace TempLite
 {
@@ -6,31 +8,14 @@ namespace TempLite
     {
         public void SetUpEmail(string serialNumber, string emailID)
         {
-            /*SmtpClient client = new SmtpClient();
-            client.Port = 587;
-            client.Host = "smtp.gmail.com";
-            client.EnableSsl = true;
-            client.Timeout = 10000;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new System.Net.NetworkCredential("jiminjang96@gmail.com", "Jimin0316");
-
-            MailMessage mail = new MailMessage("jiminjang96@gmail.com", "jimin@temprecord.com");
-            mail.Subject = "Temprecod Logger Read";
-            mail.Attachments.Add(new Attachment(serialNumber+".pdf"));
-            mail.Attachments.Add(new Attachment(serialNumber+".xls"));
-            mail.BodyEncoding = UTF8Encoding.UTF8;
-            mail.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
-            client.Send(mail);*/
-
             var message = new MimeMessage();
             var builder = new BodyBuilder();
 
             var emailTo = GetSenderEmail(emailID);
 
-            message.From.Add(new MailboxAddress("Temprecord Logger Read", "temprecordapp@temprecord.com"));
+            message.From.Add(new MailboxAddress("Temprecord Logger " + serialNumber, "temprecordapp@temprecord.com"));
             message.To.Add(new MailboxAddress(emailTo));
-            message.Subject = "Temprecord Logger Read";
+            message.Subject = "Temprecord Logger " + serialNumber;
             
             var PDF = serialNumber + ".pdf";
             var EXCEL = serialNumber + ".xls";
@@ -58,13 +43,13 @@ namespace TempLite
             switch (emailID)
             {
                 case "TBS-NSW":
-                    return "jimin@temprecord.com";
+                    return "NSWDataLoggerCommunication@arcbs.redcross.org.au";
                 case "TBS-SA":
                     return "SADataLoggerCommunication@arcbs.redcross.org.au";
                 case "TBS-TAS":
                     return "TASDataLoggerCommunication@arcbs.redcross.org.au";
                 case "TBS-VIC":
-                    return "jimin@temprecord.com";
+                    return "VICDataLoggerCommunication@arcbs.redcross.org.au";
                 case "TBS-QLD":
                     return "QLDDataLoggerCommunication@arcbs.redcross.org.au";
                 case "TBS-WA":
@@ -72,7 +57,7 @@ namespace TempLite
                 case "TBS-NT":
                     return "NSWDataLoggerCommunication@arcbs.redcross.org.au";
                 case "TBS-TEST":
-                    return "yasiru@temprecord.com";
+                    return "jimin@temprecord.com";
                 default:
                     return "jimin@temprecord.com";
             }
