@@ -48,14 +48,16 @@
             // successLabel
             // 
             this.successLabel.BackColor = System.Drawing.Color.White;
+            this.successLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.successLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.successLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.successLabel.Location = new System.Drawing.Point(107, 203);
+            this.successLabel.Location = new System.Drawing.Point(0, 204);
             this.successLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.successLabel.Name = "successLabel";
-            this.successLabel.Size = new System.Drawing.Size(115, 36);
+            this.successLabel.Size = new System.Drawing.Size(325, 46);
             this.successLabel.TabIndex = 9;
             this.successLabel.Text = "Success";
+            this.successLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // EmailDoneUserControl
             // 

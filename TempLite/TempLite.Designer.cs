@@ -36,6 +36,7 @@ namespace TempLite
             this.ReadingProgressBar = new System.Windows.Forms.ProgressBar();
             this.ReadingLabel = new System.Windows.Forms.Label();
             this.bg = new System.Windows.Forms.Panel();
+            this.readingError = new UserControls.ReadingError();
             this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
             this.emailUserControl = new UserControls.EmailUserControl();
             this.ReadLoggerButton = new System.Windows.Forms.Button();
@@ -79,6 +80,7 @@ namespace TempLite
             // bg
             // 
             this.bg.BackColor = System.Drawing.Color.White;
+            this.bg.Controls.Add(this.readingError);
             this.bg.Controls.Add(this.emailDoneUserControl);
             this.bg.Controls.Add(this.emailUserControl);
             this.bg.Controls.Add(this.ReadLoggerButton);
@@ -88,6 +90,12 @@ namespace TempLite
             this.bg.Controls.Add(this.loggerUserControl);
             resources.ApplyResources(this.bg, "bg");
             this.bg.Name = "bg";
+            // 
+            // readingError
+            // 
+            resources.ApplyResources(this.readingError, "readingError");
+            this.readingError.BackColor = System.Drawing.Color.White;
+            this.readingError.Name = "readingError";
             // 
             // emailDoneUserControl
             // 
@@ -112,6 +120,7 @@ namespace TempLite
             // loggerProgressBarUserControl
             // 
             this.loggerProgressBarUserControl.BackColor = System.Drawing.Color.White;
+            this.loggerProgressBarUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             resources.ApplyResources(this.loggerProgressBarUserControl, "loggerProgressBarUserControl");
             this.loggerProgressBarUserControl.Name = "loggerProgressBarUserControl";
             this.loggerProgressBarUserControl.VisibleChanged += new System.EventHandler(this.loggerProgressBarUserControl_VisibleChanged);
@@ -119,6 +128,7 @@ namespace TempLite
             // generateDocumentUserControl
             // 
             this.generateDocumentUserControl.BackColor = System.Drawing.Color.White;
+            this.generateDocumentUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             resources.ApplyResources(this.generateDocumentUserControl, "generateDocumentUserControl");
             this.generateDocumentUserControl.Name = "generateDocumentUserControl";
             this.generateDocumentUserControl.VisibleChanged += new System.EventHandler(this.generateDocumentUserControl_VisibleChanged);
@@ -126,6 +136,7 @@ namespace TempLite
             // readerUserControl
             // 
             this.readerUserControl.BackColor = System.Drawing.Color.White;
+            this.readerUserControl.Cursor = System.Windows.Forms.Cursors.Default;
             resources.ApplyResources(this.readerUserControl, "readerUserControl");
             this.readerUserControl.Name = "readerUserControl";
             this.readerUserControl.VisibleChanged += new System.EventHandler(this.readerUserControl_VisibleChanged);
@@ -139,11 +150,13 @@ namespace TempLite
             // 
             // TempLite
             // 
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             resources.ApplyResources(this, "$this");
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.bg);
             this.ForeColor = System.Drawing.Color.Black;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.IsMdiContainer = true;
+            this.MaximizeBox = false;
             this.Name = "TempLite";
             this.Reading.ResumeLayout(false);
             this.Reading.PerformLayout();
@@ -165,6 +178,7 @@ namespace TempLite
         private System.Windows.Forms.Button ReadLoggerButton;
         private EmailUserControl emailUserControl;
         private EmailDoneUserControl emailDoneUserControl;
+        private ReadingError readingError;
     }
 }
 

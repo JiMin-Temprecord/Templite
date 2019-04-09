@@ -44,11 +44,12 @@
             // GeneratingDocumentLabel
             // 
             this.GeneratingDocumentLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GeneratingDocumentLabel.Location = new System.Drawing.Point(81, 44);
+            this.GeneratingDocumentLabel.Location = new System.Drawing.Point(48, 19);
             this.GeneratingDocumentLabel.Name = "GeneratingDocumentLabel";
-            this.GeneratingDocumentLabel.Size = new System.Drawing.Size(168, 72);
+            this.GeneratingDocumentLabel.Size = new System.Drawing.Size(234, 116);
             this.GeneratingDocumentLabel.TabIndex = 6;
             this.GeneratingDocumentLabel.Text = "Generating Documents";
+            this.GeneratingDocumentLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // GenerateDocumentUserControl
             // 

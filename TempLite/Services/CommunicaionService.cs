@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 
 namespace TempLite.Services
 {
     public class CommunicationServices
     {
+        int recoverCount = 0;
         int length = 0;
         bool readFull = true;
         readonly int maxlenreading = 58;
@@ -28,18 +30,23 @@ namespace TempLite.Services
             }
         }
 
-        public void GenerateHexFile(SerialPort serialPort, LoggerInformation loggerInformation)
+        public bool GenerateHexFile(SerialPort serialPort, LoggerInformation loggerInformation)
         {
             var Hexes = new List<Hex>();
             Hexes = ReadLogger(serialPort, loggerInformation, Hexes);
 
-            Console.WriteLine(Path.GetTempPath());
-            var sw = new StreamWriter(Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".hex");
-            foreach (var hex in Hexes)
+            if (Hexes.Count > 0)
             {
-                sw.WriteLine(hex.ToString());
+                var sw = new StreamWriter(Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".hex");
+                foreach (var hex in Hexes)
+                {
+                    sw.WriteLine(hex.ToString());
+                    sw.Close();
+                    return false;
+                }
             }
-            sw.Close();
+
+            return true;
         }
 
         List<Hex> ReadLogger(SerialPort serialPort, LoggerInformation loggerInformation, List<Hex> Hexes)
@@ -47,30 +54,43 @@ namespace TempLite.Services
             if (serialPort.IsOpen == false)
                 serialPort.Open();
 
-            WriteBytes(new WakeUpByteWritter(), serialPort);
-            var currentAddress = ReadBytesWakeUp(serialPort, loggerInformation, recievemsg, Hexes);
-
-            WriteBytes(new SetReadByteWritter(loggerInformation.LoggerType), serialPort);
-            ReadBytesSetRead(serialPort, currentAddress, loggerInformation, Hexes);
-
-            while (currentAddress.MemoryNumber <= loggerInformation.MaxMemory)
+            while (SerialPort.GetPortNames().Contains(serialPort.PortName) && serialPort.IsOpen)
             {
-                if (readFull == true && (length >= (loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress)))
-                {
-                    length = loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress;
-                    currentAddress.MemoryAddress = loggerInformation.MemoryMax[currentAddress.MemoryNumber];
-                    currentAddress.LengthMSB = (byte)((length >> 8) & 0xff);
-                    currentAddress.LengthLSB = (byte)(length & 0xff);
-                }
+                recoverCount = 0;
 
-                WriteBytes(new ReadLoggerByteWritter(currentAddress), serialPort);
-                readFull = ReadBytesReadLogger(serialPort, currentAddress, Hexes);
-                if (readFull == true)
+                WriteBytes(new WakeUpByteWritter(), serialPort);
+                var currentAddress = ReadBytesWakeUp(serialPort, loggerInformation, recievemsg, Hexes);
+
+                WriteBytes(new SetReadByteWritter(loggerInformation.LoggerType), serialPort);
+                ReadBytesSetRead(serialPort, currentAddress, loggerInformation, Hexes);
+
+                while (SerialPort.GetPortNames().Contains(serialPort.PortName) && (currentAddress.MemoryNumber <= loggerInformation.MaxMemory))
                 {
-                    currentAddress = GetNextAddress(currentAddress, loggerInformation);
+                    if (readFull == true && (length >= (loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress)))
+                    {
+                        recoverCount = 0;
+                        length = loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress;
+                        currentAddress.MemoryAddress = loggerInformation.MemoryMax[currentAddress.MemoryNumber];
+                        currentAddress.LengthMSB = (byte)((length >> 8) & 0xff);
+                        currentAddress.LengthLSB = (byte)(length & 0xff);
+                    }
+
+                    WriteBytes(new ReadLoggerByteWritter(currentAddress), serialPort);
+                    readFull = ReadBytesReadLogger(serialPort, currentAddress, Hexes);
+
+                    if (readFull == true)
+                    {
+                        currentAddress = GetNextAddress(currentAddress, loggerInformation);
+                    }
+
+                    if (recoverCount == 20)
+                    {
+                        Hexes.Clear();
+                        return Hexes;
+                    }
                 }
+                serialPort.Close();
             }
-            serialPort.Close();
             return Hexes;
         }
 
@@ -85,11 +105,14 @@ namespace TempLite.Services
                 while (byteData != 13)
                 {
                     recievemsg.Add((byte)byteData);
-                    byteData = serialPort.ReadByte();
+                    if(SerialPort.GetPortNames().Contains(serialPort.PortName))
+                        byteData = serialPort.ReadByte();
                 }
             }
             catch (TimeoutException)
-            { }
+            {
+                recoverCount++;
+            }
 
             recievemsg.Add(0x0d);
             recievemsg = RemoveEscChar(recievemsg);

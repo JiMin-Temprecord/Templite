@@ -130,4 +130,10 @@
   <data name="emailSuccess" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\emailSuccess.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="logger-01" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\logger-01.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="errorWarning" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\errorWarning.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

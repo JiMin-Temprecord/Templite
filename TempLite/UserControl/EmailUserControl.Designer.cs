@@ -51,12 +51,13 @@
             this.emailLabel.BackColor = System.Drawing.Color.Transparent;
             this.emailLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.emailLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.emailLabel.Location = new System.Drawing.Point(65, 14);
+            this.emailLabel.Location = new System.Drawing.Point(4, 14);
             this.emailLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.emailLabel.Name = "emailLabel";
-            this.emailLabel.Size = new System.Drawing.Size(199, 36);
+            this.emailLabel.Size = new System.Drawing.Size(317, 36);
             this.emailLabel.TabIndex = 8;
             this.emailLabel.Text = "Sending Email";
+            this.emailLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // emailProgressBar
             // 

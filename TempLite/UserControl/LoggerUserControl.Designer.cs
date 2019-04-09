@@ -43,9 +43,10 @@
             this.loggerText.Font = new System.Drawing.Font("Myriad Pro", 12F);
             this.loggerText.Location = new System.Drawing.Point(100, 675);
             this.loggerText.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.loggerText.Multiline = true;
             this.loggerText.Name = "loggerText";
             this.loggerText.ReadOnly = true;
-            this.loggerText.Size = new System.Drawing.Size(533, 20);
+            this.loggerText.Size = new System.Drawing.Size(597, 83);
             this.loggerText.TabIndex = 7;
             this.loggerText.Text = "Insert a G4 or MonT logger into the reader. \n Reading should start automatically";
             // 
@@ -57,7 +58,7 @@
             this.loggerLabel.Location = new System.Drawing.Point(100, 625);
             this.loggerLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.loggerLabel.Name = "loggerLabel";
-            this.loggerLabel.Size = new System.Drawing.Size(189, 36);
+            this.loggerLabel.Size = new System.Drawing.Size(533, 36);
             this.loggerLabel.TabIndex = 6;
             this.loggerLabel.Text = "Insert Logger";
             // 

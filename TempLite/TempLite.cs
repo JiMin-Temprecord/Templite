@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO.Ports;
+using System.Linq;
 using System.Windows.Forms;
 using TempLite.Services;
 
@@ -11,14 +12,15 @@ namespace TempLite
         CommunicationServices communicationService = new CommunicationServices();
         LoggerInformation loggerInformation = new LoggerInformation();
         SerialPort serialPort = new SerialPort();
-       
+        Reader reader = new Reader();
+
         BackgroundWorker readerBW;
         BackgroundWorker loggerBW;
         BackgroundWorker progressBarBW;
         BackgroundWorker documentBW;
         BackgroundWorker sendingEmailBW;
 
-
+        bool errorDectected = false;
 
         public TempLite()
         {
@@ -42,7 +44,6 @@ namespace TempLite
 
         void readerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            Reader reader = new Reader();
             var ftdiInfo = reader.FindFTDI();
             if (ftdiInfo != null)
             {
@@ -82,12 +83,20 @@ namespace TempLite
 
         void loggerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            if(SerialPort.GetPortNames().Contains<string>(serialPort.PortName))
                 communicationService.FindLogger(serialPort);
         }
 
         void loggerBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            loggerProgressBarUserControl.Visible = true;
+            if(SerialPort.GetPortNames().Contains<string>(serialPort.PortName))
+                loggerProgressBarUserControl.Visible = true;
+            else
+            {
+                readerUserControl.Visible = true;
+                loggerUserControl.Visible = false;
+            }
+
             loggerBW.Dispose();
         }
         #endregion
@@ -105,13 +114,32 @@ namespace TempLite
         }
         void progressBarBW_DoWork(object sender, DoWorkEventArgs e)
         {
-            communicationService.GenerateHexFile(serialPort, loggerInformation);
+            if(SerialPort.GetPortNames().Contains(serialPort.PortName))
+                errorDectected = communicationService.GenerateHexFile(serialPort, loggerInformation);
         }
 
         void progressBarBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            loggerProgressBarUserControl.Visible = false;
-            generateDocumentUserControl.Visible = true;
+            if (errorDectected)
+            {
+                loggerUserControl.Visible = false;
+                loggerProgressBarUserControl.Visible = false;
+                readingError.Visible = true;
+                ReadLoggerButton.Visible = true;
+            }
+
+            else if (SerialPort.GetPortNames().Contains(serialPort.PortName))
+            {
+                loggerProgressBarUserControl.Visible = false;
+                generateDocumentUserControl.Visible = true;
+            }
+            else
+            {
+                loggerProgressBarUserControl.Visible = false;
+                loggerUserControl.Visible = false;
+                readerUserControl.Visible = true;
+            }
+
             progressBarBW.Dispose();
         }
         #endregion
@@ -178,6 +206,8 @@ namespace TempLite
 
         private void ReadLoggerButton_Click(object sender, EventArgs e)
         {
+            readingError.Visible = false;
+            ReadLoggerButton.Visible = false;
             loggerUserControl.Visible = true;
         }
     }

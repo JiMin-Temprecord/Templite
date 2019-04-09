@@ -60,7 +60,7 @@
             this.progressBarLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.progressBarLabel.Location = new System.Drawing.Point(42, 47);
             this.progressBarLabel.Name = "progressBarLabel";
-            this.progressBarLabel.Size = new System.Drawing.Size(219, 36);
+            this.progressBarLabel.Size = new System.Drawing.Size(260, 36);
             this.progressBarLabel.TabIndex = 3;
             this.progressBarLabel.Text = "Reading Logger";
             // 
