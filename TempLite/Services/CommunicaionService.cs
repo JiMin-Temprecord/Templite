@@ -41,9 +41,9 @@ namespace TempLite.Services
                 foreach (var hex in Hexes)
                 {
                     sw.WriteLine(hex.ToString());
-                    sw.Close();
-                    return false;
                 }
+                sw.Close();
+                return false;
             }
 
             return true;

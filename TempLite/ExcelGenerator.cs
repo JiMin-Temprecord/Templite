@@ -16,8 +16,9 @@ namespace TempLite
             var excel = new ExcelPackage();
             var workSheet = excel.Workbook.Worksheets.Add(loggerInformation.SerialNumber);
             CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName);
-
+            
             excel.SaveAs(new FileInfo(Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx"));
+            excel.SaveAs(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + loggerInformation.SerialNumber + ".xlsx"));
             Console.WriteLine("EXCEL Created !");
 
         }

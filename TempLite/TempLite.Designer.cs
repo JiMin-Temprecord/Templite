@@ -36,14 +36,15 @@ namespace TempLite
             this.ReadingProgressBar = new System.Windows.Forms.ProgressBar();
             this.ReadingLabel = new System.Windows.Forms.Label();
             this.bg = new System.Windows.Forms.Panel();
+            this.ReadLoggerButton = new System.Windows.Forms.Button();
             this.readingError = new UserControls.ReadingError();
             this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
             this.emailUserControl = new UserControls.EmailUserControl();
-            this.ReadLoggerButton = new System.Windows.Forms.Button();
             this.loggerProgressBarUserControl = new UserControls.LoggerProgressBarUserControl();
             this.generateDocumentUserControl = new UserControls.GenerateDocumentUserControl();
             this.readerUserControl = new UserControls.ReaderUserControl();
             this.loggerUserControl = new UserControls.LoggerUserControl();
+            this.readyStateMessage = new UserControls.ReadyStateMessage();
             this.Reading.SuspendLayout();
             this.bg.SuspendLayout();
             this.SuspendLayout();
@@ -80,6 +81,7 @@ namespace TempLite
             // bg
             // 
             this.bg.BackColor = System.Drawing.Color.White;
+            this.bg.Controls.Add(this.readyStateMessage);
             this.bg.Controls.Add(this.readingError);
             this.bg.Controls.Add(this.emailDoneUserControl);
             this.bg.Controls.Add(this.emailUserControl);
@@ -90,6 +92,14 @@ namespace TempLite
             this.bg.Controls.Add(this.loggerUserControl);
             resources.ApplyResources(this.bg, "bg");
             this.bg.Name = "bg";
+            // 
+            // ReadLoggerButton
+            // 
+            this.ReadLoggerButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            resources.ApplyResources(this.ReadLoggerButton, "ReadLoggerButton");
+            this.ReadLoggerButton.Name = "ReadLoggerButton";
+            this.ReadLoggerButton.UseVisualStyleBackColor = true;
+            this.ReadLoggerButton.Click += new System.EventHandler(this.ReadLoggerButton_Click);
             // 
             // readingError
             // 
@@ -108,14 +118,6 @@ namespace TempLite
             resources.ApplyResources(this.emailUserControl, "emailUserControl");
             this.emailUserControl.Name = "emailUserControl";
             this.emailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
-            // 
-            // ReadLoggerButton
-            // 
-            this.ReadLoggerButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            resources.ApplyResources(this.ReadLoggerButton, "ReadLoggerButton");
-            this.ReadLoggerButton.Name = "ReadLoggerButton";
-            this.ReadLoggerButton.UseVisualStyleBackColor = true;
-            this.ReadLoggerButton.Click += new System.EventHandler(this.ReadLoggerButton_Click);
             // 
             // loggerProgressBarUserControl
             // 
@@ -148,6 +150,12 @@ namespace TempLite
             this.loggerUserControl.Name = "loggerUserControl";
             this.loggerUserControl.VisibleChanged += new System.EventHandler(this.loggerUserControl_VisibleChanged);
             // 
+            // readyStateMessage
+            // 
+            this.readyStateMessage.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.readyStateMessage, "readyStateMessage");
+            this.readyStateMessage.Name = "readyStateMessage";
+            // 
             // TempLite
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -179,6 +187,7 @@ namespace TempLite
         private EmailUserControl emailUserControl;
         private EmailDoneUserControl emailDoneUserControl;
         private ReadingError readingError;
+        private ReadyStateMessage readyStateMessage;
     }
 }
 

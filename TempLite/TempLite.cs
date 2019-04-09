@@ -21,6 +21,7 @@ namespace TempLite
         BackgroundWorker sendingEmailBW;
 
         bool errorDectected = false;
+        bool loggerHasStarted = true;
 
         public TempLite()
         {
@@ -162,14 +163,25 @@ namespace TempLite
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
 
-            pdfGenerator.CreatePDF(loggerInformation);
-            excelGenerator.CreateExcel(loggerInformation);
+            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
+            if(loggerHasStarted)
+                excelGenerator.CreateExcel(loggerInformation);
         }
 
         void documentBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            generateDocumentUserControl.Visible = false;
-            emailUserControl.Visible = true;
+            if (loggerHasStarted)
+            {
+                generateDocumentUserControl.Visible = false;
+                emailUserControl.Visible = true;
+            }
+            else
+            {
+                generateDocumentUserControl.Visible = false;
+                loggerUserControl.Visible = false;
+                readyStateMessage.Visible = true;
+                ReadLoggerButton.Visible = true;
+            }
             documentBW.Dispose();
         }
         #endregion
@@ -206,6 +218,7 @@ namespace TempLite
 
         private void ReadLoggerButton_Click(object sender, EventArgs e)
         {
+            readyStateMessage.Visible = false;
             readingError.Visible = false;
             ReadLoggerButton.Visible = false;
             loggerUserControl.Visible = true;

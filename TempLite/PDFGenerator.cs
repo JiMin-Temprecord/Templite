@@ -13,7 +13,7 @@ namespace TempLite
         int pageNumber = 0;
         string path = AppDomain.CurrentDomain.BaseDirectory;
 
-        public void CreatePDF(LoggerInformation loggerInformation)
+        public bool CreatePDF(LoggerInformation loggerInformation)
         {
             double lineCounter = 80;
 
@@ -25,6 +25,9 @@ namespace TempLite
             var channelTwo = pdfVariables.ChannelTwo;
             var font = new XFont(fontType, 11, XFontStyle.Regular);
             var boldFont = new XFont(fontType, 11, XFontStyle.Bold);
+
+            if (pdfVariables.LoggerState == "Ready" || pdfVariables.LoggerState == "Delay")
+                return false;
             
             //create pen
             var pen = new XPen(XColors.Black, 1);
@@ -146,10 +149,15 @@ namespace TempLite
             DrawGraph(decoder, pdfVariables, draw, pen, font);
             FillInValues(decoder, pdfVariables, loggerInformation.SerialNumber);
 
-            string filename = Path.GetTempPath() + loggerInformation.SerialNumber + ".pdf";
+            string myDocument = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +"\\" +  loggerInformation.SerialNumber + ".pdf";
+            string filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".pdf";
+
+
             pdfDocument.Save(filename);
+            pdfDocument.Save(myDocument);
             //Process.Start(filename); //Previews PDF
             Console.WriteLine("PDF Created !");
+            return true;
         }
 
 
