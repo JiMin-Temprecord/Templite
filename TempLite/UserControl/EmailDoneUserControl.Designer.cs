@@ -47,7 +47,6 @@
             // 
             // successLabel
             // 
-            this.successLabel.AutoSize = true;
             this.successLabel.BackColor = System.Drawing.Color.White;
             this.successLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.successLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -68,7 +67,6 @@
             this.Size = new System.Drawing.Size(325, 250);
             ((System.ComponentModel.ISupportInitialize)(this.emailDoneImage)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

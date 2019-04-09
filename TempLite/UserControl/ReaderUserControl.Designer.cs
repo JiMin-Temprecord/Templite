@@ -39,8 +39,8 @@
             // 
             // readerLabel
             // 
-            resources.ApplyResources(this.readerLabel, "readerLabel");
             this.readerLabel.BackColor = System.Drawing.Color.Transparent;
+            resources.ApplyResources(this.readerLabel, "readerLabel");
             this.readerLabel.Name = "readerLabel";
             // 
             // readerTextbox

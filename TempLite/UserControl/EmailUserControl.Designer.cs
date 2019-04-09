@@ -48,7 +48,6 @@
             // 
             // emailLabel
             // 
-            this.emailLabel.AutoSize = true;
             this.emailLabel.BackColor = System.Drawing.Color.Transparent;
             this.emailLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.emailLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -89,7 +88,6 @@
             this.Name = "EmailUserControl";
             this.Size = new System.Drawing.Size(325, 250);
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.EmailImage)).EndInit();
             this.ResumeLayout(false);
 

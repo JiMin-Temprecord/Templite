@@ -1,5 +1,4 @@
 ﻿using MimeKit;
-using System;
 using System.IO;
 
 namespace TempLite
@@ -17,8 +16,8 @@ namespace TempLite
             message.To.Add(new MailboxAddress(emailTo));
             message.Subject = "Temprecord Logger " + serialNumber;
             
-            var PDF = serialNumber + ".pdf";
-            var EXCEL = serialNumber + ".xls";
+            var PDF = Path.GetTempPath() + serialNumber + ".pdf";
+            var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
 
             if (System.IO.File.Exists(PDF) && (System.IO.File.Exists(EXCEL)))
             {

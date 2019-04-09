@@ -33,7 +33,8 @@ namespace TempLite.Services
             var Hexes = new List<Hex>();
             Hexes = ReadLogger(serialPort, loggerInformation, Hexes);
 
-            var sw = new StreamWriter(loggerInformation.SerialNumber + ".hex");
+            Console.WriteLine(Path.GetTempPath());
+            var sw = new StreamWriter(Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".hex");
             foreach (var hex in Hexes)
             {
                 sw.WriteLine(hex.ToString());

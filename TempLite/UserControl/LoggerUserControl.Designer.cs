@@ -51,7 +51,6 @@
             // 
             // loggerLabel
             // 
-            this.loggerLabel.AutoSize = true;
             this.loggerLabel.BackColor = System.Drawing.Color.Transparent;
             this.loggerLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.loggerLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;

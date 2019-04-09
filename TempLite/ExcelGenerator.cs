@@ -17,7 +17,7 @@ namespace TempLite
             var workSheet = excel.Workbook.Worksheets.Add(loggerInformation.SerialNumber);
             CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName);
 
-            excel.SaveAs(new FileInfo(Application.StartupPath + "\\" + loggerInformation.SerialNumber + ".xlsx"));
+            excel.SaveAs(new FileInfo(Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx"));
             Console.WriteLine("EXCEL Created !");
 
         }
@@ -30,11 +30,12 @@ namespace TempLite
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
             var channelOne = pdfVariables.ChannelOne;
             var channelTwo = pdfVariables.ChannelTwo;
+            var path = AppDomain.CurrentDomain.BaseDirectory;
 
             var imageRange = workSheet.Cells[5, 5];
             if (channelOne.OutsideLimits == 0 && channelTwo.OutsideLimits == 0)
             {
-                var tickImage = Image.FromFile("..\\..\\Images\\greentick.png");
+                var tickImage = Image.FromFile(path + "\\Images\\greentick.png");
                 var setPosition = workSheet.Drawings.AddPicture("Within Limitis" , tickImage);
                 setPosition.SetSize(145, 128);
                 setPosition.SetPosition(80, 275);
@@ -45,7 +46,7 @@ namespace TempLite
             }
             else
             {
-                var warningImage = Image.FromFile("..\\..\\Images\\redwarning.png");
+                var warningImage = Image.FromFile(path + "\\Images\\redwarning.png");
                 var setPosition = workSheet.Drawings.AddPicture("Outside Limits" , warningImage);
                 setPosition.SetSize(145, 128);
                 setPosition.SetPosition(80, 275);
@@ -55,7 +56,7 @@ namespace TempLite
             }
 
             var logoRange = workSheet.Cells[1, 3];
-            var logoImage = Image.FromFile(AppDomain.CurrentDomain.BaseDirectory+ "..\\..\\Images\\logo.png");
+            var logoImage = Image.FromFile(path + "\\Images\\logo.png");
             var setLogoPosition = workSheet.Drawings.AddPicture(string.Empty, logoImage);
             setLogoPosition.SetSize(103, 63);
             setLogoPosition.SetPosition(10, 130);

@@ -70,6 +70,7 @@ namespace TempLite
         readonly LoggerInformation loggerInformation;
         readonly string serialNumber;
         readonly string jsonFile;
+        readonly string path = AppDomain.CurrentDomain.BaseDirectory;
 
         public HexFileDecoder(LoggerInformation loggerInformation)
         {
@@ -82,7 +83,7 @@ namespace TempLite
         {
             string[] limit;
             var jsonObject = GetJsonObject();
-
+           
             if (loggerInformation.LoggerName == "G4")
             {
                 numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
@@ -236,7 +237,7 @@ namespace TempLite
 
             try
             {
-                using (var sr = new StreamReader(serialNumber + ".hex"))
+                using (var sr = new StreamReader(Path.GetTempPath() + "\\" + serialNumber + ".hex"))
                 {
                     string line;
                     int diff = 0;
@@ -334,7 +335,7 @@ namespace TempLite
 
         JObject GetJsonObject()
         {
-            using (var sr = new StreamReader("..\\..\\Json\\"+ jsonFile))
+            using (var sr = new StreamReader(path + "\\Json\\" + jsonFile))
             {
                 return JObject.Parse(sr.ReadToEnd());
             }

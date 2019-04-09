@@ -2,6 +2,7 @@
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using System.Collections.Generic;
+using System.IO;
 
 namespace TempLite
 {
@@ -10,6 +11,7 @@ namespace TempLite
         private PdfDocument pdfDocument = new PdfDocument();
         string fontType = "Roboto";
         int pageNumber = 0;
+        string path = AppDomain.CurrentDomain.BaseDirectory;
 
         public void CreatePDF(LoggerInformation loggerInformation)
         {
@@ -59,13 +61,13 @@ namespace TempLite
 
             if ((int)channelOne.OutsideLimits == 0 && (int)channelTwo.OutsideLimits == 0)
             {
-                XImage greentick = XImage.FromFile("..\\..\\Images\\greentick.png");
+                XImage greentick = XImage.FromFile(path+"\\Images\\greentick.png");
                 draw.DrawImage(greentick, PDFcoordinates.sign_left, PDFcoordinates.sign_top, 90, 80);
                 draw.DrawString("Within Limits", font, XBrushes.Black, PDFcoordinates.limitinfo_startX, PDFcoordinates.limitinfo_startY);
             }
             else
             {
-                XImage redwarning = XImage.FromFile("..\\..\\Images\\redwarning.png");
+                XImage redwarning = XImage.FromFile(path+"\\Images\\redwarning.png");
                 draw.DrawImage(redwarning, PDFcoordinates.sign_left, PDFcoordinates.sign_top, 90, 80);
                 draw.DrawString("Limits Exceeded", font, XBrushes.Black, PDFcoordinates.limitinfo_startX, PDFcoordinates.limitinfo_startY);
             }
@@ -144,7 +146,7 @@ namespace TempLite
             DrawGraph(decoder, pdfVariables, draw, pen, font);
             FillInValues(decoder, pdfVariables, loggerInformation.SerialNumber);
 
-            string filename = loggerInformation.SerialNumber + ".pdf";
+            string filename = Path.GetTempPath() + loggerInformation.SerialNumber + ".pdf";
             pdfDocument.Save(filename);
             //Process.Start(filename); //Previews PDF
             Console.WriteLine("PDF Created !");
@@ -399,7 +401,7 @@ namespace TempLite
         {
             var serialfont = new XFont(fontType, 18, XFontStyle.Regular);
             var serialPen = new XPen(XColors.Blue, 3);
-            var logo = XImage.FromFile("..\\..\\Images\\logo.png");
+            var logo = XImage.FromFile(path+"\\Images\\logo.png");
 
             pageNumber++;
 

@@ -57,7 +57,6 @@
             // 
             // progressBarLabel
             // 
-            this.progressBarLabel.AutoSize = true;
             this.progressBarLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
             this.progressBarLabel.Location = new System.Drawing.Point(42, 47);
             this.progressBarLabel.Name = "progressBarLabel";
