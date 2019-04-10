@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,13 +14,14 @@ namespace TempLite
         CommunicationServices communicationService = new CommunicationServices();
         LoggerInformation loggerInformation = new LoggerInformation();
         SerialPort serialPort = new SerialPort();
-        Reader reader = new Reader();
+        PDFvariables pdfVariables;
 
         BackgroundWorker readerBW;
         BackgroundWorker loggerBW;
         BackgroundWorker progressBarBW;
         BackgroundWorker documentBW;
         BackgroundWorker sendingEmailBW;
+        BackgroundWorker previewPanelBW;
 
         bool errorDectected = false;
         bool loggerHasStarted = true;
@@ -45,6 +48,7 @@ namespace TempLite
 
         void readerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            var reader = new Reader();
             var ftdiInfo = reader.FindFTDI();
             if (ftdiInfo != null)
             {
@@ -117,6 +121,10 @@ namespace TempLite
         {
             if(SerialPort.GetPortNames().Contains(serialPort.PortName))
                 errorDectected = communicationService.GenerateHexFile(serialPort, loggerInformation);
+
+            var decoder = new HexFileDecoder(loggerInformation);
+            decoder.ReadIntoJsonFileAndSetupDecoder();
+            pdfVariables = decoder.AssignPDFValue();
         }
 
         void progressBarBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -131,8 +139,18 @@ namespace TempLite
 
             else if (SerialPort.GetPortNames().Contains(serialPort.PortName))
             {
-                loggerProgressBarUserControl.Visible = false;
-                generateDocumentUserControl.Visible = true;
+                if (loggerInformation.EmailId == string.Empty)
+                {
+                    loggerUserControl.Visible = false;
+                    loggerProgressBarUserControl.Visible = false;
+                    previewPanel.Visible = true;
+                    ReadLoggerButton.Visible = true;
+                }
+                else
+                {
+                    loggerProgressBarUserControl.Visible = false;
+                    generateDocumentUserControl.Visible = true;
+                }
             }
             else
             {
@@ -162,10 +180,10 @@ namespace TempLite
         {
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
-
-            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
+            
+            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,pdfVariables);
             if(loggerHasStarted)
-                excelGenerator.CreateExcel(loggerInformation);
+                excelGenerator.CreateExcel(loggerInformation,pdfVariables);
         }
 
         void documentBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -185,7 +203,6 @@ namespace TempLite
             documentBW.Dispose();
         }
         #endregion
-
         #region Sending Email
         void emailUserControl_VisibleChanged(object sender, EventArgs e)
         {
@@ -218,10 +235,64 @@ namespace TempLite
 
         private void ReadLoggerButton_Click(object sender, EventArgs e)
         {
+            previewPanel.Visible = false;
             readyStateMessage.Visible = false;
             readingError.Visible = false;
             ReadLoggerButton.Visible = false;
             loggerUserControl.Visible = true;
         }
+
+        #region Preview Panel
+
+        private void PreviewPanel_VisibleChanged(object sender, EventArgs e)
+        {
+            previewPanelBW = new BackgroundWorker();
+            previewPanelBW.DoWork += previewPanelBW_DoWork;
+            previewPanelBW.WorkerReportsProgress = true;
+            previewPanelBW.WorkerSupportsCancellation = true;
+
+            if (previewPanel.Visible)
+                previewPanelBW.RunWorkerAsync();
+        }
+        void previewPanelBW_DoWork(object sender, DoWorkEventArgs e)
+        { 
+            var pdfGenerator = new PDFGenerator();
+            var excelGenerator = new ExcelGenerator();
+
+            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,pdfVariables);
+            if (loggerHasStarted)
+                excelGenerator.CreateExcel(loggerInformation, pdfVariables);
+
+            if (loggerHasStarted == false)
+            {
+                loggerUserControl.Visible = false;
+                readyStateMessage.Visible = true;
+            }
+        }
+
+        private void previewPDF_Click(object sender, EventArgs e)
+        {
+            var filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".pdf";
+            Process.Start(filename);
+        }
+
+        private void emailPDF_Click(object sender, EventArgs e)
+        {
+            var email = new Email();
+            email.OpenEmailApplication(loggerInformation.SerialNumber, loggerInformation.EmailId,0);
+        }
+
+        private void previewExcel_Click(object sender, EventArgs e)
+        {
+            var filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx";
+            Process.Start(filename);
+        }
+
+        private void emailExcel_Click(object sender, EventArgs e)
+        {
+            var email = new Email();
+            email.OpenEmailApplication(loggerInformation.SerialNumber, loggerInformation.EmailId, 1);
+        }
+        #endregion
     }
 }

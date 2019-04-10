@@ -13,13 +13,10 @@ namespace TempLite
         int pageNumber = 0;
         string path = AppDomain.CurrentDomain.BaseDirectory;
 
-        public bool CreatePDF(LoggerInformation loggerInformation)
+        public bool CreatePDF(LoggerInformation loggerInformation, PDFvariables pdfVariables)
         {
-            double lineCounter = 80;
-
             var decoder = new HexFileDecoder(loggerInformation);
-            decoder.ReadIntoJsonFileAndSetupDecoder();
-            var pdfVariables = decoder.AssignPDFValue();
+            double lineCounter = 80;
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
             var channelOne = pdfVariables.ChannelOne;
             var channelTwo = pdfVariables.ChannelTwo;

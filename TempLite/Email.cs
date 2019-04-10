@@ -1,4 +1,5 @@
 ﻿using MimeKit;
+using Microsoft.Office.Interop.Outlook;
 using System.IO;
 
 namespace TempLite
@@ -24,7 +25,7 @@ namespace TempLite
                 builder.Attachments.Add(PDF);
                 builder.Attachments.Add(EXCEL);
             }
-
+            
             message.Body = builder.ToMessageBody();
 
             using (var client = new MailKit.Net.Smtp.SmtpClient())
@@ -35,6 +36,36 @@ namespace TempLite
                 client.Send(message);
                 client.Disconnect(true);
             }
+        }
+
+        public void OpenEmailApplication (string serialNumber, string emailID, int file = 2)
+        {
+            var PDF = Path.GetTempPath() + serialNumber + ".pdf";
+            var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
+
+            var outlookApp = new Application();
+            try
+            {
+                var outlookMail = outlookApp.CreateItem(OlItemType.olMailItem);
+
+                outlookMail.Subject = "Temprecord Logger " + serialNumber;
+                
+                if(file == 0)
+                    outlookMail.Attachments.Add(PDF);
+                else if(file == 1)
+                    outlookMail.Attachments.Add(EXCEL);
+                else
+                {
+                    outlookMail.Attachments.Add(PDF);
+                    outlookMail.Attachments.Add(EXCEL);
+                }
+
+                outlookMail.Display(true);
+            }
+            finally
+            {
+            }
+            
         }
 
         string GetSenderEmail (string emailID)

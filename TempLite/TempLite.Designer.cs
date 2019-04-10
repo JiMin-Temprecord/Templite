@@ -37,6 +37,14 @@ namespace TempLite
             this.ReadingLabel = new System.Windows.Forms.Label();
             this.bg = new System.Windows.Forms.Panel();
             this.ReadLoggerButton = new System.Windows.Forms.Button();
+            this.previewPanel = new System.Windows.Forms.Panel();
+            this.excelPanel = new System.Windows.Forms.Panel();
+            this.emailExcel = new System.Windows.Forms.Button();
+            this.previewExcel = new System.Windows.Forms.Button();
+            this.pdfPanel = new System.Windows.Forms.Panel();
+            this.emailPDF = new System.Windows.Forms.Button();
+            this.previewPDF = new System.Windows.Forms.Button();
+            this.readyStateMessage = new UserControls.ReadyStateMessage();
             this.readingError = new UserControls.ReadingError();
             this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
             this.emailUserControl = new UserControls.EmailUserControl();
@@ -44,9 +52,11 @@ namespace TempLite
             this.generateDocumentUserControl = new UserControls.GenerateDocumentUserControl();
             this.readerUserControl = new UserControls.ReaderUserControl();
             this.loggerUserControl = new UserControls.LoggerUserControl();
-            this.readyStateMessage = new UserControls.ReadyStateMessage();
             this.Reading.SuspendLayout();
             this.bg.SuspendLayout();
+            this.previewPanel.SuspendLayout();
+            this.excelPanel.SuspendLayout();
+            this.pdfPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // Reading
@@ -81,15 +91,16 @@ namespace TempLite
             // bg
             // 
             this.bg.BackColor = System.Drawing.Color.White;
+            this.bg.Controls.Add(this.ReadLoggerButton);
             this.bg.Controls.Add(this.readyStateMessage);
             this.bg.Controls.Add(this.readingError);
             this.bg.Controls.Add(this.emailDoneUserControl);
             this.bg.Controls.Add(this.emailUserControl);
-            this.bg.Controls.Add(this.ReadLoggerButton);
             this.bg.Controls.Add(this.loggerProgressBarUserControl);
             this.bg.Controls.Add(this.generateDocumentUserControl);
             this.bg.Controls.Add(this.readerUserControl);
             this.bg.Controls.Add(this.loggerUserControl);
+            this.bg.Controls.Add(this.previewPanel);
             resources.ApplyResources(this.bg, "bg");
             this.bg.Name = "bg";
             // 
@@ -100,6 +111,75 @@ namespace TempLite
             this.ReadLoggerButton.Name = "ReadLoggerButton";
             this.ReadLoggerButton.UseVisualStyleBackColor = true;
             this.ReadLoggerButton.Click += new System.EventHandler(this.ReadLoggerButton_Click);
+            // 
+            // previewPanel
+            // 
+            this.previewPanel.BackColor = System.Drawing.Color.White;
+            this.previewPanel.Controls.Add(this.excelPanel);
+            this.previewPanel.Controls.Add(this.pdfPanel);
+            resources.ApplyResources(this.previewPanel, "previewPanel");
+            this.previewPanel.Name = "previewPanel";
+            this.previewPanel.VisibleChanged += new System.EventHandler(this.PreviewPanel_VisibleChanged);
+            // 
+            // excelPanel
+            // 
+            this.excelPanel.BackColor = System.Drawing.Color.White;
+            this.excelPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.excelPanel.Controls.Add(this.emailExcel);
+            this.excelPanel.Controls.Add(this.previewExcel);
+            resources.ApplyResources(this.excelPanel, "excelPanel");
+            this.excelPanel.Name = "excelPanel";
+            // 
+            // emailExcel
+            // 
+            resources.ApplyResources(this.emailExcel, "emailExcel");
+            this.emailExcel.BackColor = System.Drawing.Color.White;
+            this.emailExcel.BackgroundImage = global::TempLite.Properties.Resources.TempLite_04;
+            this.emailExcel.Name = "emailExcel";
+            this.emailExcel.UseVisualStyleBackColor = false;
+            this.emailExcel.Click += new System.EventHandler(this.emailExcel_Click);
+            // 
+            // previewExcel
+            // 
+            resources.ApplyResources(this.previewExcel, "previewExcel");
+            this.previewExcel.BackColor = System.Drawing.Color.White;
+            this.previewExcel.BackgroundImage = global::TempLite.Properties.Resources.TempLite_051;
+            this.previewExcel.Name = "previewExcel";
+            this.previewExcel.UseVisualStyleBackColor = false;
+            this.previewExcel.Click += new System.EventHandler(this.previewExcel_Click);
+            // 
+            // pdfPanel
+            // 
+            this.pdfPanel.BackColor = System.Drawing.Color.White;
+            this.pdfPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pdfPanel.Controls.Add(this.emailPDF);
+            this.pdfPanel.Controls.Add(this.previewPDF);
+            resources.ApplyResources(this.pdfPanel, "pdfPanel");
+            this.pdfPanel.Name = "pdfPanel";
+            // 
+            // emailPDF
+            // 
+            resources.ApplyResources(this.emailPDF, "emailPDF");
+            this.emailPDF.BackColor = System.Drawing.Color.White;
+            this.emailPDF.BackgroundImage = global::TempLite.Properties.Resources.TempLite_01;
+            this.emailPDF.Name = "emailPDF";
+            this.emailPDF.UseVisualStyleBackColor = false;
+            this.emailPDF.Click += new System.EventHandler(this.emailPDF_Click);
+            // 
+            // previewPDF
+            // 
+            resources.ApplyResources(this.previewPDF, "previewPDF");
+            this.previewPDF.BackColor = System.Drawing.Color.White;
+            this.previewPDF.BackgroundImage = global::TempLite.Properties.Resources.TempLite_021;
+            this.previewPDF.Name = "previewPDF";
+            this.previewPDF.UseVisualStyleBackColor = false;
+            this.previewPDF.Click += new System.EventHandler(this.previewPDF_Click);
+            // 
+            // readyStateMessage
+            // 
+            this.readyStateMessage.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.readyStateMessage, "readyStateMessage");
+            this.readyStateMessage.Name = "readyStateMessage";
             // 
             // readingError
             // 
@@ -150,12 +230,6 @@ namespace TempLite
             this.loggerUserControl.Name = "loggerUserControl";
             this.loggerUserControl.VisibleChanged += new System.EventHandler(this.loggerUserControl_VisibleChanged);
             // 
-            // readyStateMessage
-            // 
-            this.readyStateMessage.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.readyStateMessage, "readyStateMessage");
-            this.readyStateMessage.Name = "readyStateMessage";
-            // 
             // TempLite
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -169,6 +243,9 @@ namespace TempLite
             this.Reading.ResumeLayout(false);
             this.Reading.PerformLayout();
             this.bg.ResumeLayout(false);
+            this.previewPanel.ResumeLayout(false);
+            this.excelPanel.ResumeLayout(false);
+            this.pdfPanel.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -188,6 +265,13 @@ namespace TempLite
         private EmailDoneUserControl emailDoneUserControl;
         private ReadingError readingError;
         private ReadyStateMessage readyStateMessage;
+        private System.Windows.Forms.Panel previewPanel;
+        private System.Windows.Forms.Panel pdfPanel;
+        private System.Windows.Forms.Panel excelPanel;
+        private System.Windows.Forms.Button previewPDF;
+        private System.Windows.Forms.Button emailPDF;
+        private System.Windows.Forms.Button emailExcel;
+        private System.Windows.Forms.Button previewExcel;
     }
 }
 

@@ -15,6 +15,7 @@ namespace TempLite
             serial.DataBits = 8;
             serial.StopBits = StopBits.One;
             serial.Handshake = Handshake.None;
+            serial.DtrEnable = true; // for older readers
 
             serial.ReadTimeout = 100;
             serial.WriteTimeout = 100;

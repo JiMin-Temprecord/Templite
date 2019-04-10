@@ -11,11 +11,11 @@ namespace TempLite
     {
         int row = 5;
 
-        public void CreateExcel(LoggerInformation loggerInformation)
+        public void CreateExcel(LoggerInformation loggerInformation, PDFvariables pdfVariables)
         {
             var excel = new ExcelPackage();
             var workSheet = excel.Workbook.Worksheets.Add(loggerInformation.SerialNumber);
-            CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName);
+            CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName, pdfVariables);
             
             excel.SaveAs(new FileInfo(Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx"));
             excel.SaveAs(new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + loggerInformation.SerialNumber + ".xlsx"));
@@ -23,11 +23,9 @@ namespace TempLite
 
         }
 
-        private void CreateLayout(ExcelWorksheet workSheet, LoggerInformation loggerInformation, string loggername)
+        private void CreateLayout(ExcelWorksheet workSheet, LoggerInformation loggerInformation, string loggername, PDFvariables pdfVariables)
         {
             var decoder = new HexFileDecoder(loggerInformation);
-            decoder.ReadIntoJsonFileAndSetupDecoder();
-            var pdfVariables = decoder.AssignPDFValue();
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
             var channelOne = pdfVariables.ChannelOne;
             var channelTwo = pdfVariables.ChannelTwo;

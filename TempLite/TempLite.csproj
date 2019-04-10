@@ -11,6 +11,26 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>C:\Users\JiMin\source\repos\TempLite\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <ProductName>TempLite</ProductName>
+    <PublisherName>Temprecord</PublisherName>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -24,12 +44,31 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>7E3F8542A68DEA41E6E1DF19BA7A4B478C0AE4EF</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>TempLite_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>TempLite.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.2.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
@@ -52,6 +91,10 @@
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Outlook.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Outlook.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="MimeKit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
@@ -95,13 +138,12 @@
   <ItemGroup>
     <Compile Include="AddressSection.cs" />
     <Compile Include="LoggerInformation\ChannelConfig.cs" />
-    <Compile Include="G4HexDecoder.cs" />
+    <Compile Include="HexFileDecoder.cs" />
     <Compile Include="Email.cs" />
     <Compile Include="ExcelGenerator.cs" />
     <Compile Include="FTDIInfo.cs" />
     <Compile Include="ByteWriters\ReadLoggerByteWritter.cs" />
     <Compile Include="ByteWriters\SetReadByteWritter.cs" />
-    <Compile Include="EZFontResolver.cs" />
     <Compile Include="UserControl\GenerateDocumentUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -135,7 +177,6 @@
     </Compile>
     <Compile Include="LoggerInformation\LoggerVariables.cs" />
     <Compile Include="PDFGenerator.cs" />
-    <Compile Include="HexfileDecoder.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="PDFcoordinates.cs" />
     <Compile Include="UserControl\ReaderUserControl.cs">
@@ -156,6 +197,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ByteWriters\WakeUpByteWritter.cs" />
     <Compile Include="ByteWriters\WriteByteInterface.cs" />
+    <Compile Include="UserControl\ReadingError.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\ReadingError.Designer.cs">
+      <DependentUpon>ReadingError.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControl\ReadyStateMessage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\ReadyStateMessage.Designer.cs">
+      <DependentUpon>ReadyStateMessage.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="UserControl\GenerateDocumentUserControl.resx">
       <DependentUpon>GenerateDocumentUserControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -187,6 +240,18 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="UserControl\ReadingError.resx">
+      <DependentUpon>ReadingError.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\ReadyStateMessage.resx">
+      <DependentUpon>ReadyStateMessage.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Json\G4.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Json\MonT.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -203,6 +268,28 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FTD2XX_NET.XML" />
+    <None Include="Resources\pdf.png" />
+    <None Include="Resources\excel.png" />
+    <None Include="Resources\TempLite-01.png" />
+    <None Include="Resources\TempLite-02.png" />
+    <None Include="Resources\TempLite-05.png" />
+    <None Include="Resources\TempLite-04.png" />
+    <None Include="Resources\TempLite-021.png" />
+    <None Include="Resources\TempLite-051.png" />
+    <Content Include="TempLite.ico" />
+    <None Include="Images\errorWarning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Images\greentick.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\redwarning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\logger-01.png" />
     <None Include="Resources\emailSuccess.png" />
     <None Include="Resources\email.png" />
     <None Include="Resources\reader_l.png" />
@@ -227,6 +314,18 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
