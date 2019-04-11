@@ -82,63 +82,63 @@ namespace TempLite
             string[] limit;
             var jsonObject = GetJsonObject();
            
-            if (loggerInformation.LoggerName == "G4")
+            if (loggerInformation.LoggerName == Decode.G4)
             {
-                numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
-                userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_DATA,UserDataLen"), 16);
-                emailID = ReadFromJObject(jsonObject, "USER_SETTINGS,Owner");
-                userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
-                loggerState = ReadFromJObject(jsonObject, "HEADER,State");
-                batteryPercentage = Convert.ToInt32(ReadFromJObject(jsonObject, "BATTERY_INFO,Battery"), 16) + "%";
-                loopOverwriteStartAddress = Convert.ToInt32(ReadFromJObject(jsonObject, "LoopOverWriteAddress"), 16);
-                fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, "USER_SETTINGS,Fahrenheit"));
-                utcReferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, "UTCReferenceTime"), 16);
-                totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalRTCTicks"), 16);
-                totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalSamplingEvents"), 16);
-                totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalUses"), 16);
-                startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,StartDelay"), 16);
-                samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,SamplingPeriod"), 16);
-                ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
-                ticksAtLastSample = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksAtLastSample"), 16);
-                recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"), 16);
-                timeAtFirstSameple = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TimeStarted"));
-                ReadFromJObject(jsonObject, "TABLE,CompressionTable");
-                ReadFromJObject(jsonObject, "SENSOR,SENSOR");
-                dataAddress = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,DataEndPointer"), 16);
-                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit").Split(',');
+                numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.NumberOfChannels), 16);
+                userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.UserDataLength), 16);
+                emailID = ReadFromJObject(jsonObject,Decode.EmailID);
+                userData = ReadFromJObject(jsonObject,Decode.UserData);
+                loggerState = ReadFromJObject(jsonObject,Decode.LoggerState);
+                batteryPercentage = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.BatteryPercentage), 16) + "%";
+                loopOverwriteStartAddress = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.LoopOverwriteAddress), 16);
+                fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject,Decode.IsFahrenhiet));
+                utcReferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.UTCReferenceTime), 16);
+                totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalRTCTicks), 16);
+                totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalSamplingEvents), 16);
+                totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalUses), 16);
+                startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.StartDelay), 16);
+                samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.SamplePeriod), 16);
+                ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TicksSinceStart), 16);
+                ticksAtLastSample = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TicksSinceLastSample), 16);
+                recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalRecordedSamples), 16);
+                timeAtFirstSameple = Convert.ToInt32(ReadFromJObject(jsonObject,Decode.TimeAtFirstSample));
+                ReadFromJObject(jsonObject, Decode.CompressionTable);
+                ReadFromJObject(jsonObject, Decode.Sensor);
+                dataAddress = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.DataEndPointer), 16);
+                limit = ReadFromJObject(jsonObject, Decode.LowerLimit).Split(',');
                 lowerLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
-                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit").Split(',');
+                limit = ReadFromJObject(jsonObject, Decode.UpperLimit).Split(',');
                 upperLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
-                ReadFromJObject(jsonObject, "SENSOR,Decode_Delta_Data");
+                ReadFromJObject(jsonObject, Decode.Data);
             }
 
-            if (loggerInformation.LoggerName == "Mon T")
+            if (loggerInformation.LoggerName == Decode.MonT)
             {
-                numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, "SENSOR,SensorNumber"), 16);
-                userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_DATA,UserDataLen"), 16);
-                userData = ReadFromJObject(jsonObject, "USER_DATA,UserData");
-                loggerState = ReadFromJObject(jsonObject, "HEADER,State");
-                fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, "USER_SETTINGS,Fahrenheit"));
-                utcReferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, "UTCReferenceTime"), 16);
-                totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalRTCTicks"), 16);
-                manufactureDate = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,ManufactureDate"));
-                totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalSamplingEvents"), 16);
-                totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, "HEADER,TotalUses"), 16);
-                batteryPercentage = Convert.ToInt32(ReadFromJObject(jsonObject, "BATTERY_INFO,Battery"), 16) + "%";
-                loopOverwrite = Convert.ToBoolean(ReadFromJObject(jsonObject, "DATA_INFO,Overwritten"));
-                startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,StartDelay"), 16);
-                samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, "USER_SETTINGS,SamplingPeriod"), 16);
-                secondsTimer = Convert.ToInt32(ReadFromJObject(jsonObject, "SecondsTimer"), 16);
-                ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,TicksSinceArousal"), 16);
-                timeAtFirstSameple = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,Time_FirstSample_MonT"));
-                lowestTemp = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,LowestTemp"));
-                resolution = Convert.ToDouble(ReadFromJObject(jsonObject, "USER_SETTINGS,ResolutionRatio")) / 100;
-                recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, "DATA_INFO,SamplesNumber"));
-                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,LowerLimit").Split(',');
+                numberChannel = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.NumberOfChannels), 16);
+                userDataLength = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.UserDataLength), 16);
+                userData = ReadFromJObject(jsonObject, Decode.UserData);
+                loggerState = ReadFromJObject(jsonObject, Decode.LoggerState);
+                fahrenheit = Convert.ToBoolean(ReadFromJObject(jsonObject, Decode.IsFahrenhiet));
+                utcReferenceTime = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.UTCReferenceTime), 16);
+                totalRTCticks = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalRTCTicks), 16);
+                manufactureDate = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.ManufactureDate));
+                totalSamplingEvents = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalSamplingEvents), 16);
+                totalUses = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalUses), 16);
+                batteryPercentage = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.BatteryPercentage), 16) + "%";
+                loopOverwrite = Convert.ToBoolean(ReadFromJObject(jsonObject, Decode.IsLoopOverwrite));
+                startDelay = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.StartDelay), 16);
+                samplePeriod = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.SamplePeriod), 16);
+                secondsTimer = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.SecondTimer), 16);
+                ticksSinceStart = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TicksSinceStart), 16);
+                timeAtFirstSameple = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.MonTTimeAtFirstSample));
+                lowestTemp = Convert.ToDouble(ReadFromJObject(jsonObject, Decode.LowestTemp));
+                resolution = Convert.ToDouble(ReadFromJObject(jsonObject, Decode.ResolutionRatio)) / 100;
+                recordedSamples = Convert.ToInt32(ReadFromJObject(jsonObject, Decode.TotalRecordedSamples));
+                limit = ReadFromJObject(jsonObject, Decode.LowerLimit).Split(',');
                 lowerLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
-                limit = ReadFromJObject(jsonObject, "CHANNEL_INFO,UpperLimit").Split(',');
+                limit = ReadFromJObject(jsonObject, Decode.UpperLimit).Split(',');
                 upperLimit = Array.ConvertAll<string, double>(limit, Double.Parse);
-                ReadFromJObject(jsonObject, "SENSOR,Decode_MonT_Data");
+                ReadFromJObject(jsonObject, Decode.MonTData);
             }
         }
 

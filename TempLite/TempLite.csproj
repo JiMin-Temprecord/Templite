@@ -100,9 +100,8 @@
     <Reference Include="MimeKit, Version=2.1.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
       <HintPath>..\packages\MimeKit.2.1.3\lib\net45\MimeKit.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
       <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
@@ -144,6 +143,7 @@
     <Compile Include="FTDIInfo.cs" />
     <Compile Include="ByteWriters\ReadLoggerByteWritter.cs" />
     <Compile Include="ByteWriters\SetReadByteWritter.cs" />
+    <Compile Include="Decode.cs" />
     <Compile Include="UserControl\GenerateDocumentUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -267,7 +267,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FTD2XX_NET.XML" />
     <None Include="Resources\pdf.png" />
     <None Include="Resources\excel.png" />
     <None Include="Resources\TempLite-01.png" />
