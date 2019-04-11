@@ -14,7 +14,7 @@ namespace TempLite
         CommunicationServices communicationService = new CommunicationServices();
         LoggerInformation loggerInformation = new LoggerInformation();
         SerialPort serialPort = new SerialPort();
-        PDFvariables pdfVariables;
+        LoggerVariables pdfVariables;
 
         BackgroundWorker readerBW;
         BackgroundWorker loggerBW;

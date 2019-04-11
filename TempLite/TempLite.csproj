@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressSection.cs" />
+    <Compile Include="Constant\LabelConstant.cs" />
     <Compile Include="LoggerInformation\ChannelConfig.cs" />
     <Compile Include="HexFileDecoder.cs" />
     <Compile Include="Email.cs" />
@@ -143,7 +144,7 @@
     <Compile Include="FTDIInfo.cs" />
     <Compile Include="ByteWriters\ReadLoggerByteWritter.cs" />
     <Compile Include="ByteWriters\SetReadByteWritter.cs" />
-    <Compile Include="Decode.cs" />
+    <Compile Include="Constant\DecodeConstant.cs" />
     <Compile Include="UserControl\GenerateDocumentUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

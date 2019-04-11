@@ -11,10 +11,11 @@ namespace TempLite
             var message = new MimeMessage();
             var builder = new BodyBuilder();
             var emailTo = GetSenderEmail(emailID);
+            var emailSubject = "Temprecord Logger " + serialNumber;
 
-            message.From.Add(new MailboxAddress("Temprecord Logger " + serialNumber, "temprecordapp@temprecord.com"));
+            message.From.Add(new MailboxAddress(emailSubject, "temprecordapp@temprecord.com"));
             message.To.Add(new MailboxAddress(emailTo));
-            message.Subject = "Temprecord Logger " + serialNumber;
+            message.Subject = emailSubject;
             
             var PDF = Path.GetTempPath() + serialNumber + ".pdf";
             var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";

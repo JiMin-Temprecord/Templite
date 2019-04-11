@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace TempLite
 {
-    public class PDFvariables
+    public class LoggerVariables
     {
         ArrayList time = new ArrayList();
        
@@ -16,8 +16,8 @@ namespace TempLite
         public string StartDelay { get; set; }
         public string FirstSample { get; set; }
         public string LastSample { get; set; }
-        public string TagsPlaced { get; set; }
-        public string TotalTrip { get; set; }
+        public int TagsPlaced { get; set; }
+        public int TotalTrip { get; set; }
         public string UserData { get; set; }
         public ArrayList Time { get { return time; } set { time = value; } }
         
