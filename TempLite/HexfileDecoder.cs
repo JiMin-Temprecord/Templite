@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
-using TempLite.Services;
 namespace TempLite
 {
     public class HexFileDecoder
@@ -234,83 +232,87 @@ namespace TempLite
         {
             byte[] bytes = { };
             string addtoread = "";
+            var hexPath = Path.GetTempPath() + "\\" + serialNumber + ".hex";
 
             try
             {
-                using (var sr = new StreamReader(Path.GetTempPath() + "\\" + serialNumber + ".hex"))
+                if (File.Exists(hexPath))
                 {
-                    string line;
-                    int diff = 0;
-                    while ((line = sr.ReadLine()) != null)
+                    using (var sr = new StreamReader(hexPath))
                     {
-                        string address = line.Substring(0, 6);
-                        string data = line.Substring(7, line.Length - 7);
-                        string temp = "";
-
-                        if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
-                            addtoread = address;
-
-                        if (addtoread == address)
+                        string line;
+                        int diff = 0;
+                        while ((line = sr.ReadLine()) != null)
                         {
-                            diff = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
-                            if (diff >= 0 && diff < 58) // reader can only send 64bytes at a time
+                            string address = line.Substring(0, 6);
+                            string data = line.Substring(7, line.Length - 7);
+                            string temp = "";
+
+                            if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
+                                addtoread = address;
+
+                            if (addtoread == address)
                             {
-                                int infolength = Convert.ToInt32(currentinfo[1]);
-
-                                if (infolength == 32768) // if we are reading DATA
+                                diff = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
+                                if (diff >= 0 && diff < 58) // reader can only send 64bytes at a time
                                 {
-                                    infolength = dataAddress;
+                                    int infolength = Convert.ToInt32(currentinfo[1]);
 
-                                    if (loopOverwriteStartAddress > 0)
-                                        infolength = G4MemorySize + 1;
-                                }
-                                if (infolength > 58)
-                                {
-                                    int readinfo = 58 - diff;
-                                    while (infolength > 0)
+                                    if (infolength == 32768) // if we are reading DATA
                                     {
-                                        temp += data.Substring(diff * 2, readinfo * 2);
-                                        line = sr.ReadLine();
-                                        if (line != null)
-                                        {
-                                            data = line.Substring(7, line.Length - 7);
-                                            infolength = infolength - readinfo;
-                                            diff = 0;
+                                        infolength = dataAddress;
 
-                                            if (infolength > (data.Length / 2))
-                                            {
-                                                readinfo = data.Length / 2;
-                                            }
-                                            else
-                                            {
-                                                readinfo = infolength;
-                                            }
-                                        }
-                                        else { break; }
+                                        if (loopOverwriteStartAddress > 0)
+                                            infolength = G4MemorySize + 1;
                                     }
-                                    int totallength = temp.Length;
-                                    bytes = new byte[totallength / 2];
-                                    for (int i = 0; i < totallength; i += 2)
-                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                    return bytes;
-                                }
-                                else
-                                {
-                                    if(data.Length < diff*2 + infolength*2)
+                                    if (infolength > 58)
                                     {
-                                        var readNextLine = (diff * 2 + infolength * 2) - 58*2;
-                                        temp = data.Substring(diff * 2, infolength * 2 - readNextLine);
-                                        line = sr.ReadLine();
-                                        data = line.Substring(7, line.Length - 7);
-                                        temp += data.Substring(0, readNextLine);
+                                        int readinfo = 58 - diff;
+                                        while (infolength > 0)
+                                        {
+                                            temp += data.Substring(diff * 2, readinfo * 2);
+                                            line = sr.ReadLine();
+                                            if (line != null)
+                                            {
+                                                data = line.Substring(7, line.Length - 7);
+                                                infolength = infolength - readinfo;
+                                                diff = 0;
+
+                                                if (infolength > (data.Length / 2))
+                                                {
+                                                    readinfo = data.Length / 2;
+                                                }
+                                                else
+                                                {
+                                                    readinfo = infolength;
+                                                }
+                                            }
+                                            else { break; }
+                                        }
+                                        int totallength = temp.Length;
+                                        bytes = new byte[totallength / 2];
+                                        for (int i = 0; i < totallength; i += 2)
+                                            bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                        return bytes;
                                     }
                                     else
-                                        temp = data.Substring(diff * 2, infolength * 2);
-                                    int totallength = temp.Length;
-                                    bytes = new byte[totallength / 2];
-                                    for (int i = 0; i < totallength; i += 2)
-                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                    return bytes;
+                                    {
+                                        if (data.Length < diff * 2 + infolength * 2)
+                                        {
+                                            var readNextLine = (diff * 2 + infolength * 2) - 58 * 2;
+                                            temp = data.Substring(diff * 2, infolength * 2 - readNextLine);
+                                            line = sr.ReadLine();
+                                            data = line.Substring(7, line.Length - 7);
+                                            temp += data.Substring(0, readNextLine);
+                                        }
+                                        else
+                                            temp = data.Substring(diff * 2, infolength * 2);
+                                        int totallength = temp.Length;
+                                        bytes = new byte[totallength / 2];
+                                        for (int i = 0; i < totallength; i += 2)
+                                            bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                        return bytes;
+                                    }
                                 }
                             }
                         }
@@ -916,7 +918,7 @@ namespace TempLite
             {
                 var pointer = i * offset;
                 sensorType[i] = decodeByte[pointer + 7]; // byte 7 is where the sensorType is stored
-                sensorAddressArray[0] = decodeByte[10].ToString("x02") + decodeByte[9].ToString("x02");
+                sensorAddressArray[0] = decodeByte[pointer + 10].ToString("x02") + decodeByte[pointer + 9].ToString("x02");
                 sensorAddressArray[1] = "21"; // size of the sensor information 
 
                 var sensorInfoArray = ReadHex(sensorAddressArray);
@@ -924,6 +926,7 @@ namespace TempLite
                 if (sensorInfoArray.Length != 0)
                 {
                     var sensorData = sensorInfoArray[20] << 16 | sensorInfoArray[19] << 8 | sensorInfoArray[18];
+                    Console.WriteLine("SENSOR DATA : " + sensorData);
 
                     if (sensorType[i] == 0 || sensorType[i] == 6) // get yasiru to explain why
                     {
@@ -1018,6 +1021,9 @@ namespace TempLite
         }
         void TemperatureStatistics(int currentChannel, double Value, int index)
         {
+            if (currentChannel == 1)
+                Console.WriteLine("VALUES : " + Value);
+
             if (Value < sensorMin[currentChannel])
             {
                 lowestPosition[currentChannel] = index + 1;// Cause it starts from zero

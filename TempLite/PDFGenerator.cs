@@ -8,11 +8,12 @@ namespace TempLite
 {
     public class PDFGenerator
     {
-        private PdfDocument pdfDocument = new PdfDocument();
-        string fontType = "Roboto";
-        int pageNumber = 0;
-        string path = AppDomain.CurrentDomain.BaseDirectory;
+        PdfDocument pdfDocument = new PdfDocument();
 
+        string fontType = "Roboto";
+        string path = AppDomain.CurrentDomain.BaseDirectory + "\\Images\\";
+        int pageNumber = 0;
+        
         public bool CreatePDF(LoggerInformation loggerInformation, PDFvariables pdfVariables)
         {
             var decoder = new HexFileDecoder(loggerInformation);
@@ -20,62 +21,61 @@ namespace TempLite
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
             var channelOne = pdfVariables.ChannelOne;
             var channelTwo = pdfVariables.ChannelTwo;
+
+            var pen = new XPen(XColors.Black, 1);
             var font = new XFont(fontType, 11, XFontStyle.Regular);
             var boldFont = new XFont(fontType, 11, XFontStyle.Bold);
 
             if (pdfVariables.LoggerState == "Ready" || pdfVariables.LoggerState == "Delay")
                 return false;
             
-            //create pen
-            var pen = new XPen(XColors.Black, 1);
-            
             pdfDocument.Info.Title = loggerInformation.SerialNumber;
-            var draw = CreateNewPage(font, loggerInformation.SerialNumber);
+            var pdfPage = CreateNewPage(font, loggerInformation.SerialNumber);
 
             void DrawChannelStatistics(string Label, Func<ChannelConfig, string> getString, double lineConterMultiplier = 1.0)
             {
-                draw.DrawString(Label, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
-                draw.DrawString(getString(channelOne) + channelOne.Unit , font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
+                pdfPage.DrawString(Label, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(getString(channelOne) + channelOne.Unit , font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
                 if ((channelTwoEnabled) && Label != "MKT Value :")
-                    draw.DrawString(getString(channelTwo) + channelTwo.Unit, font, XBrushes.Black, PDFcoordinates.third_column, lineCounter);
+                    pdfPage.DrawString(getString(channelTwo) + channelTwo.Unit, font, XBrushes.Black, PDFcoordinates.third_column, lineCounter);
 
                 lineCounter += PDFcoordinates.line_inc * lineConterMultiplier;
             }
 
             void DrawChannelLimits(string Label, Func<ChannelConfig, string> getString, double lineConterMultiplier = 1.0)
             {
-                draw.DrawString(Label, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
-                draw.DrawString(getString(channelOne), font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
+                pdfPage.DrawString(Label, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(getString(channelOne), font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
                 if (channelTwoEnabled)
-                    draw.DrawString(getString(channelTwo), font, XBrushes.Black, PDFcoordinates.third_column, lineCounter);
+                    pdfPage.DrawString(getString(channelTwo), font, XBrushes.Black, PDFcoordinates.third_column, lineCounter);
 
                 lineCounter += PDFcoordinates.line_inc * lineConterMultiplier;
             }
 
             void DrawSection(string firstColoumString, string secondColoumString, double lineConterMultiplier = 1.0)
             {
-                draw.DrawString(firstColoumString, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
-                draw.DrawString(secondColoumString, font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
+                pdfPage.DrawString(firstColoumString, boldFont, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(secondColoumString, font, XBrushes.Black, PDFcoordinates.second_column, lineCounter);
                 lineCounter += PDFcoordinates.line_inc * lineConterMultiplier;
             }
 
             if ((int)channelOne.OutsideLimits == 0 && (int)channelTwo.OutsideLimits == 0)
             {
-                XImage greentick = XImage.FromFile(path+"\\Images\\greentick.png");
-                draw.DrawImage(greentick, PDFcoordinates.sign_left, PDFcoordinates.sign_top, 90, 80);
-                draw.DrawString("Within Limits", font, XBrushes.Black, PDFcoordinates.limitinfo_startX, PDFcoordinates.limitinfo_startY);
+                XImage greentick = XImage.FromFile(path+"greentick.png");
+                pdfPage.DrawImage(greentick, PDFcoordinates.sign_left, PDFcoordinates.sign_top, 90, 80);
+                pdfPage.DrawString("Within Limits", font, XBrushes.Black, PDFcoordinates.limitinfo_startX, PDFcoordinates.limitinfo_startY);
             }
             else
             {
-                XImage redwarning = XImage.FromFile(path+"\\Images\\redwarning.png");
-                draw.DrawImage(redwarning, PDFcoordinates.sign_left, PDFcoordinates.sign_top, 90, 80);
-                draw.DrawString("Limits Exceeded", font, XBrushes.Black, PDFcoordinates.limitinfo_startX, PDFcoordinates.limitinfo_startY);
+                XImage redwarning = XImage.FromFile(path+"redwarning.png");
+                pdfPage.DrawImage(redwarning, PDFcoordinates.sign_left, PDFcoordinates.sign_top, 90, 80);
+                pdfPage.DrawString("Limits Exceeded", font, XBrushes.Black, PDFcoordinates.limitinfo_startX, PDFcoordinates.limitinfo_startY);
             }
             
             //Draw the boxes
-            draw.DrawRectangle(pen, PDFcoordinates.box1_X1, PDFcoordinates.box1_Y1, PDFcoordinates.box1_X2 - PDFcoordinates.box1_X1, PDFcoordinates.box1_Y2 - PDFcoordinates.box1_Y1);
-            draw.DrawRectangle(pen, PDFcoordinates.box2_X1, PDFcoordinates.box2_Y1, PDFcoordinates.box2_X2 - PDFcoordinates.box2_X1, PDFcoordinates.box2_Y2 - PDFcoordinates.box2_Y1);
-            draw.DrawRectangle(pen, PDFcoordinates.box3_X1, PDFcoordinates.box3_Y1, PDFcoordinates.box3_X2 - PDFcoordinates.box3_X1, PDFcoordinates.box3_Y2 - PDFcoordinates.box3_Y1);
+            pdfPage.DrawRectangle(pen, PDFcoordinates.box1_X1, PDFcoordinates.box1_Y1, PDFcoordinates.box1_X2 - PDFcoordinates.box1_X1, PDFcoordinates.box1_Y2 - PDFcoordinates.box1_Y1);
+            pdfPage.DrawRectangle(pen, PDFcoordinates.box2_X1, PDFcoordinates.box2_Y1, PDFcoordinates.box2_X2 - PDFcoordinates.box2_X1, PDFcoordinates.box2_Y2 - PDFcoordinates.box2_Y1);
+            pdfPage.DrawRectangle(pen, PDFcoordinates.box3_X1, PDFcoordinates.box3_Y1, PDFcoordinates.box3_X2 - PDFcoordinates.box3_X1, PDFcoordinates.box3_Y2 - PDFcoordinates.box3_Y1);
 
             //Draw the Text
             DrawSection("Model :", loggerInformation.LoggerName);
@@ -91,15 +91,19 @@ namespace TempLite
 
             lineCounter -= PDFcoordinates.line_inc * 0.75;
             XRect break1 = new XRect(10, lineCounter, 680, 0);
-            draw.DrawRectangle(pen, break1);
+            pdfPage.DrawRectangle(pen, break1);
             lineCounter += PDFcoordinates.line_inc * 0.75;
 
-            draw.DrawString("#1 - Temperature", font, XBrushes.Black, PDFcoordinates.second_column - 25, lineCounter);
-            if (channelTwoEnabled) draw.DrawString("#2 - Humidity", font, XBrushes.Black, PDFcoordinates.third_column - 25, lineCounter);
+            pdfPage.DrawString("#1 - Temperature", font, XBrushes.Black, PDFcoordinates.second_column - 25, lineCounter);
+            if (channelTwoEnabled) pdfPage.DrawString("#2 - Humidity", font, XBrushes.Black, PDFcoordinates.third_column - 25, lineCounter);
             lineCounter += PDFcoordinates.line_inc;
 
-            DrawChannelStatistics("Preset Upper Limit :", c => c.PresetUpperLimit.ToString("N2")); //need to add the breached
-            DrawChannelStatistics("Preset Lower Limit :", c => c.PresetLowerLimit.ToString("N2")); // need to add the breached
+            if (channelOne.AboveLimits > 0) pdfPage.DrawString(" (breached) ", font, XBrushes.Black, PDFcoordinates.second_column + 50, lineCounter);
+            if (channelTwo.AboveLimits > 0) pdfPage.DrawString(" (breached) ", font, XBrushes.Black, PDFcoordinates.third_column + 50, lineCounter);
+            DrawChannelStatistics("Preset Upper Limit :", c => c.PresetUpperLimit.ToString("N2")); 
+            if (channelOne.BelowLimits > 0) pdfPage.DrawString(" (breached) ", font, XBrushes.Black, PDFcoordinates.second_column + 50, lineCounter);
+            if (channelTwo.BelowLimits > 0) pdfPage.DrawString(" (breached) ", font, XBrushes.Black, PDFcoordinates.third_column + 50, lineCounter);
+            DrawChannelStatistics("Preset Lower Limit :", c => c.PresetLowerLimit.ToString("N2"));
             DrawChannelStatistics("Mean Value :", c => c.Mean.ToString("N2"));
             DrawChannelStatistics("MKT Value :", c => c.MKT_C.ToString("N2"));
             DrawChannelStatistics("Max Recorded :", c => c.Max.ToString("N2"));
@@ -123,27 +127,27 @@ namespace TempLite
                 var firstLine = pdfVariables.UserData.Substring(0, pdfVariables.UserData.Length/2);
                 var secondLine = pdfVariables.UserData.Substring(pdfVariables.UserData.Length / 2);
 
-                draw.DrawString(firstLine, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(firstLine, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
                 lineCounter += PDFcoordinates.line_inc;
-                draw.DrawString(secondLine, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(secondLine, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
                 lineCounter += PDFcoordinates.line_inc*0.5;
             }
             else
             {
-                draw.DrawString(pdfVariables.UserData, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(pdfVariables.UserData, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
                 lineCounter += PDFcoordinates.line_inc;
             }
 
             XRect break2 = new XRect(10, lineCounter, 680, 0);
-            draw.DrawRectangle(pen, break2);
+            pdfPage.DrawRectangle(pen, break2);
             lineCounter += PDFcoordinates.line_inc * 0.75;
 
-            draw.DrawString("_ Temperature " + channelOne.Unit, font, XBrushes.DarkOliveGreen, PDFcoordinates.second_column, lineCounter);
-            if (channelTwoEnabled) draw.DrawString("_ Humidity  " + channelTwo.Unit, font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
+            pdfPage.DrawString("_ Temperature " + channelOne.Unit, font, XBrushes.DarkOliveGreen, PDFcoordinates.second_column, lineCounter);
+            if (channelTwoEnabled) pdfPage.DrawString("_ Humidity  " + channelTwo.Unit, font, XBrushes.MediumPurple, PDFcoordinates.second_column + 120, lineCounter);
             lineCounter += PDFcoordinates.line_inc;
 
             //Draw graph
-            DrawGraph(decoder, pdfVariables, draw, pen, font);
+            DrawGraph(decoder, pdfVariables, pdfPage, pen, font);
             FillInValues(decoder, pdfVariables, loggerInformation.SerialNumber);
 
             string myDocument = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +"\\" +  loggerInformation.SerialNumber + ".pdf";
@@ -152,7 +156,6 @@ namespace TempLite
 
             pdfDocument.Save(filename);
             pdfDocument.Save(myDocument);
-            //Process.Start(filename); //Previews PDF
             Console.WriteLine("PDF Created !");
             return true;
         }
@@ -160,38 +163,38 @@ namespace TempLite
 
         void DrawGraph(HexFileDecoder decoder, PDFvariables pdfVariables, XGraphics draw, XPen pen, XFont font)
         {
-            XPen ch0 = new XPen(XColors.DarkGreen);
-            XPen ch1 = new XPen(XColors.MediumPurple);
-            XPen ch1Limits = new XPen(XColors.Lavender);
+            var ch0 = new XPen(XColors.DarkGreen);
+            var ch1 = new XPen(XColors.MediumPurple);
+            var ch1Limits = new XPen(XColors.Lavender);
+            var withinlimits = new XPen(XColors.ForestGreen);
+            var abovelimit = new XPen(XColors.Coral);
+            var belowlimit = new XPen(XColors.CornflowerBlue);
+
             ch1Limits.DashStyle = XDashStyle.Dash;
-            XPen withinlimits = new XPen(XColors.ForestGreen);
             withinlimits.DashStyle = XDashStyle.Dash;
-            XPen abovelimit = new XPen(XColors.Coral);
             abovelimit.DashStyle = XDashStyle.Dash;
-            XPen belowlimit = new XPen(XColors.CornflowerBlue);
             belowlimit.DashStyle = XDashStyle.Dash;
 
-            double[] chUpperLimit = new double[8];
-            double[] chLowerLimit = new double[8];
-            double[] chUpperYLimit = new double[8];
-            double[] chLowerYLimit = new double[8];
+            var chUpperLimit = new double[8];
+            var chLowerLimit = new double[8];
+            var chUpperYLimit = new double[8];
+            var chLowerYLimit = new double[8];
 
-            double[] chMax = new double[8];
-            double[] chMin = new double[8];
-            double[] chYMax = new double[8];
-            double[] chYMin = new double[8];
-            double graphHighest = 0;
-            double graphLowest = 0;
-
-            float temp_next_y = 0;
-            float rh_next_y = 0;
-            float graph_topX = 55;
-            float graph_date_x = 0;
-            float graph_y_scale = 0;
-            float graph_x_scale = 0;
+            var chMax = new double[8];
+            var chMin = new double[8];
+            var chYMax = new double[8];
+            var chYMin = new double[8];
+            
+            float yCH0 = 0;
+            float yCH1 = 0;
+            float xGraphMaximum = 55;
+            float xGraphDate = 0;
+            float xGraphScale = 0;
+            float yGraphScale = 0;
 
             int numberofDates = pdfVariables.RecordedSamples / 5;
             int dateGap;
+
             if (numberofDates <= 0)
             {
                 dateGap = 1;
@@ -206,8 +209,8 @@ namespace TempLite
             chMax[0] = pdfVariables.ChannelOne.Max;
             chMin[0] = pdfVariables.ChannelOne.Min;
 
-            graphHighest = pdfVariables.ChannelOne.Max;
-            graphLowest = pdfVariables.ChannelOne.Min;
+            var yHighest = pdfVariables.ChannelOne.Max;
+            var yLowest = pdfVariables.ChannelOne.Min;
 
             if (pdfVariables.IsChannelTwoEnabled) //Second Sensor
             {
@@ -216,48 +219,48 @@ namespace TempLite
                 chMax[1] = pdfVariables.ChannelTwo.Max;
                 chMin[1] = pdfVariables.ChannelTwo.Min;
 
-                if (pdfVariables.ChannelTwo.Max > graphHighest)
-                    graphHighest = pdfVariables.ChannelTwo.Max;
+                if (pdfVariables.ChannelTwo.Max > yHighest)
+                    yHighest = pdfVariables.ChannelTwo.Max;
 
-                if(pdfVariables.ChannelTwo.Min < graphLowest)
-                    graphLowest = pdfVariables.ChannelTwo.Min;
+                if(pdfVariables.ChannelTwo.Min < yLowest)
+                    yLowest = pdfVariables.ChannelTwo.Min;
             }
             
             //draw graph
             draw.DrawLine(pen, PDFcoordinates.G_axis_startX, PDFcoordinates.G_axis_startY, PDFcoordinates.G_axis_meetX, PDFcoordinates.G_axis_meetY);
             draw.DrawLine(pen, PDFcoordinates.G_axis_meetX, PDFcoordinates.G_axis_meetY, PDFcoordinates.G_axis_endX, PDFcoordinates.G_axis_endY);
-            graph_y_scale = (float)((PDFcoordinates.graph_H - 20) / (graphHighest - graphLowest));
-            graph_x_scale = (float)PDFcoordinates.graph_W / pdfVariables.RecordedSamples;
+            yGraphScale = (float)((PDFcoordinates.graph_H - 20) / (yHighest - yLowest));
+            xGraphScale = (float)PDFcoordinates.graph_W / pdfVariables.RecordedSamples;
 
             while (numberofDates < pdfVariables.RecordedSamples)
             {
-                graph_date_x = (graph_x_scale * numberofDates) + graph_topX;
-                draw.DrawString(decoder.UNIXtoUTCDate(Convert.ToInt32(pdfVariables.Time[numberofDates])), font, XBrushes.Black, graph_date_x - 40, PDFcoordinates.G_axis_meetY + 15);
-                draw.DrawString(decoder.UNIXtoUTCTime(Convert.ToInt32(pdfVariables.Time[numberofDates])), font, XBrushes.Black, graph_date_x - 45, PDFcoordinates.G_axis_meetY + 28);
+                xGraphDate = (xGraphScale * numberofDates) + xGraphMaximum;
+                draw.DrawString(decoder.UNIXtoUTCDate(Convert.ToInt32(pdfVariables.Time[numberofDates])), font, XBrushes.Black, xGraphDate - 40, PDFcoordinates.G_axis_meetY + 15);
+                draw.DrawString(decoder.UNIXtoUTCTime(Convert.ToInt32(pdfVariables.Time[numberofDates])), font, XBrushes.Black, xGraphDate - 45, PDFcoordinates.G_axis_meetY + 28);
                 numberofDates += dateGap;
             }
 
             if (pdfVariables.IsChannelTwoEnabled && pdfVariables.RecordedSamples > 0)
             {
-                rh_next_y = (float)(PDFcoordinates.graph_H - (pdfVariables.ChannelTwo.Data[0] - graphLowest) * graph_y_scale) + PDFcoordinates.graph_topY;
-                chUpperYLimit[1] = (float)(PDFcoordinates.graph_H - ((chUpperLimit[1] - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
-                chLowerYLimit[1] = (float)(PDFcoordinates.graph_H - ((chLowerLimit[1] - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
-                chYMax[1] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Max - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
-                chYMin[1] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Min - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
+                yCH1 = (float)(PDFcoordinates.graph_H - (pdfVariables.ChannelTwo.Data[0] - yLowest) * yGraphScale) + PDFcoordinates.graph_topY;
+                chUpperYLimit[1] = (float)(PDFcoordinates.graph_H - ((chUpperLimit[1] - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
+                chLowerYLimit[1] = (float)(PDFcoordinates.graph_H - ((chLowerLimit[1] - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
+                chYMax[1] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Max - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
+                chYMin[1] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Min - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
 
                 draw.DrawLine(ch1Limits, PDFcoordinates.graph_l_lineX_start, chYMax[1], PDFcoordinates.graph_l_lineX_end, chYMax[1]);
                 draw.DrawLine(ch1Limits, PDFcoordinates.graph_l_lineX_start, chYMin[1], PDFcoordinates.graph_l_lineX_end, chYMin[1]);
                 draw.DrawString(chMin[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chYMin[1]);
                 draw.DrawString(chMax[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chYMax[1]);
 
-                if (chLowerLimit[1] < chMin[1])
+                if (chUpperLimit[1] < chMax[1])
                 {
                     draw.DrawString(pdfVariables.ChannelTwo.Unit + " Upper Limit ", font, XBrushes.Coral, PDFcoordinates.third_column, chUpperYLimit[1] - 5);
                     draw.DrawString(chUpperLimit[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chUpperYLimit[1]);
                     draw.DrawLine(abovelimit, PDFcoordinates.graph_l_lineX_start, chUpperYLimit[1], PDFcoordinates.graph_l_lineX_end, chUpperYLimit[1]);
                 }
 
-                if (chUpperLimit[1] > chMax[1])
+                if (chLowerLimit[1] > chMin[1])
                 {
                     draw.DrawString(pdfVariables.ChannelTwo.Unit + " Lower Limit ", font, XBrushes.CornflowerBlue, PDFcoordinates.third_column, chLowerYLimit[1] + 5); 
                     draw.DrawString(chLowerLimit[1].ToString("N2"), font, XBrushes.Black, PDFcoordinates.first_column, chLowerYLimit[1]);
@@ -268,11 +271,11 @@ namespace TempLite
 
             if (pdfVariables.ChannelOne.Data != null)
             {
-                temp_next_y = (float)(PDFcoordinates.graph_H - (pdfVariables.ChannelOne.Data[0] -graphLowest) * graph_y_scale) + PDFcoordinates.graph_topY;
-                chUpperYLimit[0] = (float)(PDFcoordinates.graph_H - ((chUpperLimit[0] - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
-                chLowerYLimit[0] = (float)(PDFcoordinates.graph_H - ((chLowerLimit[0] - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
-                chYMax[0] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Max - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
-                chYMin[0] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Min - graphLowest) * graph_y_scale)) + PDFcoordinates.graph_topY;
+                yCH0 = (float)(PDFcoordinates.graph_H - (pdfVariables.ChannelOne.Data[0] -yLowest) * yGraphScale) + PDFcoordinates.graph_topY;
+                chUpperYLimit[0] = (float)(PDFcoordinates.graph_H - ((chUpperLimit[0] - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
+                chLowerYLimit[0] = (float)(PDFcoordinates.graph_H - ((chLowerLimit[0] - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
+                chYMax[0] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Max - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
+                chYMin[0] = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Min - yLowest) * yGraphScale)) + PDFcoordinates.graph_topY;
 
                 draw.DrawLine(withinlimits, PDFcoordinates.graph_l_lineX_start, chYMax[0], PDFcoordinates.graph_l_lineX_end, chYMax[0]);
                 draw.DrawLine(withinlimits, PDFcoordinates.graph_l_lineX_start, chYMin[0], PDFcoordinates.graph_l_lineX_end, chYMin[0]);
@@ -297,16 +300,16 @@ namespace TempLite
             int i = 0;
             while (i < pdfVariables.RecordedSamples && (pdfVariables.ChannelOne.Data != null))
             {
-                draw.DrawLine(ch0, graph_topX, temp_next_y, graph_topX + graph_x_scale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (graphLowest)) * graph_y_scale)) + PDFcoordinates.graph_topY);
-                temp_next_y = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (graphLowest)) * graph_y_scale)) + PDFcoordinates.graph_topY;
+                draw.DrawLine(ch0, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                yCH0 = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY;
 
                 if (pdfVariables.IsChannelTwoEnabled)
                 {
-                    draw.DrawLine(ch1, graph_topX, rh_next_y, graph_topX + graph_x_scale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (graphLowest)) * graph_y_scale)) + PDFcoordinates.graph_topY);
-                    rh_next_y = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (graphLowest)) * graph_y_scale)) + PDFcoordinates.graph_topY;
+                    draw.DrawLine(ch1, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                    yCH1 = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY;
                 }
 
-                graph_topX += graph_x_scale;
+                xGraphMaximum += xGraphScale;
                 i++;
             }
         }
@@ -406,7 +409,7 @@ namespace TempLite
         {
             var serialfont = new XFont(fontType, 18, XFontStyle.Regular);
             var serialPen = new XPen(XColors.Blue, 3);
-            var logo = XImage.FromFile(path+"\\Images\\logo.png");
+            var logo = XImage.FromFile(path+"logo.png");
 
             pageNumber++;
 

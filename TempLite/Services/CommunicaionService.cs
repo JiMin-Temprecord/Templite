@@ -54,10 +54,9 @@ namespace TempLite.Services
             if (serialPort.IsOpen == false)
                 serialPort.Open();
 
-            while (SerialPort.GetPortNames().Contains(serialPort.PortName) && serialPort.IsOpen)
+            if(SerialPort.GetPortNames().Contains(serialPort.PortName) && serialPort.IsOpen )
             {
                 recoverCount = 0;
-
                 WriteBytes(new WakeUpByteWritter(), serialPort);
                 var currentAddress = ReadBytesWakeUp(serialPort, loggerInformation, recievemsg, Hexes);
 
@@ -112,6 +111,8 @@ namespace TempLite.Services
             catch (TimeoutException)
             {
                 recoverCount++;
+                if (recoverCount == 20)
+                    return msg.Clear();
             }
 
             recievemsg.Add(0x0d);
@@ -172,16 +173,19 @@ namespace TempLite.Services
             timenow = timenow.Substring(0, (timenow.Length - hextime.Length)) + hextime;
             hexes.Add(new Hex("FF0000", timenow));
 
-            if(msg.Length > 0)
+            if (msg.Length > 8)
+            {
                 hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
+                var memoryAddress = (recievemsg[loggerInformation.MemoryHeaderPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.MemoryHeaderPointer] & 0xFF);
+                var memoryAddMSB = recievemsg[loggerInformation.MemoryHeaderPointer + 1];
+                var memoryAddLSB = recievemsg[loggerInformation.MemoryHeaderPointer];
+                var lengthMSB = (byte)((length >> 8) & 0xFF);
+                var lengthLSB = (byte)(length & 0xFF);
 
-            var memoryAddress = (recievemsg[loggerInformation.MemoryHeaderPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.MemoryHeaderPointer] & 0xFF);
-            var memoryAddMSB = recievemsg[loggerInformation.MemoryHeaderPointer + 1];
-            var memoryAddLSB = recievemsg[loggerInformation.MemoryHeaderPointer];
-            var lengthMSB = (byte)((length >> 8) & 0xFF);
-            var lengthLSB = (byte)(length & 0xFF);
+                return new AddressSection(lengthLSB, lengthMSB, 0, memoryAddLSB, memoryAddMSB, memoryAddress);
+            }
 
-            return new AddressSection(lengthLSB, lengthMSB, 0, memoryAddLSB, memoryAddMSB, memoryAddress);
+            return null;
         }
         void ReadBytesSetRead(SerialPort serialPort, AddressSection currentAddress, LoggerInformation loggerInformation, List<Hex> hexes)
         {

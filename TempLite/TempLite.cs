@@ -139,6 +139,7 @@ namespace TempLite
 
             else if (SerialPort.GetPortNames().Contains(serialPort.PortName))
             {
+                Console.WriteLine("EMAIL : " + loggerInformation.EmailId);
                 if (loggerInformation.EmailId == string.Empty)
                 {
                     loggerUserControl.Visible = false;
@@ -248,6 +249,7 @@ namespace TempLite
         {
             previewPanelBW = new BackgroundWorker();
             previewPanelBW.DoWork += previewPanelBW_DoWork;
+            previewPanelBW.RunWorkerCompleted += previewPanelBW_RunWorkerCompleted;
             previewPanelBW.WorkerReportsProgress = true;
             previewPanelBW.WorkerSupportsCancellation = true;
 
@@ -262,15 +264,19 @@ namespace TempLite
             loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,pdfVariables);
             if (loggerHasStarted)
                 excelGenerator.CreateExcel(loggerInformation, pdfVariables);
+        }
 
+        void previewPanelBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             if (loggerHasStarted == false)
             {
                 loggerUserControl.Visible = false;
+                previewPanel.Visible = false;
                 readyStateMessage.Visible = true;
             }
         }
 
-        private void previewPDF_Click(object sender, EventArgs e)
+            private void previewPDF_Click(object sender, EventArgs e)
         {
             var filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".pdf";
             Process.Start(filename);

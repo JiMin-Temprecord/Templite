@@ -10,7 +10,6 @@ namespace TempLite
         {
             var message = new MimeMessage();
             var builder = new BodyBuilder();
-
             var emailTo = GetSenderEmail(emailID);
 
             message.From.Add(new MailboxAddress("Temprecord Logger " + serialNumber, "temprecordapp@temprecord.com"));
@@ -20,7 +19,7 @@ namespace TempLite
             var PDF = Path.GetTempPath() + serialNumber + ".pdf";
             var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
 
-            if (System.IO.File.Exists(PDF) && (System.IO.File.Exists(EXCEL)))
+            if (File.Exists(PDF) && (File.Exists(EXCEL)))
             {
                 builder.Attachments.Add(PDF);
                 builder.Attachments.Add(EXCEL);
@@ -42,13 +41,13 @@ namespace TempLite
         {
             var PDF = Path.GetTempPath() + serialNumber + ".pdf";
             var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
+            var emailSubject = "Temprecord Logger " + serialNumber;
 
             var outlookApp = new Application();
             try
             {
                 var outlookMail = outlookApp.CreateItem(OlItemType.olMailItem);
-
-                outlookMail.Subject = "Temprecord Logger " + serialNumber;
+                outlookMail.Subject = emailSubject;
                 
                 if(file == 0)
                     outlookMail.Attachments.Add(PDF);
@@ -59,13 +58,9 @@ namespace TempLite
                     outlookMail.Attachments.Add(PDF);
                     outlookMail.Attachments.Add(EXCEL);
                 }
-
                 outlookMail.Display(true);
             }
-            finally
-            {
-            }
-            
+            finally{}
         }
 
         string GetSenderEmail (string emailID)
