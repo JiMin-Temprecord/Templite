@@ -14,7 +14,7 @@
         public const string IsFahrenhiet = "USER_SETTINGS,Fahrenheit";
         public const string UTCReferenceTime = "UTCReferenceTime";
         public const string TotalRTCTicks = "HEADER,TotalRTCTicks";
-        public const string ManufactureDate = "HEADER,ManufactureData";
+        public const string ManufactureDate = "HEADER,ManufactureDate";
         public const string IsLoopOverwrite = "DATA_INFO,Overwritten";
         public const string TotalSamplingEvents = "HEADER,TotalSamplingEvents";
         public const string TotalUses = "HEADER,TotalUses";
@@ -26,8 +26,8 @@
         public const string TotalRecordedSamples = "DATA_INFO,SamplesNumber";
         public const string TimeAtFirstSample = "DATA_INFO,TimeStarted";
         public const string MonTTimeAtFirstSample = "DATA_INFO,Time_FirstSample_MonT";
-        public const string LowestTemp = "USER_SETTING, LowestTemp";
-        public const string ResolutionRatio = "USER_SETTING,ResolutionRatio";
+        public const string LowestTemp = "USER_SETTINGS,LowestTemp";
+        public const string ResolutionRatio = "USER_SETTINGS,ResolutionRatio";
         public const string CompressionTable = "TABLE,CompressionTable";
         public const string Sensor = "SENSOR,SENSOR";
         public const string DataEndPointer = "DATA_INFO,DataEndPointer";

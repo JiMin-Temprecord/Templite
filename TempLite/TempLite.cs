@@ -14,7 +14,7 @@ namespace TempLite
         CommunicationServices communicationService = new CommunicationServices();
         LoggerInformation loggerInformation = new LoggerInformation();
         SerialPort serialPort = new SerialPort();
-        LoggerVariables pdfVariables;
+        LoggerVariables loggerVariables;
 
         BackgroundWorker readerBW;
         BackgroundWorker loggerBW;
@@ -124,7 +124,7 @@ namespace TempLite
 
             var decoder = new HexFileDecoder(loggerInformation);
             decoder.ReadIntoJsonFileAndSetupDecoder();
-            pdfVariables = decoder.AssignPDFValue();
+            loggerVariables = decoder.AssignPDFValue();
         }
 
         void progressBarBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -182,9 +182,9 @@ namespace TempLite
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
             
-            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,pdfVariables);
+            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,loggerVariables);
             if(loggerHasStarted)
-                excelGenerator.CreateExcel(loggerInformation,pdfVariables);
+                excelGenerator.CreateExcel(loggerInformation,loggerVariables);
         }
 
         void documentBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -261,9 +261,9 @@ namespace TempLite
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
 
-            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,pdfVariables);
+            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation,loggerVariables);
             if (loggerHasStarted)
-                excelGenerator.CreateExcel(loggerInformation, pdfVariables);
+                excelGenerator.CreateExcel(loggerInformation, loggerVariables);
         }
 
         void previewPanelBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

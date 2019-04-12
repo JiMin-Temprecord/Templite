@@ -12,7 +12,7 @@ namespace TempLite
         string loggerState;
         string batteryPercentage;
         string userData;
-        string emailID;
+        string emailID =  string.Empty;
 
         bool loopOverwrite = false;
         bool fahrenheit = false;
@@ -133,7 +133,7 @@ namespace TempLite
                 timeAtFirstSameple = ReadLongFromJObject(jsonObject, DecodeConstant.MonTTimeAtFirstSample);
                 lowestTemp = Convert.ToDouble(ReadStringFromJObject(jsonObject, DecodeConstant.LowestTemp));
                 resolution = Convert.ToDouble(ReadStringFromJObject(jsonObject, DecodeConstant.ResolutionRatio)) / 100;
-                recordedSamples = ReadIntFromJObject(jsonObject, DecodeConstant.TotalRecordedSamples);
+                recordedSamples = (int)ReadLongFromJObject(jsonObject, DecodeConstant.TotalRecordedSamples);
                 lowerLimit = ReadArrayFromJObject(jsonObject, DecodeConstant.LowerLimit);
                 upperLimit = ReadArrayFromJObject(jsonObject, DecodeConstant.UpperLimit);
                 ReadStringFromJObject(jsonObject, DecodeConstant.MonTData);

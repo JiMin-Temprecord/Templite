@@ -35,7 +35,7 @@ namespace TempLite.Constant
 
         public const string StatChannelOneLabel = " #1 - Temperature";
         public const string StatChannelTwoLabel = " #2 - Humidity";
-        public const string GraphChannelOneLabel = " _Tempreature ";
+        public const string GraphChannelOneLabel = " _Temperature ";
         public const string GraphChannelTwoLabel = " _Humidity ";
 
         public const string WithinLimit = " Within Limits ";
