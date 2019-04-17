@@ -64,8 +64,8 @@ namespace TempLite
         readonly double KelvinDec = 273.15;
         readonly double Delta_H = 83.14472;     //Delta H   is the Activation Energy:   83.14472    kJ/mole
         readonly double R = 8.314472;           //R is the Gas Constant: 0.008314472 J/mole/degree
-        readonly long Year2000 = 946684800000L;
-        readonly long Year2010 = 1262304000000L;
+        readonly long Year2000 = 946684800000;
+        readonly long Year2010 = 1262304000000;
         readonly int G4MemorySize = 32767;
 
         readonly LoggerInformation loggerInformation;
@@ -130,6 +130,7 @@ namespace TempLite
                 samplePeriod = ReadIntFromJObject(jsonObject, DecodeConstant.SamplePeriod);
                 secondsTimer = ReadIntFromJObject(jsonObject, DecodeConstant.SecondTimer);
                 ticksSinceStart = ReadIntFromJObject(jsonObject, DecodeConstant.TicksSinceStart);
+                ticksAtLastSample = ReadIntFromJObject(jsonObject, DecodeConstant.TicksSinceLastSample);
                 timeAtFirstSameple = ReadLongFromJObject(jsonObject, DecodeConstant.MonTTimeAtFirstSample);
                 lowestTemp = Convert.ToDouble(ReadStringFromJObject(jsonObject, DecodeConstant.LowestTemp));
                 resolution = Convert.ToDouble(ReadStringFromJObject(jsonObject, DecodeConstant.ResolutionRatio)) / 100;
@@ -140,7 +141,7 @@ namespace TempLite
             }
         }
 
-        public LoggerVariables AssignPDFValue()
+        public LoggerVariables AssignLoggerValue()
         {
             var loggerVariable = new LoggerVariables();
 
@@ -519,6 +520,9 @@ namespace TempLite
 
                 case "Time_FirstSample_MonT":
                     return TimeFirstSampleMonT(decodeByte);
+
+                case "Time_LastSample_MonT":
+                    return TimeLastSampleMonT(decodeByte);
 
                 default:
                     break;
@@ -973,6 +977,12 @@ namespace TempLite
                 timeAtFirstSameple = ((utcReferenceTime - ticksSinceStart) + startDelay);
                 return timeAtFirstSameple.ToString();
             }
+        }
+
+        string TimeLastSampleMonT(byte[] decodeByte)
+        {
+            var LastSample = (utcReferenceTime - (4294967040 - secondsTimer));
+            return LastSample.ToString();
         }
 
         string ToLittleEndian(byte[] decodebyte)

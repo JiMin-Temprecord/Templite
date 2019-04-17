@@ -11,18 +11,22 @@ namespace TempLite
     {
         int row = 5;
 
-        public void CreateExcel(LoggerInformation loggerInformation, LoggerVariables pdfVariables)
+        public void CreateExcel(LoggerInformation loggerInformation)
         {
+            var decoder = new HexFileDecoder(loggerInformation);
+            decoder.ReadIntoJsonFileAndSetupDecoder();
+            var loggerVariables = decoder.AssignLoggerValue();
+
             var excelPath = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx";
             var excel = new ExcelPackage();
             var workSheet = excel.Workbook.Worksheets.Add(loggerInformation.SerialNumber);
-            CreateLayout(workSheet, loggerInformation, loggerInformation.LoggerName, pdfVariables);
+            CreateLayout(workSheet, loggerInformation, loggerVariables);
             
             excel.SaveAs(new FileInfo(excelPath));
             //Console.WriteLine("EXCEL Created !");
         }
 
-        private void CreateLayout(ExcelWorksheet workSheet, LoggerInformation loggerInformation, string loggername, LoggerVariables pdfVariables)
+        private void CreateLayout(ExcelWorksheet workSheet, LoggerInformation loggerInformation, LoggerVariables pdfVariables)
         {
             var decoder = new HexFileDecoder(loggerInformation);
             var channelTwoEnabled = pdfVariables.IsChannelTwoEnabled;
@@ -71,7 +75,7 @@ namespace TempLite
             workSheet.Cells[2, 1].Value = LabelConstant.Title;
             workSheet.Cells[2, 5].Value = LabelConstant.SerialNumber + pdfVariables.SerialNumber;
 
-            FillCells(workSheet, LabelConstant.Model, loggername);
+            FillCells(workSheet, LabelConstant.Model, loggerInformation.LoggerName);
             FillCells(workSheet, LabelConstant.LoggerState, pdfVariables.LoggerState);
             FillCells(workSheet, LabelConstant.Battery, pdfVariables.BatteryPercentage);
             FillCells(workSheet, LabelConstant.SamplePeriod, pdfVariables.SameplePeriod);
@@ -87,12 +91,12 @@ namespace TempLite
                 workSheet.Cells[row, 3].Value = LabelConstant.StatChannelTwoLabel;
             row++;
 
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentLowerLimit, c => c.PresetLowerLimit.ToString("N2"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Mean, c => c.Mean.ToString("N2"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.MKT, c => c.MKT_C.ToString("N2"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Max, c => c.Max.ToString("N2"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Min, c => c.Min.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentLowerLimit, c => c.PresetLowerLimit.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Mean, c => c.Mean.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.MKT, c => c.MKT_C.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Max, c => c.Max.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Min, c => c.Min.ToString("N2"));
             FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleWithinLimits, c => c.WithinLimits.ToString("N1"));
             FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.TimeWithinLimits, c => c.TimeWithinLimits);
             FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleOutofLimits, c => c.OutsideLimits.ToString("N1"));
@@ -144,6 +148,19 @@ namespace TempLite
             if (channelTwoEnabled)
             {
                 worksheet.Cells[row, 3].Value = getString(channelTwo);
+            }
+            row++;
+        }
+
+        void FillChannelStatCells(ExcelWorksheet worksheet, ChannelConfig channelOne, ChannelConfig channelTwo, bool channelTwoEnabled, string label, Func<ChannelConfig, string> getString)
+        {
+            worksheet.Cells[row, 1].Style.Font.Bold = true;
+            worksheet.Cells[row, 1].Value = label;
+            worksheet.Cells[row, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            worksheet.Cells[row, 2].Value = getString(channelOne) + channelOne.Unit;
+            if (channelTwoEnabled && label!=LabelConstant.MKT)
+            {
+                worksheet.Cells[row, 3].Value = getString(channelTwo) + channelTwo.Unit;
             }
             row++;
         }

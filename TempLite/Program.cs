@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace TempLite
@@ -14,6 +13,7 @@ namespace TempLite
         [STAThread]
         static void Main()
         {
+            Assembly.LoadFrom("FTD2XX_NET.dll");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new TempLite());

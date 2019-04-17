@@ -1,6 +1,8 @@
 ﻿using MimeKit;
 using Microsoft.Office.Interop.Outlook;
 using System.IO;
+using System.Windows.Forms;
+using Application = Microsoft.Office.Interop.Outlook.Application;
 
 namespace TempLite
 {
@@ -43,10 +45,10 @@ namespace TempLite
             var PDF = Path.GetTempPath() + serialNumber + ".pdf";
             var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
             var emailSubject = "Temprecord Logger " + serialNumber;
-
-            var outlookApp = new Application();
+            
             try
             {
+                var outlookApp = new Application();
                 var outlookMail = outlookApp.CreateItem(OlItemType.olMailItem);
                 outlookMail.Subject = emailSubject;
                 
@@ -61,7 +63,10 @@ namespace TempLite
                 }
                 outlookMail.Display(true);
             }
-            finally{}
+            catch
+            {
+                MessageBox.Show("Unable to Detect Outlook. Please download Outlook and try again.");
+            }
         }
 
         string GetSenderEmail (string emailID)

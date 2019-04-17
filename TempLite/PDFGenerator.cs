@@ -4,6 +4,7 @@ using PdfSharp.Drawing;
 using System.Collections.Generic;
 using System.IO;
 using TempLite.Constant;
+using System.Windows.Forms;
 
 namespace TempLite
 {
@@ -15,9 +16,12 @@ namespace TempLite
         string path = AppDomain.CurrentDomain.BaseDirectory + "\\Images\\";
         int pageNumber = 0;
         
-        public bool CreatePDF(LoggerInformation loggerInformation, LoggerVariables loggerVariables)
+        public bool CreatePDF(LoggerInformation loggerInformation)
         {
             var decoder = new HexFileDecoder(loggerInformation);
+            decoder.ReadIntoJsonFileAndSetupDecoder();
+            var loggerVariables = decoder.AssignLoggerValue();
+
             double lineCounter = 80;
             var channelTwoEnabled = loggerVariables.IsChannelTwoEnabled;
             var channelOne = loggerVariables.ChannelOne;
@@ -153,14 +157,10 @@ namespace TempLite
             
             string filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".pdf";
 
-
             pdfDocument.Save(filename);
-            //pdfDocument.Save(myDocument);
-            //Console.WriteLine("PDF Created !");
             return true;
         }
-
-
+        
         void DrawGraph(HexFileDecoder decoder, LoggerVariables pdfVariables, XGraphics draw, XPen pen, XFont font)
         {
             var ch0 = new XPen(XColors.DarkGreen);
@@ -300,12 +300,24 @@ namespace TempLite
             int i = 0;
             while (i < pdfVariables.RecordedSamples && (pdfVariables.ChannelOne.Data != null))
             {
-                draw.DrawLine(ch0, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                if(pdfVariables.ChannelOne.Data[i] > pdfVariables.ChannelOne.AboveLimits)
+                    draw.DrawLine(abovelimit, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                else if (pdfVariables.ChannelOne.Data[i] < pdfVariables.ChannelOne.BelowLimits)
+                    draw.DrawLine(belowlimit, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                else
+                    draw.DrawLine(ch0, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+
                 yCH0 = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY;
 
                 if (pdfVariables.IsChannelTwoEnabled)
                 {
-                    draw.DrawLine(ch1, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                    if(pdfVariables.ChannelTwo.Data[i] > pdfVariables.ChannelTwo.AboveLimits)
+                        draw.DrawLine(abovelimit, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                    else if(pdfVariables.ChannelTwo.Data[i] < pdfVariables.ChannelTwo.BelowLimits)
+                        draw.DrawLine(belowlimit, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                    else
+                        draw.DrawLine(ch1, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+
                     yCH1 = (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY;
                 }
 

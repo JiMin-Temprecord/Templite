@@ -62,7 +62,7 @@ namespace TempLite.Services
                 ReaderAvailable = WriteBytes(new SetReadByteWritter(loggerInformation.LoggerType), serialPort);
                 if(ReaderAvailable) ReadBytesSetRead(serialPort, currentAddress, loggerInformation, Hexes);
 
-                while (ReaderAvailable && (currentAddress.MemoryNumber <= loggerInformation.MaxMemory))
+                while (ReaderAvailable && currentAddress!= null && (currentAddress.MemoryNumber <= loggerInformation.MaxMemory))
                 {
                     if (readFull == true && (length >= (loggerInformation.MemoryMax[currentAddress.MemoryNumber] - currentAddress.MemoryAddress)))
                     {
@@ -88,6 +88,12 @@ namespace TempLite.Services
                     }
                 }
                 serialPort.Close();
+
+                if(currentAddress == null)
+                {
+                    Hexes.Clear();
+                    return Hexes;
+                }
             }
             return Hexes;
         }
@@ -196,41 +202,44 @@ namespace TempLite.Services
         }
         void ReadBytesSetRead(SerialPort serialPort, AddressSection currentAddress, LoggerInformation loggerInformation, List<Hex> hexes)
         {
-            ReadBytes(serialPort);
+            var msg = ReadBytes(serialPort);
             length = maxlenreading;
 
-            switch (loggerInformation.LoggerType)
+            if (msg.Length > 8)
             {
-                //MonT
-                case 3:
-                    loggerInformation.MemoryStart[0] = 0x0000;
-                    loggerInformation.MemoryMax[0] = 0x2000;
-                    break;
+                switch (loggerInformation.LoggerType)
+                {
+                    //MonT
+                    case 3:
+                        loggerInformation.MemoryStart[0] = 0x0000;
+                        loggerInformation.MemoryMax[0] = 0x2000;
+                        break;
 
-                case 6:
-                    loggerInformation.MemoryStart[4] = (recievemsg[loggerInformation.RequestMemoryStartPointer + 1] ) << 8 | (recievemsg[loggerInformation.RequestMemoryStartPointer]);
-                    loggerInformation.MemoryMax[4] = (recievemsg[loggerInformation.RequestMemoryMaxPointer + 1]) << 8 | (recievemsg[loggerInformation.RequestMemoryMaxPointer]);
+                    case 6:
+                        loggerInformation.MemoryStart[4] = (recievemsg[loggerInformation.RequestMemoryStartPointer + 1]) << 8 | (recievemsg[loggerInformation.RequestMemoryStartPointer]);
+                        loggerInformation.MemoryMax[4] = (recievemsg[loggerInformation.RequestMemoryMaxPointer + 1]) << 8 | (recievemsg[loggerInformation.RequestMemoryMaxPointer]);
 
-                    if (loggerInformation.MemoryStart[4] > loggerInformation.MemoryMax[4])
-                    {
-                        hexes.Add(new Hex("FD0000", loggerInformation.MemoryStart[4].ToString("X04")));
-                        loggerInformation.MemoryStart[4] = 0x0000;
-                        loggerInformation.MemoryMax[4] = 0x8000;
-                    }
-                    else
-                    {
-                        hexes.Add(new Hex("FD0000", "0000"));
-                    }
+                        if (loggerInformation.MemoryStart[4] > loggerInformation.MemoryMax[4])
+                        {
+                            hexes.Add(new Hex("FD0000", loggerInformation.MemoryStart[4].ToString("X04")));
+                            loggerInformation.MemoryStart[4] = 0x0000;
+                            loggerInformation.MemoryMax[4] = 0x8000;
+                        }
+                        else
+                        {
+                            hexes.Add(new Hex("FD0000", "0000"));
+                        }
 
-                    if (loggerInformation.MemoryMax[4] < 80)
-                    {
-                        loggerInformation.MemoryMax[4] = 80;
-                    }
-                    break;
+                        if (loggerInformation.MemoryMax[4] < 80)
+                        {
+                            loggerInformation.MemoryMax[4] = 80;
+                        }
+                        break;
+                }
+
+                currentAddress.LengthMSB = (byte)((length >> 8) & 0xff);
+                currentAddress.LengthLSB = (byte)(length & 0xff);
             }
-
-            currentAddress.LengthMSB = (byte)((length >> 8) & 0xff);
-            currentAddress.LengthLSB = (byte)(length & 0xff);
         }
         bool ReadBytesReadLogger(SerialPort serialPort, AddressSection currentAddress, List<Hex> Hexes)
         {

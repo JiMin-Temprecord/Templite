@@ -23,6 +23,7 @@
         public const string SamplePeriod = "USER_SETTINGS,SamplingPeriod";
         public const string TicksSinceStart = "DATA_INFO,TicksSinceArousal";
         public const string TicksSinceLastSample = "DATA_INFO,TicksAtLastSample";
+        public const string TicksAtLastSample = "DATA_INFO,LastSampleAt";
         public const string TotalRecordedSamples = "DATA_INFO,SamplesNumber";
         public const string TimeAtFirstSample = "DATA_INFO,TimeStarted";
         public const string MonTTimeAtFirstSample = "DATA_INFO,Time_FirstSample_MonT";

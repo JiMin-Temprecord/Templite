@@ -25,6 +25,7 @@ namespace TempLite
         {
             try
             {
+
                 var ft = new FTDI();
 
                 uint deviceCount = 0;
@@ -67,7 +68,10 @@ namespace TempLite
                     }
                 }
             }
-            catch { }
+            catch
+            {
+
+            }
 
             return null;
         }
