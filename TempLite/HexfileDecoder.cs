@@ -672,7 +672,7 @@ namespace TempLite
                 {
                     check = false;
                 }
-
+                Console.WriteLine("VERIFYVALUE : " + verifyValue);
                 sensorStartingValue[currentSensor] -= verifyValue;
                 sensorStartingValue[currentSensor] *= -1;
 
@@ -695,11 +695,16 @@ namespace TempLite
         }
         void DecodeDeltaData(byte[] decodeByte)
         {
+            Console.WriteLine("DECODEBYTE : " + decodeByte.Length);
+            Console.WriteLine("DECODEBYTE : " + decodeByte[1].ToString("X02"));
+
             var memoryStart = loopOverwriteStartAddress;
+            Console.WriteLine("START : " + memoryStart.ToString("X02"));
             if (memoryStart > 0)
             {
                 memoryStart = FindStartSentinel(memoryStart - 1, 16, decodeByte);
                 memoryStart++;
+                Console.WriteLine("STARTSentinel : " + memoryStart.ToString("X02"));
             }
             if (decodeByte.Length > 0)
             {
@@ -795,11 +800,12 @@ namespace TempLite
         int FindStartSentinel(int memoryStart, int max, byte[] decodeByte)
         {
             var maxI = (memoryStart + max);
-
+            Console.WriteLine("memoryStart1 : " + maxI);
             if (maxI > memoryStart)
             {
                 while (maxI > memoryStart)
                 {
+                    Console.WriteLine("memoryStart2 : " + decodeByte[memoryStart].ToString("X02"));
                     if ((decodeByte[memoryStart] == 0x7F) || (decodeByte[memoryStart] == 0xff)) //???????????????????????
                     {
                         return memoryStart;
@@ -815,6 +821,7 @@ namespace TempLite
                 {
                     if ((decodeByte[memoryStart] == 0x7f) || (decodeByte[memoryStart] & 0xff) == 0xff) // ????????
                     {
+                        Console.WriteLine("memoryStart3 : " + memoryStart);
                         return memoryStart;
                     }
                     memoryStart++;
@@ -877,6 +884,7 @@ namespace TempLite
 
                 while ((dataPointer < decodeByte.Length) && (decodeByte[dataPointer] != 0x7F) && ((decodeByte[dataPointer] & 0xFF) != 0xFF) && (totalSameples < MaxReadingLength))
                 {
+                    Console.WriteLine("DecodeByte : " + decodeByte[dataPointer]);
                     if ((decodeByte[dataPointer] & 0xFF) == 0x80)
                     {
                         if (i == 0)
@@ -895,7 +903,7 @@ namespace TempLite
                         {
                             sensorStartingValue[i] += (decodeByte[dataPointer]);
                         }
-
+                        Console.WriteLine("DATA : " + (double)sensorStartingValue[i] / 100);
                         channelList.Add((double)sensorStartingValue[i] / 100);
                         TemperatureStatistics(i, ((double)sensorStartingValue[i] / 100), arrayPointer);
                         totalSameples++;
@@ -940,7 +948,8 @@ namespace TempLite
                 if (sensorInfoArray.Length != 0)
                 {
                     var sensorData = sensorInfoArray[20] << 16 | sensorInfoArray[19] << 8 | sensorInfoArray[18];
-
+                    Console.WriteLine("sensorType : " + sensorType[i]);
+                    Console.WriteLine("sensorDATA : " + sensorData);
                     if (sensorType[i] == 0 || sensorType[i] == 6) // get yasiru to explain why
                     {
                         sensorStartingValue[i] = Kelvin - sensorData;

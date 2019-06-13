@@ -30,6 +30,7 @@
         {
             this.emailDoneImage = new System.Windows.Forms.PictureBox();
             this.successLabel = new System.Windows.Forms.Label();
+            this.emailCancelButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.emailDoneImage)).BeginInit();
             this.SuspendLayout();
             // 
@@ -56,13 +57,28 @@
             this.successLabel.Name = "successLabel";
             this.successLabel.Size = new System.Drawing.Size(325, 46);
             this.successLabel.TabIndex = 9;
-            this.successLabel.Text = "Success";
+            this.successLabel.Text = "Sent to ";
             this.successLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // emailCancelButton
+            // 
+            this.emailCancelButton.BackColor = System.Drawing.Color.Crimson;
+            this.emailCancelButton.FlatAppearance.BorderSize = 0;
+            this.emailCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.emailCancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.emailCancelButton.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.emailCancelButton.Location = new System.Drawing.Point(298, 10);
+            this.emailCancelButton.Name = "emailCancelButton";
+            this.emailCancelButton.Size = new System.Drawing.Size(27, 28);
+            this.emailCancelButton.TabIndex = 10;
+            this.emailCancelButton.Text = "X";
+            this.emailCancelButton.UseVisualStyleBackColor = false;
             // 
             // EmailDoneUserControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.emailCancelButton);
             this.Controls.Add(this.successLabel);
             this.Controls.Add(this.emailDoneImage);
             this.Name = "EmailDoneUserControl";
@@ -75,6 +91,7 @@
         #endregion
 
         private System.Windows.Forms.PictureBox emailDoneImage;
-        private System.Windows.Forms.Label successLabel;
+        public System.Windows.Forms.Label successLabel;
+        public System.Windows.Forms.Button emailCancelButton;
     }
 }

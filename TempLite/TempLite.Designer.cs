@@ -1,4 +1,4 @@
-﻿using UserControls; 
+﻿using UserControls;
 
 namespace TempLite
 {
@@ -37,13 +37,6 @@ namespace TempLite
             this.ReadingLabel = new System.Windows.Forms.Label();
             this.bg = new System.Windows.Forms.Panel();
             this.ReadLoggerButton = new System.Windows.Forms.Button();
-            this.previewPanel = new System.Windows.Forms.Panel();
-            this.excelPanel = new System.Windows.Forms.Panel();
-            this.emailExcel = new System.Windows.Forms.Button();
-            this.previewExcel = new System.Windows.Forms.Button();
-            this.pdfPanel = new System.Windows.Forms.Panel();
-            this.emailPDF = new System.Windows.Forms.Button();
-            this.previewPDF = new System.Windows.Forms.Button();
             this.readyStateMessage = new UserControls.ReadyStateMessage();
             this.readingError = new UserControls.ReadingError();
             this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
@@ -52,6 +45,14 @@ namespace TempLite
             this.generateDocumentUserControl = new UserControls.GenerateDocumentUserControl();
             this.readerUserControl = new UserControls.ReaderUserControl();
             this.loggerUserControl = new UserControls.LoggerUserControl();
+            this.previewPanel = new System.Windows.Forms.Panel();
+            this.addEmailUserControl = new UserControls.AddEmailUserControl();
+            this.excelPanel = new System.Windows.Forms.Panel();
+            this.emailExcel = new System.Windows.Forms.Button();
+            this.previewExcel = new System.Windows.Forms.Button();
+            this.pdfPanel = new System.Windows.Forms.Panel();
+            this.emailPDF = new System.Windows.Forms.Button();
+            this.previewPDF = new System.Windows.Forms.Button();
             this.Reading.SuspendLayout();
             this.bg.SuspendLayout();
             this.previewPanel.SuspendLayout();
@@ -112,14 +113,84 @@ namespace TempLite
             this.ReadLoggerButton.UseVisualStyleBackColor = true;
             this.ReadLoggerButton.Click += new System.EventHandler(this.ReadLoggerButton_Click);
             // 
+            // readyStateMessage
+            // 
+            this.readyStateMessage.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.readyStateMessage, "readyStateMessage");
+            this.readyStateMessage.Name = "readyStateMessage";
+            // 
+            // readingError
+            // 
+            resources.ApplyResources(this.readingError, "readingError");
+            this.readingError.BackColor = System.Drawing.Color.White;
+            this.readingError.Name = "readingError";
+            // 
+            // emailDoneUserControl
+            // 
+            resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
+            this.emailDoneUserControl.Name = "emailDoneUserControl";
+            this.emailDoneUserControl.emailCancelButton.Click += new System.EventHandler(this.emailCancelButton_Click);
+            // 
+            // emailUserControl
+            // 
+            this.emailUserControl.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.emailUserControl, "emailUserControl");
+            this.emailUserControl.Name = "emailUserControl";
+            this.emailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
+            // 
+            // loggerProgressBarUserControl
+            // 
+            this.loggerProgressBarUserControl.BackColor = System.Drawing.Color.White;
+            this.loggerProgressBarUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            resources.ApplyResources(this.loggerProgressBarUserControl, "loggerProgressBarUserControl");
+            this.loggerProgressBarUserControl.Name = "loggerProgressBarUserControl";
+            this.loggerProgressBarUserControl.VisibleChanged += new System.EventHandler(this.loggerProgressBarUserControl_VisibleChanged);
+            // 
+            // generateDocumentUserControl
+            // 
+            this.generateDocumentUserControl.BackColor = System.Drawing.Color.White;
+            this.generateDocumentUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            resources.ApplyResources(this.generateDocumentUserControl, "generateDocumentUserControl");
+            this.generateDocumentUserControl.Name = "generateDocumentUserControl";
+            this.generateDocumentUserControl.VisibleChanged += new System.EventHandler(this.generateDocumentUserControl_VisibleChanged);
+            // 
+            // readerUserControl
+            // 
+            this.readerUserControl.BackColor = System.Drawing.Color.White;
+            this.readerUserControl.Cursor = System.Windows.Forms.Cursors.Default;
+            resources.ApplyResources(this.readerUserControl, "readerUserControl");
+            this.readerUserControl.Name = "readerUserControl";
+            this.readerUserControl.VisibleChanged += new System.EventHandler(this.readerUserControl_VisibleChanged);
+            // 
+            // loggerUserControl
+            // 
+            this.loggerUserControl.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.loggerUserControl, "loggerUserControl");
+            this.loggerUserControl.Name = "loggerUserControl";
+            this.loggerUserControl.VisibleChanged += new System.EventHandler(this.loggerUserControl_VisibleChanged);
+            // 
             // previewPanel
             // 
             this.previewPanel.BackColor = System.Drawing.Color.White;
+            this.previewPanel.Controls.Add(this.addEmailUserControl);
             this.previewPanel.Controls.Add(this.excelPanel);
             this.previewPanel.Controls.Add(this.pdfPanel);
             resources.ApplyResources(this.previewPanel, "previewPanel");
             this.previewPanel.Name = "previewPanel";
-            this.previewPanel.VisibleChanged += new System.EventHandler(this.PreviewPanel_VisibleChanged);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyUp);
+            // 
+            // addEmailUserControl
+            // 
+            this.addEmailUserControl.BackColor = System.Drawing.Color.White;
+            this.addEmailUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            resources.ApplyResources(this.addEmailUserControl, "addEmailUserControl");
+            this.addEmailUserControl.Name = "addEmailUserControl";
+            this.addEmailUserControl.AddEmailButton.Click += new System.EventHandler(this.addEmailButton_Click);
+            this.addEmailUserControl.loggerIdTextbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyDown);
+            this.addEmailUserControl.loggerIdTextbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyUp);
+            this.addEmailUserControl.emailTextbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyDown);
+            this.addEmailUserControl.emailTextbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyUp);
             // 
             // excelPanel
             // 
@@ -175,61 +246,6 @@ namespace TempLite
             this.previewPDF.UseVisualStyleBackColor = false;
             this.previewPDF.Click += new System.EventHandler(this.previewPDF_Click);
             // 
-            // readyStateMessage
-            // 
-            this.readyStateMessage.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.readyStateMessage, "readyStateMessage");
-            this.readyStateMessage.Name = "readyStateMessage";
-            // 
-            // readingError
-            // 
-            resources.ApplyResources(this.readingError, "readingError");
-            this.readingError.BackColor = System.Drawing.Color.White;
-            this.readingError.Name = "readingError";
-            // 
-            // emailDoneUserControl
-            // 
-            resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
-            this.emailDoneUserControl.Name = "emailDoneUserControl";
-            // 
-            // emailUserControl
-            // 
-            this.emailUserControl.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.emailUserControl, "emailUserControl");
-            this.emailUserControl.Name = "emailUserControl";
-            this.emailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
-            // 
-            // loggerProgressBarUserControl
-            // 
-            this.loggerProgressBarUserControl.BackColor = System.Drawing.Color.White;
-            this.loggerProgressBarUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            resources.ApplyResources(this.loggerProgressBarUserControl, "loggerProgressBarUserControl");
-            this.loggerProgressBarUserControl.Name = "loggerProgressBarUserControl";
-            this.loggerProgressBarUserControl.VisibleChanged += new System.EventHandler(this.loggerProgressBarUserControl_VisibleChanged);
-            // 
-            // generateDocumentUserControl
-            // 
-            this.generateDocumentUserControl.BackColor = System.Drawing.Color.White;
-            this.generateDocumentUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            resources.ApplyResources(this.generateDocumentUserControl, "generateDocumentUserControl");
-            this.generateDocumentUserControl.Name = "generateDocumentUserControl";
-            this.generateDocumentUserControl.VisibleChanged += new System.EventHandler(this.generateDocumentUserControl_VisibleChanged);
-            // 
-            // readerUserControl
-            // 
-            this.readerUserControl.BackColor = System.Drawing.Color.White;
-            this.readerUserControl.Cursor = System.Windows.Forms.Cursors.Default;
-            resources.ApplyResources(this.readerUserControl, "readerUserControl");
-            this.readerUserControl.Name = "readerUserControl";
-            this.readerUserControl.VisibleChanged += new System.EventHandler(this.readerUserControl_VisibleChanged);
-            // 
-            // loggerUserControl
-            // 
-            this.loggerUserControl.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.loggerUserControl, "loggerUserControl");
-            this.loggerUserControl.Name = "loggerUserControl";
-            this.loggerUserControl.VisibleChanged += new System.EventHandler(this.loggerUserControl_VisibleChanged);
-            // 
             // TempLite
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -240,6 +256,8 @@ namespace TempLite
             this.IsMdiContainer = true;
             this.MaximizeBox = false;
             this.Name = "TempLite";
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyDown);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyUp);
             this.Reading.ResumeLayout(false);
             this.Reading.PerformLayout();
             this.bg.ResumeLayout(false);
@@ -272,6 +290,6 @@ namespace TempLite
         private System.Windows.Forms.Button emailPDF;
         private System.Windows.Forms.Button emailExcel;
         private System.Windows.Forms.Button previewExcel;
+        private AddEmailUserControl addEmailUserControl;
     }
 }
-

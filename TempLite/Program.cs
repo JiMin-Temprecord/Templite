@@ -13,7 +13,6 @@ namespace TempLite
         [STAThread]
         static void Main()
         {
-            Assembly.LoadFrom("FTD2XX_NET.dll");
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new TempLite());

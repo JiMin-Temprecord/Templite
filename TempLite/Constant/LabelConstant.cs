@@ -33,10 +33,9 @@ namespace TempLite.Constant
         public const string TimeBelowLimit = "Time below Lower Limit : ";
         public const string UserComment = "User Comments : ";
 
-        public const string StatChannelOneLabel = " #1 - Temperature";
-        public const string StatChannelTwoLabel = " #2 - Humidity";
-        public const string GraphChannelOneLabel = " _Temperature ";
-        public const string GraphChannelTwoLabel = " _Humidity ";
+        public const string Channel = "Channel :";
+        public const string ChannelOneLabel = "Temperature ";
+        public const string ChannelTwoLabel = "Humidity ";
 
         public const string WithinLimit = " Within Limits ";
         public const string LimitsExceeded = " Limits Exceeded ";

@@ -86,9 +86,8 @@ namespace TempLite
             FillCells(workSheet, LabelConstant.TagsPlaced, pdfVariables.TagsPlaced.ToString());
             row++;
 
-            workSheet.Cells[row, 2].Value = LabelConstant.StatChannelOneLabel;
-            if (channelTwoEnabled)
-                workSheet.Cells[row, 3].Value = LabelConstant.StatChannelTwoLabel;
+            FillCells(workSheet, LabelConstant.Channel, LabelConstant.ChannelOneLabel);
+            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = LabelConstant.ChannelTwoLabel;
             row++;
 
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
@@ -116,11 +115,14 @@ namespace TempLite
                 FillCells(workSheet, firstLine, string.Empty);
                 FillCells(workSheet, secondLine, string.Empty);
             }
+            else
+            {
+                FillCells(workSheet, pdfVariables.UserData, string.Empty);
+            }
 
             row = 50;
-            if (channelTwoEnabled)
-                workSheet.Cells[row, 3].Value = LabelConstant.GraphChannelTwoLabel;
-            FillCells(workSheet, LabelConstant.DateTime, LabelConstant.GraphChannelOneLabel);
+            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = LabelConstant.ChannelTwoLabel;
+            FillCells(workSheet, LabelConstant.DateTime, LabelConstant.ChannelOneLabel);
             row++;
 
             var startRange = row;
@@ -192,10 +194,10 @@ namespace TempLite
             {
                 var ySeries2 = worksheet.Cells[start, 3, end - 1, 3];
                 graph.Series.Add(ySeries2, xSeries);
-                graph.Series[1].Header = LabelConstant.GraphChannelTwoLabel + channelTwo.Unit;
+                graph.Series[1].Header = LabelConstant.ChannelTwoLabel + channelTwo.Unit;
             }
 
-            graph.Series[0].Header = LabelConstant.GraphChannelOneLabel + channelOne.Unit;
+            graph.Series[0].Header = LabelConstant.ChannelOneLabel + channelOne.Unit;
         }
     }
 }

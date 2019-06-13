@@ -6,13 +6,15 @@ using System.IO.Ports;
 using System.Linq;
 using System.Windows.Forms;
 using TempLite.Services;
+using TempLite.Constant;
+using System.Drawing;
 
 namespace TempLite
 {
     public partial class TempLite : Form
     {
         CommunicationServices communicationService = new CommunicationServices();
-        LoggerInformation loggerInformation;
+        LoggerInformation loggerInformation; 
         SerialPort serialPort = new SerialPort();
 
         BackgroundWorker readerBW;
@@ -25,11 +27,14 @@ namespace TempLite
         bool errorDectected = false;
         bool loggerHasStarted = true;
 
+        bool pdfOnly = false;
+        bool excelOnly = false;
+
         public TempLite()
         {
             InitializeComponent();
-         
             readerUserControl.Visible = true;
+            Log.WritetoLog(LogConstant.OpenApplication);
         }
 
         #region Find Reader
@@ -47,20 +52,28 @@ namespace TempLite
 
         void readerBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var reader = new Reader();
-            var ftdiInfo = reader.FindFTDI();
-            if (ftdiInfo != null)
+            try
             {
-                reader.SetUpCom(serialPort, ftdiInfo);
-            }
-
-            while (ftdiInfo == null)
-            {
-                ftdiInfo = reader.FindFTDI();
+                var reader = new Reader();
+                var ftdiInfo = reader.FindFTDI();
                 if (ftdiInfo != null)
                 {
                     reader.SetUpCom(serialPort, ftdiInfo);
                 }
+
+                while (ftdiInfo == null)
+                {
+                    ftdiInfo = reader.FindFTDI();
+                    if (ftdiInfo != null)
+                    {
+                        reader.SetUpCom(serialPort, ftdiInfo);
+                    }
+                }
+            }
+            catch
+            {
+                //Assembly.LoadFrom("FTD2XX_NET.dll");
+                //MessageBox.Show("Please Plug in the Reader and Restart the Application");
             }
         }
         void readerBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -123,6 +136,7 @@ namespace TempLite
             if (SerialPort.GetPortNames().Contains(serialPort.PortName))
             {
                 errorDectected = communicationService.GenerateHexFile(serialPort, loggerInformation);
+                Log.WritetoLog(LogConstant.ReadingLogger);
             }
         }
 
@@ -130,6 +144,7 @@ namespace TempLite
         {
             if (errorDectected)
             {
+                Log.WritetoLog(LogConstant.ErrorReadingLogger);
                 loggerUserControl.Visible = false;
                 loggerProgressBarUserControl.Visible = false;
                 readingError.Visible = true;
@@ -138,11 +153,13 @@ namespace TempLite
 
             else if (SerialPort.GetPortNames().Contains(serialPort.PortName))
             {
+                Log.WritetoLog(LogConstant.ReadLogger + loggerInformation.SerialNumber);
                 loggerProgressBarUserControl.Visible = false;
                 generateDocumentUserControl.Visible = true;
             }
             else
             {
+                Log.WritetoLog(LogConstant.ReadLogger + loggerInformation.SerialNumber);
                 loggerProgressBarUserControl.Visible = false;
                 loggerUserControl.Visible = false;
                 readerUserControl.Visible = true;
@@ -179,7 +196,9 @@ namespace TempLite
         {
             if (loggerHasStarted)
             {
-                if (loggerInformation.EmailId == string.Empty)
+                Console.WriteLine("EMAIL : " + loggerInformation.EmailId);
+
+                if (loggerInformation.EmailId == string.Empty || loggerInformation.EmailId == "TBS-TEST")
                 {
                     loggerUserControl.Visible = false;
                     generateDocumentUserControl.Visible = false;
@@ -199,6 +218,8 @@ namespace TempLite
                 {
                     generateDocumentUserControl.Visible = false;
                     emailUserControl.Visible = true;
+                    pdfOnly = false;
+                    excelOnly = false;
                 }
             }
             else
@@ -228,31 +249,43 @@ namespace TempLite
         void sendingEmailBW_DoWork(object sender, DoWorkEventArgs e)
         {
             var email = new Email();
-            email.SetUpEmail(loggerInformation.SerialNumber, loggerInformation.EmailId);
+            if (pdfOnly)
+                email.SendEmailAutomatically(loggerInformation.SerialNumber, loggerInformation.EmailId, 0);
+            else if (excelOnly)
+                email.SendEmailAutomatically(loggerInformation.SerialNumber, loggerInformation.EmailId, 1);
+            else
+                email.SendEmailAutomatically(loggerInformation.SerialNumber, loggerInformation.EmailId);
+
         }
 
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            emailDoneUserControl.successLabel.Text +=  loggerInformation.EmailId;
+            Log.WritetoLog(LogConstant.EmailSuccessfull + loggerInformation.EmailId);
             loggerUserControl.Visible = false;
             emailUserControl.Visible = false;
-            emailDoneUserControl.Visible = true;
             ReadLoggerButton.Visible = true;
+
+            if (pdfOnly || excelOnly)
+            {
+                emailDoneUserControl.Visible = true;
+                emailDoneUserControl.emailCancelButton.Visible = true;
+                previewPanel.Enabled = false;
+                ReadLoggerButton.Enabled = false;
+            }
+            else
+            {
+                emailDoneUserControl.Visible = true;
+                emailDoneUserControl.emailCancelButton.Visible = false;
+                previewPanel.Enabled = false;
+                ReadLoggerButton.Enabled = false;
+            }
             sendingEmailBW.Dispose();
         }
         #endregion
-
-        private void ReadLoggerButton_Click(object sender, EventArgs e)
-        {
-            previewPanel.Visible = false;
-            readyStateMessage.Visible = false;
-            readingError.Visible = false;
-            ReadLoggerButton.Visible = false;
-            loggerUserControl.Visible = true;
-        }
-
         #region Preview Panel
 
-        private void PreviewPanel_VisibleChanged(object sender, EventArgs e)
+        private void PreviewPanelPreviewPanel_VisibleChanged(object sender, EventArgs e)
         {
             previewPanelBW = new BackgroundWorker();
             previewPanelBW.DoWork += previewPanelBW_DoWork;
@@ -285,6 +318,7 @@ namespace TempLite
 
         private void previewPDF_Click(object sender, EventArgs e)
         {
+            Log.WritetoLog(LogConstant.PreviewPDF);
             var filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".pdf";
             try
             {
@@ -298,12 +332,23 @@ namespace TempLite
 
         private void emailPDF_Click(object sender, EventArgs e)
         {
+            Log.WritetoLog(LogConstant.EmailPDFPreview);
+
             var email = new Email();
-            email.OpenEmailApplication(loggerInformation.SerialNumber, loggerInformation.EmailId,0);
+            if (File.Exists(loggerInformation.EmailId + ".txt"))
+            {
+                pdfOnly = true;
+                excelOnly = false;
+                emailUserControl.Visible = true;
+            }
+            else
+                email.OpenEmailApplication(loggerInformation.SerialNumber, loggerInformation.EmailId, 0);
         }
 
         private void previewExcel_Click(object sender, EventArgs e)
         {
+            Log.WritetoLog(LogConstant.PreviewExcel);
+
             var filename = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx";
             try
             {
@@ -317,9 +362,111 @@ namespace TempLite
 
         private void emailExcel_Click(object sender, EventArgs e)
         {
+            Log.WritetoLog(LogConstant.EmailExcelPreview);
+
             var email = new Email();
-            email.OpenEmailApplication(loggerInformation.SerialNumber, loggerInformation.EmailId, 1);
+            if (File.Exists(loggerInformation.EmailId + ".txt"))
+            {
+                pdfOnly = false;
+                excelOnly = true;
+                emailUserControl.Visible = true;
+            }
+            else
+                email.OpenEmailApplication(loggerInformation.SerialNumber, loggerInformation.EmailId, 1);
         }
         #endregion
+        #region Hidden Add Email Feature
+        string keyDown = string.Empty;
+        private void TempLite_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(keyDown == string.Empty)
+                keyDown = e.KeyCode.ToString();
+            //Debug.WriteLine("KEYDOWN : " + e.KeyCode);
+        }
+
+        private void TempLite_KeyUp(object sender, KeyEventArgs e)
+        {
+            Debug.WriteLine("KEYUP : " + e.KeyCode.ToString());
+            Debug.WriteLine("KEYDOWN : " + keyDown);
+
+            if (e.KeyCode.ToString() == keyDown)
+                keyDown = string.Empty;
+
+            if (keyDown == Keys.ControlKey.ToString() && e.KeyCode.ToString() == Keys.A.ToString())
+            {
+                if(addEmailUserControl.Visible == true)
+                {
+                    addEmailUserControl.Visible = false;
+                    ReadLoggerButton.Visible = true;
+                }
+                else
+                {
+                    addEmailUserControl.Visible = true;
+                    ReadLoggerButton.Visible = false;
+                }
+            }
+        }
+        
+        private void addEmailButton_Click (object sender, EventArgs e)
+        {
+            var loggerID = addEmailUserControl.loggerIdTextbox.Text.ToUpper(); //unless we will in the future have case sensitive ids
+            var emailAddress = addEmailUserControl.emailTextbox.Text;
+            var textFile = loggerID + ".txt";
+
+            if (addEmailUserControl.loggerIdTextbox.Text == loggerInformation.EmailId)
+            {
+                if (emailAddress != string.Empty && emailAddress.Contains("@"))
+                {
+                    if (File.Exists(textFile) && Log.CheckEmail(textFile, emailAddress))
+                    {
+                            addEmailUserControl.promptMessage.Text = LogConstant.EmailAlreadyExists;
+                            addEmailUserControl.promptMessage.ForeColor = Color.Orange;
+                    }
+                    else
+                    {
+                        Log.AddEmail(textFile, emailAddress);
+                        addEmailUserControl.promptMessage.Text = LogConstant.EmailAddressAdded;
+                        addEmailUserControl.promptMessage.ForeColor = Color.Green;
+                    }
+                }
+                else
+                {
+                    addEmailUserControl.promptMessage.Text = LogConstant.MissTypeEmail;
+                    addEmailUserControl.promptMessage.ForeColor = Color.Red;
+                }
+            }
+            else
+            {
+                addEmailUserControl.promptMessage.Text = LogConstant.LoggerIdMissMatch;
+                addEmailUserControl.promptMessage.ForeColor = Color.Red;
+            }
+
+            Log.ReadFromlog(textFile);
+        }
+        #endregion
+
+        private void ReadLoggerButton_Click(object sender, EventArgs e)
+        {
+            previewPanel.Visible = false;
+            readyStateMessage.Visible = false;
+            readingError.Visible = false;
+            ReadLoggerButton.Visible = false;
+            loggerUserControl.Visible = true;
+
+            Log.ReadFromlog("log.txt");
+        }
+
+        private void TempLite_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Log.WritetoLog(LogConstant.CloseApplication);
+            Log.WritetoLog("==================================================================");
+        }
+
+        private void emailCancelButton_Click(object sender, EventArgs e)
+        {
+            emailDoneUserControl.Visible = false;
+            previewPanel.Enabled = true;
+            ReadLoggerButton.Enabled = true;
+        }
     }
 }

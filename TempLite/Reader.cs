@@ -1,4 +1,6 @@
-﻿using FTD2XX_NET;
+﻿
+using FTD2XX_NET;
+using System;
 using System.IO.Ports;
 
 namespace TempLite
@@ -7,7 +9,6 @@ namespace TempLite
     {
         public void SetUpCom(SerialPort serial, FTDIInfo ftdiInfo)
         {
-
             serial.DiscardNull = false;
             serial.PortName = ftdiInfo.PortName;
             serial.BaudRate = 19200;
@@ -23,56 +24,49 @@ namespace TempLite
 
         public FTDIInfo FindFTDI()
         {
-            try
+            var ft = new FTDI();
+
+            uint deviceCount = 0;
+            uint deviceID = 0;
+
+            var stat = ft.GetNumberOfDevices(ref deviceCount);
+            FTDI.FT_DEVICE_INFO_NODE[] devices = new FTDI.FT_DEVICE_INFO_NODE[deviceCount];
+            stat = ft.GetDeviceList(devices);
+
+            foreach (var dev in devices)
             {
-
-                var ft = new FTDI();
-
-                uint deviceCount = 0;
-                uint deviceID = 0;
-
-                var stat = ft.GetNumberOfDevices(ref deviceCount);
-                FTDI.FT_DEVICE_INFO_NODE[] devices = new FTDI.FT_DEVICE_INFO_NODE[deviceCount];
-                stat = ft.GetDeviceList(devices);
-
-                foreach (var dev in devices)
+                try
                 {
-                    try
+                    stat = ft.OpenByLocation(dev.LocId);
+                    if (stat == FTDI.FT_STATUS.FT_OK)
                     {
-                        stat = ft.OpenByLocation(dev.LocId);
-                        if (stat == FTDI.FT_STATUS.FT_OK)
+                        ft.GetDeviceID(ref deviceID);
+                        if (deviceID != 67330049)
                         {
                             ft.GetCOMPort(out var portName);
-                            ft.GetDeviceID(ref deviceID);
                             ft.Close();
-
                             return new FTDIInfo(portName, deviceID);
                         }
                     }
-                    catch
+                }
+                catch
+                {
+                    try
                     {
-                        try
+                        if (ft.IsOpen)
                         {
-                            if (ft.IsOpen)
-                            {
-                                ft.Close();
-                            }
-                        } 
-                        finally
+                            ft.Close();
+                        }
+                    } 
+                    finally
+                    {
+                        if(ft.IsOpen)
                         {
-                            if(ft.IsOpen)
-                            {
-                                ft.Close();
-                            }
+                            ft.Close();
                         }
                     }
                 }
             }
-            catch
-            {
-
-            }
-
             return null;
         }
     }
