@@ -26,6 +26,7 @@ namespace TempLite.Services
             {
                 WriteBytes(new WakeUpByteWritter(), serialPort);
                 msg = ReadBytes(serialPort);
+                Console.WriteLine("MSG" + msg);
                 System.Threading.Thread.Sleep(1000);
             }
         }
@@ -121,7 +122,7 @@ namespace TempLite.Services
                         return msg.Clear();
                 }
 
-                else if (e is IOException)
+                else if (e is IOException || e is InvalidOperationException)
                 {
                     msg.Clear();
                     return msg.Append("Exception");
@@ -135,6 +136,7 @@ namespace TempLite.Services
             {
                 msg = msg.Append(recievemsg[i].ToString("x02"));
             }
+            Console.WriteLine("MSG : " + msg);
             return msg;
         }
 
@@ -271,14 +273,18 @@ namespace TempLite.Services
         {
             var sendMessage = new byte[11];
             sendMessage = byteWriter.WriteBytes(sendMessage);
-            
+
+            for (int i = 0; i < sendMessage.Length; i++)
+                Console.Write(sendMessage[i].ToString("x02") + "-");
+            Console.WriteLine("");
+
             try
             {
                 serialPort.Write(sendMessage, 0, sendMessage.Length);
             }
             catch (Exception e)
             {
-                if(e is IOException)
+                if(e is IOException || e is InvalidOperationException)
                     return false;
             }
 
