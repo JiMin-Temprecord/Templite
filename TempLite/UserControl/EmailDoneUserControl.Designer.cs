@@ -49,13 +49,12 @@
             // successLabel
             // 
             this.successLabel.BackColor = System.Drawing.Color.White;
-            this.successLabel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.successLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
+            this.successLabel.Font = new System.Drawing.Font("Myriad Pro Light", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.successLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.successLabel.Location = new System.Drawing.Point(0, 204);
+            this.successLabel.Location = new System.Drawing.Point(34, 23);
             this.successLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.successLabel.Name = "successLabel";
-            this.successLabel.Size = new System.Drawing.Size(325, 46);
+            this.successLabel.Size = new System.Drawing.Size(257, 38);
             this.successLabel.TabIndex = 9;
             this.successLabel.Text = "Sent to ";
             this.successLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

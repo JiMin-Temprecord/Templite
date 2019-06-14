@@ -49,22 +49,22 @@
             // emailLabel
             // 
             this.emailLabel.BackColor = System.Drawing.Color.Transparent;
-            this.emailLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
+            this.emailLabel.Font = new System.Drawing.Font("Myriad Pro Light", 20F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.emailLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.emailLabel.Location = new System.Drawing.Point(4, 14);
+            this.emailLabel.Location = new System.Drawing.Point(62, 23);
             this.emailLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.emailLabel.Name = "emailLabel";
-            this.emailLabel.Size = new System.Drawing.Size(317, 36);
+            this.emailLabel.Size = new System.Drawing.Size(204, 38);
             this.emailLabel.TabIndex = 8;
             this.emailLabel.Text = "Sending Email";
             this.emailLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // emailProgressBar
             // 
-            this.emailProgressBar.Location = new System.Drawing.Point(41, 217);
+            this.emailProgressBar.Location = new System.Drawing.Point(62, 207);
             this.emailProgressBar.MarqueeAnimationSpeed = 16;
             this.emailProgressBar.Name = "emailProgressBar";
-            this.emailProgressBar.Size = new System.Drawing.Size(249, 18);
+            this.emailProgressBar.Size = new System.Drawing.Size(204, 18);
             this.emailProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.emailProgressBar.TabIndex = 6;
             // 

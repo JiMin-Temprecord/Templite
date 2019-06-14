@@ -188,6 +188,12 @@
     <Compile Include="PDFGenerator.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="PDFcoordinates.cs" />
+    <Compile Include="UserControl\LogUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\LogUserControl.Designer.cs">
+      <DependentUpon>LogUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl\ReaderUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -235,6 +241,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\LoggerUserControl.resx">
       <DependentUpon>LoggerUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\LogUserControl.resx">
+      <DependentUpon>LogUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\ReaderUserControl.resx">
       <DependentUpon>ReaderUserControl.cs</DependentUpon>

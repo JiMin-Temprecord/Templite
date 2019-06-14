@@ -2,9 +2,9 @@
 
 namespace UserControls
 {
-    public partial class AddEmailUserControl : UserControl
+    public partial class LogUserControl : UserControl
     {
-        public AddEmailUserControl()
+        public LogUserControl()
         {
             InitializeComponent();
         }

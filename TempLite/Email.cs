@@ -155,5 +155,18 @@ namespace TempLite
                     return "jimin@temprecord.com";
             }
         }
+
+        public static bool IsValid(string emailAddress)
+        {
+            try
+            {
+                var emailCheck = new System.Net.Mail.MailAddress(emailAddress);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

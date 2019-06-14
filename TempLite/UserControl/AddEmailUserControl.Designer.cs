@@ -62,7 +62,6 @@
             // 
             this.loggerIdTextbox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.loggerIdTextbox.Location = new System.Drawing.Point(229, 49);
-            this.loggerIdTextbox.Multiline = true;
             this.loggerIdTextbox.Name = "loggerIdTextbox";
             this.loggerIdTextbox.Size = new System.Drawing.Size(242, 20);
             this.loggerIdTextbox.TabIndex = 2;
@@ -70,7 +69,6 @@
             // emailTextbox
             // 
             this.emailTextbox.Location = new System.Drawing.Point(229, 75);
-            this.emailTextbox.Multiline = true;
             this.emailTextbox.Name = "emailTextbox";
             this.emailTextbox.Size = new System.Drawing.Size(242, 20);
             this.emailTextbox.TabIndex = 3;

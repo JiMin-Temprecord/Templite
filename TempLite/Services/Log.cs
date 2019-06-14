@@ -21,16 +21,19 @@ namespace TempLite.Services
             }
         }
 
-        public static void ReadFromlog(string filename)
+        public static string ReadFromlog(string filename)
         {
+            StringBuilder logString = new StringBuilder();
             string line;
             using (StreamReader sr = File.OpenText(filename))
             {
                 while ((line = sr.ReadLine()) != null)
                 {
-                    Console.WriteLine(line);
+                    logString.Append(line + "\r\n");
                 }
             }
+
+            return logString.ToString();
         }
 
         public static void AddEmail(string textFile, string Email)

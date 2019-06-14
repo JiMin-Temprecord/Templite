@@ -471,6 +471,33 @@
   <data name="&gt;&gt;loggerUserControl.ZOrder" xml:space="preserve">
     <value>8</value>
   </data>
+  <data name="logUserControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="logUserControl.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="logUserControl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>709, 761</value>
+  </data>
+  <data name="logUserControl.TabIndex" type="System.Int32, mscorlib">
+    <value>18</value>
+  </data>
+  <data name="logUserControl.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.Name" xml:space="preserve">
+    <value>logUserControl</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.Type" xml:space="preserve">
+    <value>UserControls.LogUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.Parent" xml:space="preserve">
+    <value>previewPanel</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="addEmailUserControl.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
@@ -493,7 +520,7 @@
     <value>previewPanel</value>
   </data>
   <data name="&gt;&gt;addEmailUserControl.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="emailExcel.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
@@ -616,7 +643,7 @@
     <value>previewPanel</value>
   </data>
   <data name="&gt;&gt;excelPanel.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="emailPDF.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
@@ -739,7 +766,7 @@
     <value>previewPanel</value>
   </data>
   <data name="&gt;&gt;pdfPanel.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="previewPanel.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
