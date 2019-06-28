@@ -41,21 +41,21 @@ namespace TempLite
         double lowestTemp = 0;
         double resolution = 0;
 
-        int[] highestPosition = new int[8];
-        int[] lowestPosition = new int[8];
-        int[] sensorStartingValue = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        int[] sensorTablePointer = { 0, 0, 0, 0, 0, 0, 0, 0 };
-        int[] sensorType = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        readonly int[] highestPosition = new int[8];
+        readonly int[] lowestPosition = new int[8];
+        readonly int[] sensorStartingValue = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        readonly int[] sensorTablePointer = { 0, 0, 0, 0, 0, 0, 0, 0 };
+        readonly int[] sensorType = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
         double[] upperLimit = new double[8];
         double[] lowerLimit = new double[8];
-        double[] sensorMin = new double[8];
-        double[] sensorMax = new double[8];
-        double[] mean = new double[8];
-        double[] mkt = new double[8];
-        double[] withinLimit = new double[8];
-        double[] belowLimit = new double[8];
-        double[] aboveLimit = new double[8];
+        readonly double[] sensorMin = new double[8];
+        readonly double[] sensorMax = new double[8];
+        readonly double[] mean = new double[8];
+        readonly double[] mkt = new double[8];
+        readonly double[] withinLimit = new double[8];
+        readonly double[] belowLimit = new double[8];
+        readonly double[] aboveLimit = new double[8];
 
         List<List<double>> Data = new List<List<double>>();
         List<int> Tag = new List<int>();

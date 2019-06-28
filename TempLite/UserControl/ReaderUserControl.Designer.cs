@@ -41,6 +41,7 @@
             // 
             this.readerLabel.BackColor = System.Drawing.Color.Transparent;
             resources.ApplyResources(this.readerLabel, "readerLabel");
+            this.readerLabel.ForeColor = System.Drawing.Color.Black;
             this.readerLabel.Name = "readerLabel";
             // 
             // readerTextbox
@@ -49,6 +50,7 @@
             this.readerTextbox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.readerTextbox.Cursor = System.Windows.Forms.Cursors.Default;
             resources.ApplyResources(this.readerTextbox, "readerTextbox");
+            this.readerTextbox.ForeColor = System.Drawing.Color.Black;
             this.readerTextbox.Name = "readerTextbox";
             this.readerTextbox.ReadOnly = true;
             this.readerTextbox.TabStop = false;

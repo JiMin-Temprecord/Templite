@@ -41,6 +41,7 @@
             this.loggerText.BackColor = System.Drawing.Color.White;
             this.loggerText.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.loggerText.Font = new System.Drawing.Font("Myriad Pro", 12F);
+            this.loggerText.ForeColor = System.Drawing.Color.Black;
             this.loggerText.Location = new System.Drawing.Point(100, 675);
             this.loggerText.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.loggerText.Multiline = true;
@@ -54,6 +55,7 @@
             // 
             this.loggerLabel.BackColor = System.Drawing.Color.Transparent;
             this.loggerLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
+            this.loggerLabel.ForeColor = System.Drawing.Color.Black;
             this.loggerLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.loggerLabel.Location = new System.Drawing.Point(100, 625);
             this.loggerLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);

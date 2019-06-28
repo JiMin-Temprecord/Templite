@@ -11,7 +11,9 @@ namespace TempLite.Services
 {
     public class Log
     {
-        public static void WritetoLog(string logMessage)
+        static string path = AppDomain.CurrentDomain.BaseDirectory + "Email\\";
+
+        public static void Write(string logMessage)
         {
             using (StreamWriter sw = File.AppendText("log.txt"))
             {
@@ -21,7 +23,7 @@ namespace TempLite.Services
             }
         }
 
-        public static string ReadFromlog(string filename)
+        public static string Read(string filename)
         {
             StringBuilder logString = new StringBuilder();
             string line;
@@ -34,30 +36,6 @@ namespace TempLite.Services
             }
 
             return logString.ToString();
-        }
-
-        public static void AddEmail(string textFile, string Email)
-        {
-            using (StreamWriter sw = File.AppendText(textFile))
-            {
-                sw.WriteLine(Email);
-                sw.Close();
-            }
-        }
-
-        public static bool CheckEmail(string textFile, string Email)
-        {
-            string line;
-            using (StreamReader sr = File.OpenText(textFile))
-            {
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (line == Email)
-                        return true;
-                }
-
-                return false;
-            }
         }
     }
 }

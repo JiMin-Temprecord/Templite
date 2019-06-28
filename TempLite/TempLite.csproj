@@ -135,18 +135,19 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UserControl\AddEmailUserControl.cs">
+    <Compile Include="Constant\EmailConstant.cs" />
+    <Compile Include="UserControl\EmailListUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControl\AddEmailUserControl.Designer.cs">
-      <DependentUpon>AddEmailUserControl.cs</DependentUpon>
+    <Compile Include="UserControl\EmailListUserControl.Designer.cs">
+      <DependentUpon>EmailListUserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="AddressSection.cs" />
-    <Compile Include="Constant\LabelConstant.cs" />
+    <Compile Include="Constant\DocumentLabelConstant.cs" />
     <Compile Include="Constant\LogConstant.cs" />
     <Compile Include="LoggerInformation\ChannelConfig.cs" />
     <Compile Include="HexFileDecoder.cs" />
-    <Compile Include="Email.cs" />
+    <Compile Include="Services\Email.cs" />
     <Compile Include="ExcelGenerator.cs" />
     <Compile Include="FTDIInfo.cs" />
     <Compile Include="ByteWriters\ReadLoggerByteWritter.cs" />
@@ -166,11 +167,17 @@
     <Compile Include="UserControl\EmailDoneUserControl.Designer.cs">
       <DependentUpon>EmailDoneUserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\EmailUserControl.cs">
+    <Compile Include="UserControl\SendingEmailUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControl\EmailUserControl.Designer.cs">
-      <DependentUpon>EmailUserControl.cs</DependentUpon>
+    <Compile Include="UserControl\SendingEmailUserControl.Designer.cs">
+      <DependentUpon>SendingEmailUserControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControl\ListEmailUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\ListEmailUserControl.Designer.cs">
+      <DependentUpon>ListEmailUserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="UserControl\LoggerProgressBarUserControl.cs">
       <SubType>UserControl</SubType>
@@ -194,6 +201,12 @@
     <Compile Include="UserControl\LogUserControl.Designer.cs">
       <DependentUpon>LogUserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControl\PasswordUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\PasswordUserControl.Designer.cs">
+      <DependentUpon>PasswordUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl\ReaderUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -212,20 +225,26 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ByteWriters\WakeUpByteWritter.cs" />
     <Compile Include="ByteWriters\WriteByteInterface.cs" />
-    <Compile Include="UserControl\ReadingError.cs">
+    <Compile Include="UserControl\ReadingErrorUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControl\ReadingError.Designer.cs">
-      <DependentUpon>ReadingError.cs</DependentUpon>
+    <Compile Include="UserControl\ReadingErrorUserControl.Designer.cs">
+      <DependentUpon>ReadingErrorUserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\ReadyStateMessage.cs">
+    <Compile Include="UserControl\ReadyStateMessageUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControl\ReadyStateMessage.Designer.cs">
-      <DependentUpon>ReadyStateMessage.cs</DependentUpon>
+    <Compile Include="UserControl\ReadyStateMessageUserControl.Designer.cs">
+      <DependentUpon>ReadyStateMessageUserControl.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="UserControl\AddEmailUserControl.resx">
-      <DependentUpon>AddEmailUserControl.cs</DependentUpon>
+    <Compile Include="UserControl\UserConfirmUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\UserConfirmUserControl.Designer.cs">
+      <DependentUpon>UserConfirmUserControl.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="UserControl\EmailListUserControl.resx">
+      <DependentUpon>EmailListUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\GenerateDocumentUserControl.resx">
       <DependentUpon>GenerateDocumentUserControl.cs</DependentUpon>
@@ -233,8 +252,11 @@
     <EmbeddedResource Include="UserControl\EmailDoneUserControl.resx">
       <DependentUpon>EmailDoneUserControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\EmailUserControl.resx">
-      <DependentUpon>EmailUserControl.cs</DependentUpon>
+    <EmbeddedResource Include="UserControl\SendingEmailUserControl.resx">
+      <DependentUpon>SendingEmailUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\ListEmailUserControl.resx">
+      <DependentUpon>ListEmailUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\LoggerProgressBarUserControl.resx">
       <DependentUpon>LoggerProgressBarUserControl.cs</DependentUpon>
@@ -244,6 +266,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\LogUserControl.resx">
       <DependentUpon>LogUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\PasswordUserControl.resx">
+      <DependentUpon>PasswordUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\ReaderUserControl.resx">
       <DependentUpon>ReaderUserControl.cs</DependentUpon>
@@ -261,11 +286,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="UserControl\ReadingError.resx">
-      <DependentUpon>ReadingError.cs</DependentUpon>
+    <EmbeddedResource Include="UserControl\ReadingErrorUserControl.resx">
+      <DependentUpon>ReadingErrorUserControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\ReadyStateMessage.resx">
-      <DependentUpon>ReadyStateMessage.cs</DependentUpon>
+    <EmbeddedResource Include="UserControl\ReadyStateMessageUserControl.resx">
+      <DependentUpon>ReadyStateMessageUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\UserConfirmUserControl.resx">
+      <DependentUpon>UserConfirmUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Json\G4.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -296,6 +324,42 @@
     <None Include="Resources\TempLite-04.png" />
     <None Include="Resources\TempLite-021.png" />
     <None Include="Resources\TempLite-051.png" />
+    <Content Include="Email\Admin.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\ARCBS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\Default.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\Email.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-NSW.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-NT.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-QLD.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-SA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-TAS.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-VIC.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Email\TBS-WA.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TempLite User Manual for Desktop PCs.htm">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="TempLite.ico" />
     <None Include="Images\errorWarning.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -35,6 +35,7 @@
             // 
             // progressBar
             // 
+            this.progressBar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
             this.progressBar.Location = new System.Drawing.Point(48, 138);
             this.progressBar.MarqueeAnimationSpeed = 16;
             this.progressBar.Name = "progressBar";
@@ -47,6 +48,7 @@
             this.progressBarText.BackColor = System.Drawing.Color.White;
             this.progressBarText.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.progressBarText.Font = new System.Drawing.Font("Myriad Pro", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.progressBarText.ForeColor = System.Drawing.Color.Black;
             this.progressBarText.Location = new System.Drawing.Point(48, 86);
             this.progressBarText.Multiline = true;
             this.progressBarText.Name = "progressBarText";
@@ -58,6 +60,7 @@
             // progressBarLabel
             // 
             this.progressBarLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold);
+            this.progressBarLabel.ForeColor = System.Drawing.Color.Black;
             this.progressBarLabel.Location = new System.Drawing.Point(42, 47);
             this.progressBarLabel.Name = "progressBarLabel";
             this.progressBarLabel.Size = new System.Drawing.Size(260, 36);
@@ -73,6 +76,7 @@
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.progressBarText);
             this.Controls.Add(this.progressBarLabel);
+            this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
             this.Name = "LoggerProgressBarUserControl";
             this.Size = new System.Drawing.Size(323, 198);
             this.ResumeLayout(false);

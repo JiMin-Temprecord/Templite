@@ -34,6 +34,7 @@
             // 
             // progressBar
             // 
+            this.progressBar.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
             this.progressBar.Location = new System.Drawing.Point(48, 138);
             this.progressBar.MarqueeAnimationSpeed = 16;
             this.progressBar.Name = "progressBar";
@@ -43,10 +44,11 @@
             // 
             // GeneratingDocumentLabel
             // 
-            this.GeneratingDocumentLabel.Font = new System.Drawing.Font("Myriad Pro", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.GeneratingDocumentLabel.Location = new System.Drawing.Point(48, 19);
+            this.GeneratingDocumentLabel.Font = new System.Drawing.Font("Myriad Pro", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.GeneratingDocumentLabel.ForeColor = System.Drawing.Color.Black;
+            this.GeneratingDocumentLabel.Location = new System.Drawing.Point(35, 47);
             this.GeneratingDocumentLabel.Name = "GeneratingDocumentLabel";
-            this.GeneratingDocumentLabel.Size = new System.Drawing.Size(234, 116);
+            this.GeneratingDocumentLabel.Size = new System.Drawing.Size(256, 80);
             this.GeneratingDocumentLabel.TabIndex = 6;
             this.GeneratingDocumentLabel.Text = "Generating Documents";
             this.GeneratingDocumentLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -59,6 +61,7 @@
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.GeneratingDocumentLabel);
+            this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
             this.Name = "GenerateDocumentUserControl";
             this.Size = new System.Drawing.Size(323, 198);
             this.ResumeLayout(false);
