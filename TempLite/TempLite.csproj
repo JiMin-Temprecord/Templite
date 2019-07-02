@@ -167,6 +167,12 @@
     <Compile Include="UserControl\EmailDoneUserControl.Designer.cs">
       <DependentUpon>EmailDoneUserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControl\ResetSuccessUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\ResetSuccessUserControl.Designer.cs">
+      <DependentUpon>ResetSuccessUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl\SendingEmailUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -237,6 +243,12 @@
     <Compile Include="UserControl\ReadyStateMessageUserControl.Designer.cs">
       <DependentUpon>ReadyStateMessageUserControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControl\ResetUserConfirmUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\ResetUserConfirmUserControl.Designer.cs">
+      <DependentUpon>ResetUserConfirmUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl\UserConfirmUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -251,6 +263,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\EmailDoneUserControl.resx">
       <DependentUpon>EmailDoneUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\ResetSuccessUserControl.resx">
+      <DependentUpon>ResetSuccessUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\SendingEmailUserControl.resx">
       <DependentUpon>SendingEmailUserControl.cs</DependentUpon>
@@ -291,6 +306,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\ReadyStateMessageUserControl.resx">
       <DependentUpon>ReadyStateMessageUserControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\ResetUserConfirmUserControl.resx">
+      <DependentUpon>ResetUserConfirmUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\UserConfirmUserControl.resx">
       <DependentUpon>UserConfirmUserControl.cs</DependentUpon>

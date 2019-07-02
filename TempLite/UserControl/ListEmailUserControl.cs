@@ -19,11 +19,13 @@ namespace UserControls
             Enabled = false;
 
             var ConfirmUserControl = new UserConfirmUserControl();
-            this.Parent.Controls.Add(ConfirmUserControl);
+            this.Parent.Parent.Controls.Add(ConfirmUserControl);
             ConfirmUserControl.Size = new Size(250, 175);
             ConfirmUserControl.Location = new Point(225, 250);
             ConfirmUserControl.BringToFront();
             ConfirmUserControl.Visible = true;
+
+            this.Parent.Enabled = false;
 
             waitForConfirmBW = new BackgroundWorker();
             waitForConfirmBW.DoWork += waitForConfirmBackgroundWorker_DoWork;
@@ -41,6 +43,8 @@ namespace UserControls
         }
         void waitForConfirmBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            this.Parent.Enabled = true ;
+
             if (UserConfirmUserControl.shouldDelete)
             {
                 Email.Delete(emailLabel.Text);

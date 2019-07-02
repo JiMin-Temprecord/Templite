@@ -11,7 +11,8 @@ namespace UserControls
 
         private void emailCancelButton_Click(object sender, System.EventArgs e)
         {
-            this.Visible = false;
+            Visible = false;
+            Parent.Enabled = true;
         }
     }
 }

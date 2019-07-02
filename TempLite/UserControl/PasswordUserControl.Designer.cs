@@ -41,7 +41,7 @@
             this.keycodeLabel.BackColor = System.Drawing.Color.Transparent;
             this.keycodeLabel.Font = new System.Drawing.Font("Myriad Pro Cond", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.keycodeLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.keycodeLabel.Location = new System.Drawing.Point(94, 35);
+            this.keycodeLabel.Location = new System.Drawing.Point(95, 35);
             this.keycodeLabel.Name = "keycodeLabel";
             this.keycodeLabel.Size = new System.Drawing.Size(117, 25);
             this.keycodeLabel.TabIndex = 3;

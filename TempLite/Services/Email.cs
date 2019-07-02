@@ -104,24 +104,29 @@ namespace TempLite
             message.Body = builder.ToMessageBody();
             return message;
         }
-        public static int Count(string ownerID)
+
+        public int Count(string ownerID)
         {
             string line;
             int count = 0;
-            using (StreamReader sr = File.OpenText(ownerID + ".txt"))
+            if (File.Exists(path + ownerID + ".txt"))
             {
-                while ((line = sr.ReadLine()) != null)
+                using (StreamReader sr = File.OpenText(path + ownerID + ".txt"))
                 {
-                    count++;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        count++;
+                    }
                 }
             }
             return count;
         }
-        public static string GetEmailAddress (string ownerID)
+        public string GetEmailAddress (string ownerID)
         {
-            using (StreamReader sr = File.OpenText(ownerID + ".txt"))
+            using (StreamReader sr = File.OpenText(path + ownerID + ".txt"))
             {
                 var firstEmail = sr.ReadLine();
+                Console.WriteLine("EMAIL : " + firstEmail);
                 var start = firstEmail.IndexOf("@");
                 var hiddenEmail = "******" + firstEmail.Substring(start, firstEmail.Length - start);
 
@@ -166,15 +171,23 @@ namespace TempLite
                 return false;
             }
         }
-        public static void Delete (string EmailAddress)
+
+
+        public static void Delete (string EmailAddress , bool fromReset = false)
         {
             var start = EmailAddress.IndexOf("(");
             var end = EmailAddress.IndexOf(")");
             var emailAddress = EmailAddress.Substring(0, start);
             var emailFilename = EmailAddress.Substring(start + 1, end - start - 1) + ".txt";
 
-            var newLines = File.ReadAllLines(path + EmailConstant.AllEmail).Where(line => line != EmailAddress).ToArray();
-            File.WriteAllLines(path + EmailConstant.AllEmail, newLines);
+            Console.WriteLine("filename : " + emailFilename);
+            Console.WriteLine("email Address : " + emailAddress);
+
+            if (fromReset == false)
+            {
+                var newLines = File.ReadAllLines(path + EmailConstant.AllEmail).Where(line => line != EmailAddress).ToArray();
+                File.WriteAllLines(path + EmailConstant.AllEmail, newLines);
+            }
 
             var newEmailList = File.ReadAllLines(path + emailFilename).Where(line => line != emailAddress).ToArray();
             File.WriteAllLines(path + emailFilename, newEmailList);

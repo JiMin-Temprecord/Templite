@@ -101,8 +101,6 @@ namespace TempLite
             this.bg.Controls.Add(this.ReadLoggerButton);
             this.bg.Controls.Add(this.readyStateMessageUserControl);
             this.bg.Controls.Add(this.readingErrorUserControl);
-            this.bg.Controls.Add(this.emailDoneUserControl);
-            this.bg.Controls.Add(this.emailUserControl);
             this.bg.Controls.Add(this.loggerProgressBarUserControl);
             this.bg.Controls.Add(this.generateDocumentUserControl);
             this.bg.Controls.Add(this.readerUserControl);
@@ -110,6 +108,8 @@ namespace TempLite
             this.bg.Controls.Add(this.previewPanel);
             this.bg.Controls.Add(this.logUserControl);
             this.bg.Controls.Add(this.addEmailUserControl);
+            this.bg.Controls.Add(this.emailDoneUserControl);
+            this.bg.Controls.Add(this.emailUserControl);
             resources.ApplyResources(this.bg, "bg");
             this.bg.Name = "bg";
             this.TempLiteHelp.SetShowHelp(this.bg, ((bool)(resources.GetObject("bg.ShowHelp"))));
