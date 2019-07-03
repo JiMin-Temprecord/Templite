@@ -39,11 +39,11 @@
             this.keycodeLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.keycodeLabel.AutoSize = true;
             this.keycodeLabel.BackColor = System.Drawing.Color.Transparent;
-            this.keycodeLabel.Font = new System.Drawing.Font("Myriad Pro Cond", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.keycodeLabel.Font = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.keycodeLabel.ForeColor = System.Drawing.Color.WhiteSmoke;
-            this.keycodeLabel.Location = new System.Drawing.Point(95, 35);
+            this.keycodeLabel.Location = new System.Drawing.Point(17, 63);
             this.keycodeLabel.Name = "keycodeLabel";
-            this.keycodeLabel.Size = new System.Drawing.Size(117, 25);
+            this.keycodeLabel.Size = new System.Drawing.Size(139, 26);
             this.keycodeLabel.TabIndex = 3;
             this.keycodeLabel.Text = "Enter KeyCode";
             // 
@@ -54,10 +54,10 @@
             this.keycodeTextbox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.keycodeTextbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.keycodeTextbox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
-            this.keycodeTextbox.Location = new System.Drawing.Point(35, 93);
+            this.keycodeTextbox.Location = new System.Drawing.Point(20, 108);
             this.keycodeTextbox.Margin = new System.Windows.Forms.Padding(5);
             this.keycodeTextbox.Name = "keycodeTextbox";
-            this.keycodeTextbox.Size = new System.Drawing.Size(233, 26);
+            this.keycodeTextbox.Size = new System.Drawing.Size(191, 26);
             this.keycodeTextbox.TabIndex = 4;
             this.keycodeTextbox.UseSystemPasswordChar = true;
             this.keycodeTextbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.keycodeTextbox_KeyUp);
@@ -67,21 +67,21 @@
             this.promptMessage.AutoSize = true;
             this.promptMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.promptMessage.ForeColor = System.Drawing.Color.Tomato;
-            this.promptMessage.Location = new System.Drawing.Point(36, 72);
+            this.promptMessage.Location = new System.Drawing.Point(18, 88);
             this.promptMessage.Name = "promptMessage";
             this.promptMessage.Size = new System.Drawing.Size(0, 13);
             this.promptMessage.TabIndex = 5;
             // 
             // PasswordUserControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
             this.Controls.Add(this.promptMessage);
             this.Controls.Add(this.keycodeTextbox);
             this.Controls.Add(this.keycodeLabel);
             this.Name = "PasswordUserControl";
-            this.Size = new System.Drawing.Size(300, 150);
+            this.Size = new System.Drawing.Size(323, 187);
             this.ResumeLayout(false);
             this.PerformLayout();
 

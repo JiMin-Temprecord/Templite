@@ -132,11 +132,11 @@
             // 
             this.addEmailLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.addEmailLabel.AutoSize = true;
-            this.addEmailLabel.Font = new System.Drawing.Font("Myriad Pro Cond", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addEmailLabel.Font = new System.Drawing.Font("Calibri", 21.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.addEmailLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(33)))), ((int)(((byte)(99)))));
-            this.addEmailLabel.Location = new System.Drawing.Point(263, 227);
+            this.addEmailLabel.Location = new System.Drawing.Point(238, 220);
             this.addEmailLabel.Name = "addEmailLabel";
-            this.addEmailLabel.Size = new System.Drawing.Size(198, 35);
+            this.addEmailLabel.Size = new System.Drawing.Size(244, 36);
             this.addEmailLabel.TabIndex = 7;
             this.addEmailLabel.Text = "Add Email Address";
             // 

@@ -70,13 +70,14 @@ namespace TempLite
             message.Subject = emailSubject;
 
             string line;
-            using (StreamReader sr = File.OpenText(emailID + ".txt"))
+            using (StreamReader sr = File.OpenText(path + emailID + ".txt"))
             {
                 while ((line = sr.ReadLine()) != null)
                 {
                     message.To.Add(new MailboxAddress(line));
                 }
             }
+
 
             if (file == 2)
             {
@@ -171,8 +172,6 @@ namespace TempLite
                 return false;
             }
         }
-
-
         public static void Delete (string EmailAddress , bool fromReset = false)
         {
             var start = EmailAddress.IndexOf("(");

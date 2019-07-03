@@ -64,7 +64,7 @@ namespace UserControls
                         Email.AddtoTextfile(Email.path + emailFilename, emailAddress);
                     }
                 }
-
+                ;
                 ResetSuccessUserControl resetSuccessUserControl = new ResetSuccessUserControl();
                 this.Parent.Parent.Controls.Add(resetSuccessUserControl);
                 resetSuccessUserControl.Size = new Size(300, 150);

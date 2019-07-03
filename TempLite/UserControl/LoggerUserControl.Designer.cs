@@ -40,6 +40,7 @@
             // 
             this.loggerText.BackColor = System.Drawing.Color.White;
             this.loggerText.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.loggerText.Enabled = false;
             this.loggerText.Font = new System.Drawing.Font("Myriad Pro", 12F);
             this.loggerText.ForeColor = System.Drawing.Color.Black;
             this.loggerText.Location = new System.Drawing.Point(100, 675);

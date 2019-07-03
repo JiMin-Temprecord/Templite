@@ -40,7 +40,7 @@ namespace TempLite
             this.readyStateMessageUserControl = new UserControls.ReadyStateMessageUserControl();
             this.readingErrorUserControl = new UserControls.ReadingErrorUserControl();
             this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
-            this.emailUserControl = new UserControls.SendingEmailUserControl();
+            this.sendingEmailUserControl = new UserControls.SendingEmailUserControl();
             this.loggerProgressBarUserControl = new UserControls.LoggerProgressBarUserControl();
             this.generateDocumentUserControl = new UserControls.GenerateDocumentUserControl();
             this.readerUserControl = new UserControls.ReaderUserControl();
@@ -53,7 +53,7 @@ namespace TempLite
             this.emailPDF = new System.Windows.Forms.Button();
             this.previewPDF = new System.Windows.Forms.Button();
             this.logUserControl = new UserControls.LogUserControl();
-            this.addEmailUserControl = new UserControls.EmailListUserControl();
+            this.emailListUserControl = new UserControls.EmailListUserControl();
             this.TempLiteHelp = new System.Windows.Forms.HelpProvider();
             this.Reading.SuspendLayout();
             this.bg.SuspendLayout();
@@ -107,9 +107,9 @@ namespace TempLite
             this.bg.Controls.Add(this.loggerUserControl);
             this.bg.Controls.Add(this.previewPanel);
             this.bg.Controls.Add(this.logUserControl);
-            this.bg.Controls.Add(this.addEmailUserControl);
+            this.bg.Controls.Add(this.emailListUserControl);
             this.bg.Controls.Add(this.emailDoneUserControl);
-            this.bg.Controls.Add(this.emailUserControl);
+            this.bg.Controls.Add(this.sendingEmailUserControl);
             resources.ApplyResources(this.bg, "bg");
             this.bg.Name = "bg";
             this.TempLiteHelp.SetShowHelp(this.bg, ((bool)(resources.GetObject("bg.ShowHelp"))));
@@ -145,11 +145,11 @@ namespace TempLite
             // 
             // emailUserControl
             // 
-            this.emailUserControl.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.emailUserControl, "emailUserControl");
-            this.emailUserControl.Name = "emailUserControl";
-            this.TempLiteHelp.SetShowHelp(this.emailUserControl, ((bool)(resources.GetObject("emailUserControl.ShowHelp"))));
-            this.emailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
+            this.sendingEmailUserControl.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.sendingEmailUserControl, "emailUserControl");
+            this.sendingEmailUserControl.Name = "emailUserControl";
+            this.TempLiteHelp.SetShowHelp(this.sendingEmailUserControl, ((bool)(resources.GetObject("emailUserControl.ShowHelp"))));
+            this.sendingEmailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
             // 
             // loggerProgressBarUserControl
             // 
@@ -266,11 +266,11 @@ namespace TempLite
             // 
             // addEmailUserControl
             // 
-            this.addEmailUserControl.BackColor = System.Drawing.Color.White;
-            this.addEmailUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            resources.ApplyResources(this.addEmailUserControl, "addEmailUserControl");
-            this.addEmailUserControl.Name = "addEmailUserControl";
-            this.TempLiteHelp.SetShowHelp(this.addEmailUserControl, ((bool)(resources.GetObject("addEmailUserControl.ShowHelp"))));
+            this.emailListUserControl.BackColor = System.Drawing.Color.White;
+            this.emailListUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            resources.ApplyResources(this.emailListUserControl, "addEmailUserControl");
+            this.emailListUserControl.Name = "addEmailUserControl";
+            this.TempLiteHelp.SetShowHelp(this.emailListUserControl, ((bool)(resources.GetObject("addEmailUserControl.ShowHelp"))));
             // 
             // TempLiteHelp
             // 
@@ -312,7 +312,7 @@ namespace TempLite
         private LoggerProgressBarUserControl loggerProgressBarUserControl;
         private GenerateDocumentUserControl generateDocumentUserControl;
         private System.Windows.Forms.Button ReadLoggerButton;
-        private SendingEmailUserControl emailUserControl;
+        private SendingEmailUserControl sendingEmailUserControl;
         private EmailDoneUserControl emailDoneUserControl;
         private ReadingErrorUserControl readingErrorUserControl;
         private ReadyStateMessageUserControl readyStateMessageUserControl;
@@ -323,7 +323,7 @@ namespace TempLite
         private System.Windows.Forms.Button emailPDF;
         private System.Windows.Forms.Button emailExcel;
         private System.Windows.Forms.Button previewExcel;
-        private EmailListUserControl addEmailUserControl;
+        private EmailListUserControl emailListUserControl;
         private LogUserControl logUserControl;
         private System.Windows.Forms.HelpProvider TempLiteHelp;
         public System.Windows.Forms.Panel bg;
