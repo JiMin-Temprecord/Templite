@@ -135,7 +135,37 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Form\AddEmailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\AddEmailForm.Designer.cs">
+      <DependentUpon>AddEmailForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constant\EmailConstant.cs" />
+    <Compile Include="Form\KeycodeInputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\KeycodeInputForm.Designer.cs">
+      <DependentUpon>KeycodeInputForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ResetConfirmationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ResetConfirmationForm.Designer.cs">
+      <DependentUpon>ResetConfirmationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form\ResetSuccessfulForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\ResetSuccessfulForm.Designer.cs">
+      <DependentUpon>ResetSuccessfulForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form\UserConfirmationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form\UserConfirmationForm.Designer.cs">
+      <DependentUpon>UserConfirmationForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControl\EmailListUserControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -243,18 +273,21 @@
     <Compile Include="UserControl\ReadyStateMessageUserControl.Designer.cs">
       <DependentUpon>ReadyStateMessageUserControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\ResetUserConfirmUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\ResetUserConfirmUserControl.Designer.cs">
-      <DependentUpon>ResetUserConfirmUserControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControl\UserConfirmUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\UserConfirmUserControl.Designer.cs">
-      <DependentUpon>UserConfirmUserControl.cs</DependentUpon>
-    </Compile>
+    <EmbeddedResource Include="Form\AddEmailForm.resx">
+      <DependentUpon>AddEmailForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\KeycodeInputForm.resx">
+      <DependentUpon>KeycodeInputForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ResetConfirmationForm.resx">
+      <DependentUpon>ResetConfirmationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\ResetSuccessfulForm.resx">
+      <DependentUpon>ResetSuccessfulForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form\UserConfirmationForm.resx">
+      <DependentUpon>UserConfirmationForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControl\EmailListUserControl.resx">
       <DependentUpon>EmailListUserControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -306,12 +339,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserControl\ReadyStateMessageUserControl.resx">
       <DependentUpon>ReadyStateMessageUserControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\ResetUserConfirmUserControl.resx">
-      <DependentUpon>ResetUserConfirmUserControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\UserConfirmUserControl.resx">
-      <DependentUpon>UserConfirmUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Json\G4.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

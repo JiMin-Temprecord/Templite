@@ -40,7 +40,7 @@
             this.keycodeLabel.BackColor = System.Drawing.Color.Transparent;
             this.keycodeLabel.Font = new System.Drawing.Font("Myriad Pro Cond", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.keycodeLabel.ForeColor = System.Drawing.Color.White;
-            this.keycodeLabel.Location = new System.Drawing.Point(65, 64);
+            this.keycodeLabel.Location = new System.Drawing.Point(61, 61);
             this.keycodeLabel.Name = "keycodeLabel";
             this.keycodeLabel.Size = new System.Drawing.Size(176, 25);
             this.keycodeLabel.TabIndex = 3;
@@ -48,7 +48,7 @@
             // 
             // emailCancelButton
             // 
-            this.emailCancelButton.BackColor = System.Drawing.Color.Crimson;
+            this.emailCancelButton.BackColor = System.Drawing.Color.Tomato;
             this.emailCancelButton.FlatAppearance.BorderSize = 0;
             this.emailCancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.emailCancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

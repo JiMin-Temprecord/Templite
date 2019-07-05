@@ -15,64 +15,11 @@ namespace UserControls
         {
             InitializeComponent();
         }
-
-        public void AddEmailButton_Click(object sender, EventArgs e)
+        private void EmailListUserControl_VisibleChanged(object sender, EventArgs e)
         {
-            var ownerID = loggerIDTextbox.Text.ToUpper(); //unless we will in the future have case sensitive ids
-            var emailAddress = emailTextbox.Text;
-            var confirmEmailAddress = confirmEmailTextbox.Text;
-            var textFile = Email.path + ownerID + ".txt";
-
-            var isEmailValid = Email.IsValid(emailAddress);
-
-            if (emailTextbox.Text == string.Empty || confirmEmailTextbox.Text == string.Empty)
-            {
-                promptMessage.Text = LogConstant.FieldsEmpty;
-                promptMessage.ForeColor = Color.Red;
-            }
-            else
-            {
-                if (emailAddress != EmailConstant.EmailText && confirmEmailAddress != EmailConstant.ConfirmEmailText)
-                {
-                    if (emailAddress.Equals(confirmEmailAddress))
-                    {
-                        if (isEmailValid)
-                        {
-                            if (File.Exists(textFile) && Email.IsExsist(textFile, emailAddress))
-                            {
-                                promptMessage.Text = LogConstant.EmailAlreadyExists;
-                                promptMessage.ForeColor = Color.Orange;
-                            }
-                            else
-                            {
-                                Email.AddtoTextfile(textFile, emailAddress);
-                                Email.AddtoTextfile(Email.path + EmailConstant.AllEmail, emailAddress + "(" + ownerID + ")");
-                                Log.Write(LogConstant.EmailAddressAdded);
-                                promptMessage.Text = LogConstant.EmailAddressAdded;
-                                promptMessage.ForeColor = Color.Green;
-                            }
-                        }
-                        else
-                        {
-                            promptMessage.ForeColor = Color.Red;
-                            promptMessage.Text = LogConstant.InvalidEmail;
-                        }
-                    }
-                    else
-                    {
-                        promptMessage.ForeColor = Color.Red;
-                        promptMessage.Text = LogConstant.EmailDoNotMatch;
-                    }
-                }
-                else
-                {
-                    Log.Write(LogConstant.AddEmailThrewError);
-                    promptMessage.Text = LogConstant.FieldsEmpty;
-                    promptMessage.ForeColor = Color.Red;
-                }
-            }
+            removeEmailfromList();
+            addEmailtoList();
         }
-        
         public void addEmailtoList()
         {
             string line;
@@ -105,18 +52,6 @@ namespace UserControls
 
                 Email.emailList.Clear();
             }
-        }
-
-        private void EmailListUserControl_VisibleChanged(object sender, EventArgs e)
-        {
-            removeEmailfromList();
-            addEmailtoList();
-        }
-
-        private void addEmailPanel_VisibleChanged(object sender, EventArgs e)
-        {
-            removeEmailfromList();
-            addEmailtoList();
         }
     }
 }

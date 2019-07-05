@@ -2,17 +2,16 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using TempLite;
 using TempLite.Constant;
 
-namespace UserControls
+namespace TempLite
 {
-    public partial class PasswordUserControl : UserControl
+    public partial class KeycodeInputForm : Form
     {
         public bool isFirstCopy = true;
         public bool isReset = false;
 
-        public PasswordUserControl()
+        public KeycodeInputForm()
         {
             InitializeComponent();
         }
@@ -36,6 +35,7 @@ namespace UserControls
         {
             this.Visible = false;
             promptMessage.Text = string.Empty;
+            DialogResult = DialogResult.OK;
 
             if (isReset)
             {
@@ -79,8 +79,45 @@ namespace UserControls
 
                     Email.AddtoTextfile(Email.path + emailFilename, emailAddress);
                 }
-            }
-                ;
+            };
         }
+
+        #region Key Events
+        string firstKeyDown = string.Empty;
+        string secondKeyDown = string.Empty;
+
+        void KeycodeInputForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (firstKeyDown == string.Empty && secondKeyDown == string.Empty)
+                firstKeyDown = e.KeyCode.ToString();
+
+            else if (secondKeyDown == string.Empty)
+                secondKeyDown = e.KeyCode.ToString();
+        }
+
+        void KeycodeInputForm_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode.ToString() == firstKeyDown)
+            {
+                firstKeyDown = string.Empty;
+                secondKeyDown = string.Empty;
+            }
+
+            else if (e.KeyCode.ToString() == secondKeyDown)
+            {
+                secondKeyDown = string.Empty;
+            }
+
+            if (!isReset && firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.E.ToString())
+            {
+                DialogResult = DialogResult.Cancel;
+            }
+            else if (isReset && firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.R.ToString())
+            {
+                DialogResult = DialogResult.Cancel;
+            }
+
+        }
+        #endregion
     }
 }
