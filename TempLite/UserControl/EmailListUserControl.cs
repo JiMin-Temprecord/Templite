@@ -17,31 +17,34 @@ namespace UserControls
         }
         private void EmailListUserControl_VisibleChanged(object sender, EventArgs e)
         {
-            removeEmailfromList();
-            addEmailtoList();
+            removeAllEmailfromList();
+            addAllEmailtoList();
         }
-        public void addEmailtoList()
+        public void addAllEmailtoList()
         {
             string line;
             int y = 45;
             int i = 0;
 
-            using (StreamReader sr = File.OpenText(Email.path + EmailConstant.AllEmail))
+            if (File.Exists(Email.path + EmailConstant.AllEmail))
             {
-                while ((line = sr.ReadLine()) != null)
+                using (StreamReader sr = File.OpenText(Email.path + EmailConstant.AllEmail))
                 {
-                    var listEmailUserControl = new ListEmailUserControl();
-                    listEmailUserControl.emailLabel.Text = line;
-                    listEmailUserControl.Location = new Point(-1, y);
-                    listEmailUserControl.SendToBack();
-                    emailListPanel.Controls.Add(listEmailUserControl);
-                    Email.emailList.Add(listEmailUserControl);
-                    y = y + 45;
-                    i++;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        var listEmailUserControl = new ListEmailUserControl();
+                        listEmailUserControl.emailLabel.Text = line;
+                        listEmailUserControl.Location = new Point(-1, y);
+                        listEmailUserControl.SendToBack();
+                        emailListPanel.Controls.Add(listEmailUserControl);
+                        Email.emailList.Add(listEmailUserControl);
+                        y = y + 45;
+                        i++;
+                    }
                 }
             }
         }
-        public void removeEmailfromList()
+        public void removeAllEmailfromList()
         {         
             if (Email.emailList.Count > 0)
             {

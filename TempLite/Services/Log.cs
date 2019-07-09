@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace TempLite.Services
 {
     public class Log
     {
-        static string path = AppDomain.CurrentDomain.BaseDirectory + "Email\\";
+        public static string  logPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\log.txt";
+
 
         public static void Write(string logMessage)
         {
-            using (StreamWriter sw = File.AppendText("log.txt"))
+            //if (!File.Exists(logPath))
+             //   File.Create(logPath);
+
+            using (StreamWriter sw = File.AppendText(logPath))
             {
                 sw.Write($"{DateTime.Now.ToShortDateString()} {DateTime.Now.ToLongTimeString()}");
                 sw.WriteLine($" : {logMessage}");

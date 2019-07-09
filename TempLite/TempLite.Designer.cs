@@ -39,8 +39,6 @@ namespace TempLite
             this.ReadLoggerButton = new System.Windows.Forms.Button();
             this.readyStateMessageUserControl = new UserControls.ReadyStateMessageUserControl();
             this.readingErrorUserControl = new UserControls.ReadingErrorUserControl();
-            this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
-            this.sendingEmailUserControl = new UserControls.SendingEmailUserControl();
             this.loggerProgressBarUserControl = new UserControls.LoggerProgressBarUserControl();
             this.generateDocumentUserControl = new UserControls.GenerateDocumentUserControl();
             this.readerUserControl = new UserControls.ReaderUserControl();
@@ -54,6 +52,8 @@ namespace TempLite
             this.previewPDF = new System.Windows.Forms.Button();
             this.logUserControl = new UserControls.LogUserControl();
             this.emailListUserControl = new UserControls.EmailListUserControl();
+            this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
+            this.sendingEmailUserControl = new UserControls.SendingEmailUserControl();
             this.TempLiteHelp = new System.Windows.Forms.HelpProvider();
             this.Reading.SuspendLayout();
             this.bg.SuspendLayout();
@@ -136,20 +136,6 @@ namespace TempLite
             this.readingErrorUserControl.BackColor = System.Drawing.Color.White;
             this.readingErrorUserControl.Name = "readingErrorUserControl";
             this.TempLiteHelp.SetShowHelp(this.readingErrorUserControl, ((bool)(resources.GetObject("readingErrorUserControl.ShowHelp"))));
-            // 
-            // emailDoneUserControl
-            // 
-            resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
-            this.emailDoneUserControl.Name = "emailDoneUserControl";
-            this.TempLiteHelp.SetShowHelp(this.emailDoneUserControl, ((bool)(resources.GetObject("emailDoneUserControl.ShowHelp"))));
-            // 
-            // emailUserControl
-            // 
-            this.sendingEmailUserControl.BackColor = System.Drawing.Color.White;
-            resources.ApplyResources(this.sendingEmailUserControl, "emailUserControl");
-            this.sendingEmailUserControl.Name = "emailUserControl";
-            this.TempLiteHelp.SetShowHelp(this.sendingEmailUserControl, ((bool)(resources.GetObject("emailUserControl.ShowHelp"))));
-            this.sendingEmailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
             // 
             // loggerProgressBarUserControl
             // 
@@ -264,13 +250,27 @@ namespace TempLite
             this.logUserControl.Name = "logUserControl";
             this.TempLiteHelp.SetShowHelp(this.logUserControl, ((bool)(resources.GetObject("logUserControl.ShowHelp"))));
             // 
-            // addEmailUserControl
+            // emailListUserControl
             // 
             this.emailListUserControl.BackColor = System.Drawing.Color.White;
             this.emailListUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            resources.ApplyResources(this.emailListUserControl, "addEmailUserControl");
-            this.emailListUserControl.Name = "addEmailUserControl";
-            this.TempLiteHelp.SetShowHelp(this.emailListUserControl, ((bool)(resources.GetObject("addEmailUserControl.ShowHelp"))));
+            resources.ApplyResources(this.emailListUserControl, "emailListUserControl");
+            this.emailListUserControl.Name = "emailListUserControl";
+            this.TempLiteHelp.SetShowHelp(this.emailListUserControl, ((bool)(resources.GetObject("emailListUserControl.ShowHelp"))));
+            // 
+            // emailDoneUserControl
+            // 
+            resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
+            this.emailDoneUserControl.Name = "emailDoneUserControl";
+            this.TempLiteHelp.SetShowHelp(this.emailDoneUserControl, ((bool)(resources.GetObject("emailDoneUserControl.ShowHelp"))));
+            // 
+            // sendingEmailUserControl
+            // 
+            this.sendingEmailUserControl.BackColor = System.Drawing.Color.White;
+            resources.ApplyResources(this.sendingEmailUserControl, "sendingEmailUserControl");
+            this.sendingEmailUserControl.Name = "sendingEmailUserControl";
+            this.TempLiteHelp.SetShowHelp(this.sendingEmailUserControl, ((bool)(resources.GetObject("sendingEmailUserControl.ShowHelp"))));
+            this.sendingEmailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
             // 
             // TempLiteHelp
             // 

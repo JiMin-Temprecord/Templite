@@ -14,9 +14,10 @@ namespace TempLite
     public class Email
     {
         public static List<ListEmailUserControl> emailList { get; set; } = new List<ListEmailUserControl>();
-        public static string path = AppDomain.CurrentDomain.BaseDirectory + "Email\\";
 
-        public void OpenApplication(string serialNumber, string emailID, int file = 2)
+        public static string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\Email\\";
+
+        public void OpenApplication(string serialNumber, string onwerID, int file = 2)
         {
             var PDF = Path.GetTempPath() + serialNumber + ".pdf";
             var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
@@ -32,7 +33,7 @@ namespace TempLite
                     outlookMail.Attachments.Add(PDF);
                 else if (file == 1)
                     outlookMail.Attachments.Add(EXCEL);
-                else
+                else if (file == 2)
                 {
                     outlookMail.Attachments.Add(PDF);
                     outlookMail.Attachments.Add(EXCEL);
@@ -44,9 +45,9 @@ namespace TempLite
                 MessageBox.Show("Unable to Detect Outlook. Please download Outlook and try again.");
             }
         }
-        public void SendAutomatically(string serialNumber, string emailID, int file = 2)
+        public void SendAutomatically(string serialNumber, string ownerID, int file = 2)
         {
-            var message = SetUp(serialNumber, emailID, file);
+            var message = SetUp(serialNumber, ownerID, file);
 
             using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
@@ -57,20 +58,26 @@ namespace TempLite
                 client.Disconnect(true);
             }
         }
-        MimeMessage SetUp(string serialNumber, string emailID, int file = 2)
+        MimeMessage SetUp(string serialNumber, string ownerID, int file = 2)
         {
             var message = new MimeMessage();
             var builder = new BodyBuilder();
             var emailSubject = "Temprecord Logger " + serialNumber;
-
-            var PDF = Path.GetTempPath() + serialNumber + ".pdf";
-            var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
-
+            
             message.From.Add(new MailboxAddress(emailSubject, "temprecordapp@temprecord.com"));
             message.Subject = emailSubject;
+            
+            message = AddSendto(message, ownerID);
+            message = AddAttachments(message, builder, serialNumber, file);
+            message.Body = builder.ToMessageBody();
 
+            return message;
+        }
+        MimeMessage AddSendto( MimeMessage message, string ownerID)
+        {
             string line;
-            using (StreamReader sr = File.OpenText(path + emailID + ".txt"))
+
+            using (StreamReader sr = File.OpenText(path + ownerID + ".txt"))
             {
                 while ((line = sr.ReadLine()) != null)
                 {
@@ -78,6 +85,12 @@ namespace TempLite
                 }
             }
 
+            return message;
+        }
+        MimeMessage AddAttachments(MimeMessage message, BodyBuilder builder, string serialNumber, int file)
+        {
+            var PDF = Path.GetTempPath() + serialNumber + ".pdf";
+            var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
 
             if (file == 2)
             {
@@ -92,7 +105,7 @@ namespace TempLite
             else if (file == 1)
             {
                 if (File.Exists(EXCEL))
-                builder.Attachments.Add(EXCEL);
+                    builder.Attachments.Add(EXCEL);
             }
 
             else if (file == 0)
@@ -100,19 +113,16 @@ namespace TempLite
                 if (File.Exists(PDF))
                     builder.Attachments.Add(PDF);
             }
-
-
-            message.Body = builder.ToMessageBody();
             return message;
         }
-
         public int Count(string ownerID)
         {
             string line;
             int count = 0;
-            if (File.Exists(path + ownerID + ".txt"))
+            var filename = path + ownerID + ".txt";
+            if (File.Exists(filename))
             {
-                using (StreamReader sr = File.OpenText(path + ownerID + ".txt"))
+                using (StreamReader sr = File.OpenText(filename))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -122,18 +132,18 @@ namespace TempLite
             }
             return count;
         }
-        public string GetEmailAddress (string ownerID)
+        public string GetHiddenEmailAddress (string ownerID)
         {
             using (StreamReader sr = File.OpenText(path + ownerID + ".txt"))
             {
                 var firstEmail = sr.ReadLine();
-                Console.WriteLine("EMAIL : " + firstEmail);
+                //Console.WriteLine("EMAIL : " + firstEmail);
                 var start = firstEmail.IndexOf("@");
                 var hiddenEmail = "******" + firstEmail.Substring(start, firstEmail.Length - start);
 
-                var emailCount = Count(ownerID);
-                if (emailCount > 1)
-                    hiddenEmail += " and " + (emailCount - 1) + " other(s) ";
+                var numberOfEmail = Count(ownerID);
+                if (numberOfEmail > 1)
+                    hiddenEmail += " and " + (numberOfEmail - 1) + " other(s) ";
 
                 return hiddenEmail;
             }
@@ -142,7 +152,7 @@ namespace TempLite
         {
             try
             {
-                var emailCheck = new System.Net.Mail.MailAddress(emailAddress);
+                new System.Net.Mail.MailAddress(emailAddress);
                 return true;
             }
             catch
@@ -152,6 +162,9 @@ namespace TempLite
         }
         public static void AddtoTextfile(string textFilename, string Email)
         {
+            if (!File.Exists(textFilename))
+                File.Create(textFilename);
+
             using (StreamWriter sw = File.AppendText(textFilename))
             {
                 sw.WriteLine(Email);
@@ -172,15 +185,12 @@ namespace TempLite
                 return false;
             }
         }
-        public static void Delete (string EmailAddress , bool fromReset = false)
+        public static void Delete(string EmailAddress, bool fromReset = false)
         {
             var start = EmailAddress.IndexOf("(");
             var end = EmailAddress.IndexOf(")");
             var emailAddress = EmailAddress.Substring(0, start);
             var emailFilename = EmailAddress.Substring(start + 1, end - start - 1) + ".txt";
-
-            Console.WriteLine("filename : " + emailFilename);
-            Console.WriteLine("email Address : " + emailAddress);
 
             if (fromReset == false)
             {
@@ -188,8 +198,11 @@ namespace TempLite
                 File.WriteAllLines(path + EmailConstant.AllEmail, newLines);
             }
 
-            var newEmailList = File.ReadAllLines(path + emailFilename).Where(line => line != emailAddress).ToArray();
-            File.WriteAllLines(path + emailFilename, newEmailList);
+            if (File.Exists(path + emailFilename))
+            {
+                var newEmailList = File.ReadAllLines(path + emailFilename).Where(line => line != emailAddress).ToArray();
+                File.WriteAllLines(path + emailFilename, newEmailList);
+            }
         }
     }
 }

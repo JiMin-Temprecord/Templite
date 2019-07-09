@@ -8,15 +8,15 @@ namespace TempLite
 {
     public partial class KeycodeInputForm : Form
     {
-        public bool isFirstCopy = true;
         public bool isReset = false;
+        string accessLevel = string.Empty;
 
         public KeycodeInputForm()
         {
             InitializeComponent();
         }
 
-        private void keycodeTextbox_KeyUp(object sender, KeyEventArgs e)
+        void keycodeTextbox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode.ToString() == Keys.Return.ToString())
             {
@@ -43,11 +43,13 @@ namespace TempLite
                 File.WriteAllText(Email.path + EmailConstant.AllEmail, String.Empty);
                 File.Copy(Email.path + TargetEmail, Email.path + EmailConstant.AllEmail, true);
                 AddDefaultEmailstoList();
+
+                accessLevel = TargetEmail;
             }
 
-            if (isFirstCopy)
+            if (accessLevel != TargetEmail && new FileInfo(Email.path + EmailConstant.AllEmail).Length == 0)
             {
-                isFirstCopy = false;
+                accessLevel = TargetEmail;
                 File.Copy(Email.path + TargetEmail, Email.path + EmailConstant.AllEmail, true);
             }
         }
@@ -55,6 +57,7 @@ namespace TempLite
         void DeleteAllEmailsfromList()
         {
             string line;
+            
             using (StreamReader sr = File.OpenText(Email.path + EmailConstant.AllEmail))
             {
                 while ((line = sr.ReadLine()) != null)
@@ -67,19 +70,21 @@ namespace TempLite
         void AddDefaultEmailstoList()
         {
             string line = string.Empty;
-
-            using (StreamReader sr = File.OpenText(Email.path + EmailConstant.AllEmail))
+            if (accessLevel != string.Empty)
             {
-                while ((line = sr.ReadLine()) != null)
+                using (StreamReader sr = File.OpenText(Email.path + accessLevel))
                 {
-                    var start = line.IndexOf("(");
-                    var end = line.IndexOf(")");
-                    var emailAddress = line.Substring(0, start);
-                    var emailFilename = line.Substring(start + 1, end - start - 1) + ".txt";
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        var start = line.IndexOf("(");
+                        var end = line.IndexOf(")");
+                        var emailAddress = line.Substring(0, start);
+                        var emailFilename = line.Substring(start + 1, end - start - 1) + ".txt";
 
-                    Email.AddtoTextfile(Email.path + emailFilename, emailAddress);
-                }
-            };
+                        Email.AddtoTextfile(Email.path + emailFilename, emailAddress);
+                    }
+                };
+            }
         }
 
         #region Key Events

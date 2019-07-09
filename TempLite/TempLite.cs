@@ -5,11 +5,8 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Windows.Forms;
-using TempLite.Services;
 using TempLite.Constant;
-using UserControls;
-using System.Drawing;
-using System.Collections.Generic;
+using TempLite.Services;
 
 namespace TempLite
 {
@@ -35,12 +32,11 @@ namespace TempLite
 
         bool initalEmailCopy = true;
 
-        string path = AppDomain.CurrentDomain.BaseDirectory + "Email\\";
-
         public TempLite()
         {
             InitializeComponent();
             readerUserControl.Visible = true;
+            CopyEmailFoldertoAppData();
             Log.Write(LogConstant.OpenApplication);
         }
         void TempLite_FormClosed(object sender, FormClosedEventArgs e)
@@ -198,7 +194,6 @@ namespace TempLite
 
             if (generateDocumentUserControl.Visible)
                 documentBW.RunWorkerAsync();
-
         }
 
         void documentBW_DoWork(object sender, DoWorkEventArgs e)
@@ -291,7 +286,7 @@ namespace TempLite
         void sendingEmailBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //instead of the logging the EmailID We need to log the EmailAddress itself, for all email address 
-            emailDoneUserControl.successTextbox.Text = "Sent " + loggerInformation.SerialNumber + " to " + email.GetEmailAddress(loggerInformation.EmailId);
+            emailDoneUserControl.successTextbox.Text = "Sent " + loggerInformation.SerialNumber + " to " + email.GetHiddenEmailAddress(loggerInformation.EmailId);
             Log.Write(LogConstant.EmailSuccessfull + loggerInformation.EmailId);
             loggerUserControl.Visible = false;
             sendingEmailUserControl.Visible = false;
@@ -366,8 +361,8 @@ namespace TempLite
         {
             Log.Write(LogConstant.EmailPDFPreview);
             
-            var emailCount = email.Count(loggerInformation.EmailId);
-            if (emailCount> 0)
+            var numberOfEmail = email.Count(loggerInformation.EmailId);
+            if (numberOfEmail > 0)
             {
                 pdfOnly = true;
                 excelOnly = false;
@@ -399,8 +394,8 @@ namespace TempLite
         {
             Log.Write(LogConstant.EmailExcelPreview);
             
-            var emailCount = email.Count(loggerInformation.EmailId);
-            if (emailCount > 0)
+            var numberOfEmail = email.Count(loggerInformation.EmailId);
+            if (numberOfEmail > 0)
             {
                 pdfOnly = false;
                 excelOnly = true;
@@ -413,7 +408,7 @@ namespace TempLite
                 email.OpenApplication(loggerInformation.SerialNumber, loggerInformation.EmailId, 1);
         }
         #endregion
-        #region Hidden Add Email Feature
+        #region Hidden Add Email Features
 
         string firstKeyDown = string.Empty;
         string secondKeyDown = string.Empty;
@@ -443,12 +438,30 @@ namespace TempLite
             //how do I do this more clearly
             if (loggerProgressBarUserControl.Visible == false && generateDocumentUserControl.Visible == false && sendingEmailUserControl.Visible == false)
             {
-                if (firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.E.ToString()) { AddEmailListPanelVisible(); }
-                else if (firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.R.ToString()) { ResetEmailtoDefault(); }
-                else if (emailListUserControl.Visible && firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.A.ToString()) { AddAddEmailForm(); }
-                else if (emailListUserControl.emailListPanel.Visible && firstKeyDown == Keys.ControlKey.ToString() && e.KeyCode.ToString() == Keys.D.ToString()) { ChangeDeleteButtonVisible(); }
-                else if (firstKeyDown == Keys.ControlKey.ToString() && e.KeyCode.ToString() == Keys.L.ToString() && ReadLoggerButton.Enabled) { ChangeLogListVisible(); }
-                else if (e.KeyCode.ToString() == Keys.Space.ToString() && ReadLoggerButton.Enabled) { ReadLoggerButton_Click(sender, e); }
+                if (firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.E.ToString())
+                {
+                    AddEmailListPanelVisible();
+                }
+                else if (!emailListUserControl.Visible && firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.R.ToString())
+                {
+                    ResetEmailtoDefault();
+                }
+                else if (emailListUserControl.Visible && firstKeyDown == Keys.ControlKey.ToString() && secondKeyDown == Keys.ShiftKey.ToString() && e.KeyCode.ToString() == Keys.A.ToString())
+                {
+                    AddAddEmailForm();
+                }
+                else if (emailListUserControl.emailListPanel.Visible && firstKeyDown == Keys.ControlKey.ToString() && e.KeyCode.ToString() == Keys.D.ToString())
+                {
+                    ChangeDeleteButtonVisible();
+                }
+                else if (firstKeyDown == Keys.ControlKey.ToString() && e.KeyCode.ToString() == Keys.L.ToString() && ReadLoggerButton.Enabled)
+                {
+                    ChangeLogListVisible();
+                }
+                else if (e.KeyCode.ToString() == Keys.Space.ToString() && ReadLoggerButton.Enabled)
+                {
+                    ReadLoggerButton_Click(sender, e);
+                }
             }
         }
 
@@ -456,10 +469,10 @@ namespace TempLite
         {
             var addEmailForm = new AddEmailForm();
             addEmailForm.ShowDialog();
-            emailListUserControl.removeEmailfromList();
-            emailListUserControl.addEmailtoList();
+            emailListUserControl.removeAllEmailfromList();
+            emailListUserControl.addAllEmailtoList();
         }
-        //REDO
+
         void AddEmailListPanelVisible()
         {
             if (initalEmailCopy)
@@ -469,16 +482,13 @@ namespace TempLite
                 keycodeInputForm.isReset = false;
                 var dialogResult = keycodeInputForm.ShowDialog();
 
+                //if promptMessage is empty this means that no error was thrown
                 if (keycodeInputForm.promptMessage.Text == string.Empty && dialogResult != DialogResult.Cancel)
                 {
                     initalEmailCopy = false;
-
-                    emailListUserControl.addEmailtoList();
+                    logUserControl.Visible = false;
                     emailListUserControl.BringToFront();
                     emailListUserControl.Visible = true;
-                    emailListUserControl.emailListPanel.Visible = true;
-                    ReadLoggerButton.Enabled = false;
-                    logUserControl.Visible = false;
                 }
 
                 else if (dialogResult == DialogResult.Cancel)
@@ -488,6 +498,7 @@ namespace TempLite
             }
             else if (emailListUserControl.Visible == false)
             {
+                logUserControl.Visible = false;
                 emailListUserControl.BringToFront();
                 emailListUserControl.Visible = true;
 
@@ -499,7 +510,7 @@ namespace TempLite
                 ChangePreviewPanelEnable(true);
             }
         }
-        //REDO
+
         void ResetEmailtoDefault()
         {
             var keycodeInputForm = new KeycodeInputForm();
@@ -517,8 +528,8 @@ namespace TempLite
                     var resetsuccessfulForm = new ResetSuccessfulForm();
                     resetsuccessfulForm.ShowDialog();
 
-                    emailListUserControl.removeEmailfromList();
-                    emailListUserControl.addEmailtoList();
+                    emailListUserControl.removeAllEmailfromList();
+                    emailListUserControl.addAllEmailtoList();
 
                     resetsuccessfulForm.Dispose();
                 }
@@ -553,7 +564,7 @@ namespace TempLite
                 Log.Write(LogConstant.LogViewOpen);
                 logUserControl.Visible = true;
                 logUserControl.BringToFront();
-                logUserControl.logTextBox.Text = Log.Read("log.txt");
+                logUserControl.logTextBox.Text = Log.Read(Log.logPath);
                 ReadLoggerButton.Visible = false;
                 emailListUserControl.Visible = false;
             }
@@ -578,5 +589,19 @@ namespace TempLite
 
 
         #endregion
+        
+        void CopyEmailFoldertoAppData()
+        {
+            if (!Directory.Exists(Email.path))
+                Directory.CreateDirectory(Email.path);
+
+            var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Email\\");
+
+            foreach (string file in files)
+            {
+                var filename = Path.GetFileName(file);
+                File.Copy(file, Email.path+ filename,true);
+            }
+        }
     }
 }

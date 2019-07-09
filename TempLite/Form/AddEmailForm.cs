@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TempLite.Constant;
 using TempLite.Services;
@@ -18,62 +12,45 @@ namespace TempLite
         public AddEmailForm()
         {
             InitializeComponent();
+            this.Focus();
         }
-
+        
         public void AddEmailButton_Click(object sender, EventArgs e)
         {
             var ownerID = loggerIDTextbox.Text.ToUpper(); //unless we will in the future have case sensitive ids
             var emailAddress = emailTextbox.Text;
             var confirmEmailAddress = confirmEmailTextbox.Text;
             var textFile = Email.path + ownerID + ".txt";
-
             var isEmailValid = Email.IsValid(emailAddress);
 
-            if (emailTextbox.Text == string.Empty || confirmEmailTextbox.Text == string.Empty)
+            if (emailAddress == EmailConstant.EmailText && confirmEmailAddress == EmailConstant.ConfirmEmailText)
             {
-                promptMessage.Text = LogConstant.FieldsEmpty;
-                promptMessage.ForeColor = Color.Red;
+                Log.Write(LogConstant.AddEmailThrewError);
+                changePromptMessage(LogConstant.FieldsEmpty, Color.Tomato);
+            }
+            else if (emailTextbox.Text == string.Empty || confirmEmailTextbox.Text == string.Empty)
+            {
+                changePromptMessage(LogConstant.FieldsEmpty, Color.Tomato);
+            }
+            else if (emailAddress.Equals(confirmEmailAddress) == false)
+            {
+                changePromptMessage(LogConstant.EmailDoNotMatch, Color.Tomato);
+            }
+            else if (isEmailValid == false)
+            {
+                changePromptMessage(LogConstant.InvalidEmail, Color.Tomato);
+
+            }
+            else if (File.Exists(textFile) && Email.IsExsist(textFile, emailAddress))
+            {
+                changePromptMessage(LogConstant.EmailAlreadyExists, Color.Orange);
             }
             else
             {
-                if (emailAddress != EmailConstant.EmailText && confirmEmailAddress != EmailConstant.ConfirmEmailText)
-                {
-                    if (emailAddress.Equals(confirmEmailAddress))
-                    {
-                        if (isEmailValid)
-                        {
-                            if (File.Exists(textFile) && Email.IsExsist(textFile, emailAddress))
-                            {
-                                promptMessage.Text = LogConstant.EmailAlreadyExists;
-                                promptMessage.ForeColor = Color.Orange;
-                            }
-                            else
-                            {
-                                Email.AddtoTextfile(textFile, emailAddress);
-                                Email.AddtoTextfile(Email.path + EmailConstant.AllEmail, emailAddress + "(" + ownerID + ")");
-                                Log.Write(LogConstant.EmailAddressAdded);
-                                promptMessage.Text = LogConstant.EmailAddressAdded;
-                                promptMessage.ForeColor = Color.Green;
-                            }
-                        }
-                        else
-                        {
-                            promptMessage.ForeColor = Color.Tomato;
-                            promptMessage.Text = LogConstant.InvalidEmail;
-                        }
-                    }
-                    else
-                    {
-                        promptMessage.ForeColor = Color.Tomato;
-                        promptMessage.Text = LogConstant.EmailDoNotMatch;
-                    }
-                }
-                else
-                {
-                    Log.Write(LogConstant.AddEmailThrewError);
-                    promptMessage.Text = LogConstant.FieldsEmpty;
-                    promptMessage.ForeColor = Color.Red;
-                }
+                Email.AddtoTextfile(textFile, emailAddress);
+                Email.AddtoTextfile(Email.path + EmailConstant.AllEmail, emailAddress + "(" + ownerID + ")");
+                Log.Write(LogConstant.EmailAddressAdded);
+                changePromptMessage(LogConstant.EmailAddressAdded, Color.Green);
             }
         }
 
@@ -111,6 +88,12 @@ namespace TempLite
 
             else if (secondKeyDown == string.Empty)
                 secondKeyDown = e.KeyCode.ToString();
+        }
+
+        void changePromptMessage (string message, Color color)
+        {
+            promptMessage.Text = message;
+            promptMessage.ForeColor = color;
         }
     }
 }

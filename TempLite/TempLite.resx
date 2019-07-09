@@ -117,14 +117,71 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="&gt;&gt;ReadingTextBox.Name" xml:space="preserve">
+    <value>ReadingTextBox</value>
+  </data>
+  <data name="&gt;&gt;ReadingTextBox.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ReadingTextBox.Parent" xml:space="preserve">
+    <value>Reading</value>
+  </data>
+  <data name="&gt;&gt;ReadingTextBox.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;ReadingProgressBar.Name" xml:space="preserve">
+    <value>ReadingProgressBar</value>
+  </data>
+  <data name="&gt;&gt;ReadingProgressBar.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ProgressBar, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ReadingProgressBar.Parent" xml:space="preserve">
+    <value>Reading</value>
+  </data>
+  <data name="&gt;&gt;ReadingProgressBar.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;ReadingLabel.Name" xml:space="preserve">
+    <value>ReadingLabel</value>
+  </data>
+  <data name="&gt;&gt;ReadingLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;ReadingLabel.Parent" xml:space="preserve">
+    <value>Reading</value>
+  </data>
+  <data name="&gt;&gt;ReadingLabel.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="Reading.Location" type="System.Drawing.Point, System.Drawing">
+    <value>192, 243</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Reading.ShowHelp" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="Reading.Size" type="System.Drawing.Size, System.Drawing">
+    <value>319, 179</value>
+  </data>
+  <data name="Reading.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="Reading.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;Reading.Name" xml:space="preserve">
+    <value>Reading</value>
+  </data>
+  <data name="&gt;&gt;Reading.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="ReadingTextBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>Myriad Pro, 11.25pt</value>
   </data>
   <data name="ReadingTextBox.Location" type="System.Drawing.Point, System.Drawing">
     <value>29, 66</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="ReadingTextBox.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -132,7 +189,7 @@
     <value>17, 17</value>
   </metadata>
   <data name="TempLiteHelp.HelpNamespace" xml:space="preserve">
-    <value>D:\Documents\My Documents\TempLite User Manual for Desktop PCs.htm</value>
+    <value>https://temprecord.com/help/templite/TempLiteHelp.html</value>
   </data>
   <data name="ReadingTextBox.ShowHelp" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -222,26 +279,185 @@
   <data name="&gt;&gt;ReadingLabel.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="Reading.Location" type="System.Drawing.Point, System.Drawing">
-    <value>192, 243</value>
-  </data>
-  <data name="Reading.ShowHelp" type="System.Boolean, mscorlib">
+  <metadata name="ReadLoggerButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
+  </metadata>
+  <metadata name="readyStateMessageUserControl.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="loggerUserControl.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="&gt;&gt;ReadLoggerButton.Name" xml:space="preserve">
+    <value>ReadLoggerButton</value>
   </data>
-  <data name="Reading.Size" type="System.Drawing.Size, System.Drawing">
-    <value>319, 179</value>
+  <data name="&gt;&gt;ReadLoggerButton.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Reading.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;ReadLoggerButton.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;ReadLoggerButton.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;readyStateMessageUserControl.Name" xml:space="preserve">
+    <value>readyStateMessageUserControl</value>
+  </data>
+  <data name="&gt;&gt;readyStateMessageUserControl.Type" xml:space="preserve">
+    <value>UserControls.ReadyStateMessageUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;readyStateMessageUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;readyStateMessageUserControl.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;readingErrorUserControl.Name" xml:space="preserve">
+    <value>readingErrorUserControl</value>
+  </data>
+  <data name="&gt;&gt;readingErrorUserControl.Type" xml:space="preserve">
+    <value>UserControls.ReadingErrorUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;readingErrorUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;readingErrorUserControl.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="&gt;&gt;loggerProgressBarUserControl.Name" xml:space="preserve">
+    <value>loggerProgressBarUserControl</value>
+  </data>
+  <data name="&gt;&gt;loggerProgressBarUserControl.Type" xml:space="preserve">
+    <value>UserControls.LoggerProgressBarUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;loggerProgressBarUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;loggerProgressBarUserControl.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="&gt;&gt;generateDocumentUserControl.Name" xml:space="preserve">
+    <value>generateDocumentUserControl</value>
+  </data>
+  <data name="&gt;&gt;generateDocumentUserControl.Type" xml:space="preserve">
+    <value>UserControls.GenerateDocumentUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;generateDocumentUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;generateDocumentUserControl.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="&gt;&gt;readerUserControl.Name" xml:space="preserve">
+    <value>readerUserControl</value>
+  </data>
+  <data name="&gt;&gt;readerUserControl.Type" xml:space="preserve">
+    <value>UserControls.ReaderUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;readerUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;readerUserControl.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="&gt;&gt;loggerUserControl.Name" xml:space="preserve">
+    <value>loggerUserControl</value>
+  </data>
+  <data name="&gt;&gt;loggerUserControl.Type" xml:space="preserve">
+    <value>UserControls.LoggerUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;loggerUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;loggerUserControl.ZOrder" xml:space="preserve">
     <value>6</value>
   </data>
-  <data name="Reading.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
+  <data name="&gt;&gt;previewPanel.Name" xml:space="preserve">
+    <value>previewPanel</value>
   </data>
-  <data name="&gt;&gt;Reading.Name" xml:space="preserve">
-    <value>Reading</value>
-  </data>
-  <data name="&gt;&gt;Reading.Type" xml:space="preserve">
+  <data name="&gt;&gt;previewPanel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;previewPanel.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;previewPanel.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.Name" xml:space="preserve">
+    <value>logUserControl</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.Type" xml:space="preserve">
+    <value>UserControls.LogUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;logUserControl.ZOrder" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;emailListUserControl.Name" xml:space="preserve">
+    <value>emailListUserControl</value>
+  </data>
+  <data name="&gt;&gt;emailListUserControl.Type" xml:space="preserve">
+    <value>UserControls.EmailListUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;emailListUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;emailListUserControl.ZOrder" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.Name" xml:space="preserve">
+    <value>emailDoneUserControl</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.Type" xml:space="preserve">
+    <value>UserControls.EmailDoneUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.ZOrder" xml:space="preserve">
+    <value>10</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.Name" xml:space="preserve">
+    <value>sendingEmailUserControl</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.Type" xml:space="preserve">
+    <value>UserControls.SendingEmailUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.ZOrder" xml:space="preserve">
+    <value>11</value>
+  </data>
+  <data name="bg.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="bg.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="bg.ShowHelp" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="bg.Size" type="System.Drawing.Size, System.Drawing">
+    <value>709, 761</value>
+  </data>
+  <data name="bg.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="&gt;&gt;bg.Name" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;bg.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;bg.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;bg.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <metadata name="ReadLoggerButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -345,60 +561,6 @@
   <data name="&gt;&gt;readingErrorUserControl.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
-  <data name="emailDoneUserControl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>145, 150</value>
-  </data>
-  <data name="emailDoneUserControl.ShowHelp" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="emailDoneUserControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>425, 350</value>
-  </data>
-  <data name="emailDoneUserControl.TabIndex" type="System.Int32, mscorlib">
-    <value>14</value>
-  </data>
-  <data name="emailDoneUserControl.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;emailDoneUserControl.Name" xml:space="preserve">
-    <value>emailDoneUserControl</value>
-  </data>
-  <data name="&gt;&gt;emailDoneUserControl.Type" xml:space="preserve">
-    <value>UserControls.EmailDoneUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;emailDoneUserControl.Parent" xml:space="preserve">
-    <value>bg</value>
-  </data>
-  <data name="&gt;&gt;emailDoneUserControl.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="emailUserControl.Location" type="System.Drawing.Point, System.Drawing">
-    <value>145, 150</value>
-  </data>
-  <data name="emailUserControl.ShowHelp" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="emailUserControl.Size" type="System.Drawing.Size, System.Drawing">
-    <value>425, 350</value>
-  </data>
-  <data name="emailUserControl.TabIndex" type="System.Int32, mscorlib">
-    <value>13</value>
-  </data>
-  <data name="emailUserControl.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;emailUserControl.Name" xml:space="preserve">
-    <value>emailUserControl</value>
-  </data>
-  <data name="&gt;&gt;emailUserControl.Type" xml:space="preserve">
-    <value>UserControls.EmailUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;emailUserControl.Parent" xml:space="preserve">
-    <value>bg</value>
-  </data>
-  <data name="&gt;&gt;emailUserControl.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <data name="loggerProgressBarUserControl.Location" type="System.Drawing.Point, System.Drawing">
     <value>205, 223</value>
   </data>
@@ -424,7 +586,7 @@
     <value>bg</value>
   </data>
   <data name="&gt;&gt;loggerProgressBarUserControl.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>3</value>
   </data>
   <data name="generateDocumentUserControl.Location" type="System.Drawing.Point, System.Drawing">
     <value>205, 223</value>
@@ -451,7 +613,7 @@
     <value>bg</value>
   </data>
   <data name="&gt;&gt;generateDocumentUserControl.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>4</value>
   </data>
   <data name="readerUserControl.Location" type="System.Drawing.Point, System.Drawing">
     <value>-1, 3</value>
@@ -481,7 +643,7 @@
     <value>bg</value>
   </data>
   <data name="&gt;&gt;readerUserControl.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>5</value>
   </data>
   <metadata name="loggerUserControl.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -514,7 +676,106 @@
     <value>bg</value>
   </data>
   <data name="&gt;&gt;loggerUserControl.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.Name" xml:space="preserve">
+    <value>excelPanel</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.Parent" xml:space="preserve">
+    <value>previewPanel</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;pdfPanel.Name" xml:space="preserve">
+    <value>pdfPanel</value>
+  </data>
+  <data name="&gt;&gt;pdfPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;pdfPanel.Parent" xml:space="preserve">
+    <value>previewPanel</value>
+  </data>
+  <data name="&gt;&gt;pdfPanel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="previewPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="previewPanel.ShowHelp" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="previewPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>709, 761</value>
+  </data>
+  <data name="previewPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>17</value>
+  </data>
+  <data name="previewPanel.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;previewPanel.Name" xml:space="preserve">
+    <value>previewPanel</value>
+  </data>
+  <data name="&gt;&gt;previewPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;previewPanel.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;previewPanel.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;emailExcel.Name" xml:space="preserve">
+    <value>emailExcel</value>
+  </data>
+  <data name="&gt;&gt;emailExcel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;emailExcel.Parent" xml:space="preserve">
+    <value>excelPanel</value>
+  </data>
+  <data name="&gt;&gt;emailExcel.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;previewExcel.Name" xml:space="preserve">
+    <value>previewExcel</value>
+  </data>
+  <data name="&gt;&gt;previewExcel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;previewExcel.Parent" xml:space="preserve">
+    <value>excelPanel</value>
+  </data>
+  <data name="&gt;&gt;previewExcel.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="excelPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>152, 355</value>
+  </data>
+  <data name="excelPanel.ShowHelp" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="excelPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>402, 215</value>
+  </data>
+  <data name="excelPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.Name" xml:space="preserve">
+    <value>excelPanel</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.Parent" xml:space="preserve">
+    <value>previewPanel</value>
+  </data>
+  <data name="&gt;&gt;excelPanel.ZOrder" xml:space="preserve">
+    <value>0</value>
   </data>
   <data name="emailExcel.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
@@ -624,29 +885,56 @@
   <data name="&gt;&gt;previewExcel.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="excelPanel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>152, 355</value>
+  <data name="&gt;&gt;emailPDF.Name" xml:space="preserve">
+    <value>emailPDF</value>
   </data>
-  <data name="excelPanel.ShowHelp" type="System.Boolean, mscorlib">
-    <value>True</value>
+  <data name="&gt;&gt;emailPDF.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="excelPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>402, 215</value>
+  <data name="&gt;&gt;emailPDF.Parent" xml:space="preserve">
+    <value>pdfPanel</value>
   </data>
-  <data name="excelPanel.TabIndex" type="System.Int32, mscorlib">
+  <data name="&gt;&gt;emailPDF.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;previewPDF.Name" xml:space="preserve">
+    <value>previewPDF</value>
+  </data>
+  <data name="&gt;&gt;previewPDF.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;previewPDF.Parent" xml:space="preserve">
+    <value>pdfPanel</value>
+  </data>
+  <data name="&gt;&gt;previewPDF.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="&gt;&gt;excelPanel.Name" xml:space="preserve">
-    <value>excelPanel</value>
+  <data name="pdfPanel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>151, 135</value>
   </data>
-  <data name="&gt;&gt;excelPanel.Type" xml:space="preserve">
+  <data name="pdfPanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="pdfPanel.ShowHelp" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="pdfPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>402, 215</value>
+  </data>
+  <data name="pdfPanel.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;pdfPanel.Name" xml:space="preserve">
+    <value>pdfPanel</value>
+  </data>
+  <data name="&gt;&gt;pdfPanel.Type" xml:space="preserve">
     <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;excelPanel.Parent" xml:space="preserve">
+  <data name="&gt;&gt;pdfPanel.Parent" xml:space="preserve">
     <value>previewPanel</value>
   </data>
-  <data name="&gt;&gt;excelPanel.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="&gt;&gt;pdfPanel.ZOrder" xml:space="preserve">
+    <value>1</value>
   </data>
   <data name="emailPDF.AutoSizeMode" type="System.Windows.Forms.AutoSizeMode, System.Windows.Forms">
     <value>GrowAndShrink</value>
@@ -753,60 +1041,6 @@
   <data name="&gt;&gt;previewPDF.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
-  <data name="pdfPanel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>151, 135</value>
-  </data>
-  <data name="pdfPanel.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="pdfPanel.ShowHelp" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="pdfPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>402, 215</value>
-  </data>
-  <data name="pdfPanel.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;pdfPanel.Name" xml:space="preserve">
-    <value>pdfPanel</value>
-  </data>
-  <data name="&gt;&gt;pdfPanel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;pdfPanel.Parent" xml:space="preserve">
-    <value>previewPanel</value>
-  </data>
-  <data name="&gt;&gt;pdfPanel.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="previewPanel.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="previewPanel.ShowHelp" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="previewPanel.Size" type="System.Drawing.Size, System.Drawing">
-    <value>709, 761</value>
-  </data>
-  <data name="previewPanel.TabIndex" type="System.Int32, mscorlib">
-    <value>17</value>
-  </data>
-  <data name="previewPanel.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;previewPanel.Name" xml:space="preserve">
-    <value>previewPanel</value>
-  </data>
-  <data name="&gt;&gt;previewPanel.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;previewPanel.Parent" xml:space="preserve">
-    <value>bg</value>
-  </data>
-  <data name="&gt;&gt;previewPanel.ZOrder" xml:space="preserve">
-    <value>9</value>
-  </data>
   <data name="logUserControl.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
@@ -835,67 +1069,94 @@
     <value>bg</value>
   </data>
   <data name="&gt;&gt;logUserControl.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>8</value>
   </data>
-  <data name="addEmailUserControl.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="emailListUserControl.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
-  <data name="addEmailUserControl.ShowHelp" type="System.Boolean, mscorlib">
+  <data name="emailListUserControl.ShowHelp" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="addEmailUserControl.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="emailListUserControl.Size" type="System.Drawing.Size, System.Drawing">
     <value>710, 760</value>
   </data>
-  <data name="addEmailUserControl.TabIndex" type="System.Int32, mscorlib">
+  <data name="emailListUserControl.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
   </data>
-  <data name="addEmailUserControl.Visible" type="System.Boolean, mscorlib">
+  <data name="emailListUserControl.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
-  <data name="&gt;&gt;addEmailUserControl.Name" xml:space="preserve">
-    <value>addEmailUserControl</value>
+  <data name="&gt;&gt;emailListUserControl.Name" xml:space="preserve">
+    <value>emailListUserControl</value>
   </data>
-  <data name="&gt;&gt;addEmailUserControl.Type" xml:space="preserve">
-    <value>UserControls.AddEmailUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  <data name="&gt;&gt;emailListUserControl.Type" xml:space="preserve">
+    <value>UserControls.EmailListUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
   </data>
-  <data name="&gt;&gt;addEmailUserControl.Parent" xml:space="preserve">
+  <data name="&gt;&gt;emailListUserControl.Parent" xml:space="preserve">
     <value>bg</value>
   </data>
-  <data name="&gt;&gt;addEmailUserControl.ZOrder" xml:space="preserve">
-    <value>11</value>
+  <data name="&gt;&gt;emailListUserControl.ZOrder" xml:space="preserve">
+    <value>9</value>
   </data>
-  <data name="bg.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
+  <data name="emailDoneUserControl.Location" type="System.Drawing.Point, System.Drawing">
+    <value>145, 150</value>
   </data>
-  <data name="bg.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="bg.ShowHelp" type="System.Boolean, mscorlib">
+  <data name="emailDoneUserControl.ShowHelp" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="bg.Size" type="System.Drawing.Size, System.Drawing">
-    <value>709, 761</value>
+  <data name="emailDoneUserControl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>425, 350</value>
   </data>
-  <data name="bg.TabIndex" type="System.Int32, mscorlib">
-    <value>12</value>
+  <data name="emailDoneUserControl.TabIndex" type="System.Int32, mscorlib">
+    <value>14</value>
   </data>
-  <data name="&gt;&gt;bg.Name" xml:space="preserve">
+  <data name="emailDoneUserControl.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.Name" xml:space="preserve">
+    <value>emailDoneUserControl</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.Type" xml:space="preserve">
+    <value>UserControls.EmailDoneUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;emailDoneUserControl.Parent" xml:space="preserve">
     <value>bg</value>
   </data>
-  <data name="&gt;&gt;bg.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="&gt;&gt;emailDoneUserControl.ZOrder" xml:space="preserve">
+    <value>10</value>
   </data>
-  <data name="&gt;&gt;bg.Parent" xml:space="preserve">
-    <value>$this</value>
+  <data name="sendingEmailUserControl.Location" type="System.Drawing.Point, System.Drawing">
+    <value>145, 150</value>
   </data>
-  <data name="&gt;&gt;bg.ZOrder" xml:space="preserve">
-    <value>0</value>
+  <data name="sendingEmailUserControl.ShowHelp" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="sendingEmailUserControl.Size" type="System.Drawing.Size, System.Drawing">
+    <value>425, 350</value>
+  </data>
+  <data name="sendingEmailUserControl.TabIndex" type="System.Int32, mscorlib">
+    <value>13</value>
+  </data>
+  <data name="sendingEmailUserControl.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.Name" xml:space="preserve">
+    <value>sendingEmailUserControl</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.Type" xml:space="preserve">
+    <value>UserControls.SendingEmailUserControl, TempLite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.Parent" xml:space="preserve">
+    <value>bg</value>
+  </data>
+  <data name="&gt;&gt;sendingEmailUserControl.ZOrder" xml:space="preserve">
+    <value>11</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>25</value>
+    <value>113</value>
   </metadata>
   <data name="$this.BackgroundImageLayout" type="System.Windows.Forms.ImageLayout, System.Windows.Forms">
     <value>None</value>

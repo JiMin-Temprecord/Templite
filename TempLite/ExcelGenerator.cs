@@ -44,7 +44,6 @@ namespace TempLite
                 workSheet.Cells[12, 5].Value = DocumentLabelConstant.WithinLimit;
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-
             }
             else
             {
