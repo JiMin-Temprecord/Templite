@@ -330,17 +330,17 @@ namespace TempLite
             var dateColumn = 20;
             var timeColumn = 30;
 
-            var columnStart = 85;
+            var columnStart = 75;
             var currentColumn = columnStart;
             var maxColumnValue = 650;
-            var columnIncrement = 45;
+            var columnIncrement = 35;
 
             var rowStart = 65;
             var row = rowStart;
-            var rowIncrement = 16;
+            var rowIncrement = 12;
 
-            var font = new XFont("Roboto", 10, XFontStyle.Regular);
-            var boldFont = new XFont("Roboto", 10, XFontStyle.Bold);
+            var font = new XFont("Roboto", 8, XFontStyle.Regular);
+            var boldFont = new XFont("Roboto", 8, XFontStyle.Bold);
             var tempPen = new XPen(XColors.Black, 1);
             var humPen = new XPen(XColors.Gray, 1);
 
