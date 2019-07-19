@@ -37,27 +37,27 @@ namespace TempLite
             var imageRange = workSheet.Cells[5, 5];
             if (channelOne.OutsideLimits == 0 && channelTwo.OutsideLimits == 0)
             {
-                var tickImage = Image.FromFile(path + DocumentLabelConstant.WithinLimitImage);
-                var setPosition = workSheet.Drawings.AddPicture(DocumentLabelConstant.WithinLimit, tickImage);
+                var tickImage = Image.FromFile(path + LabelConstant.WithinLimitImage);
+                var setPosition = workSheet.Drawings.AddPicture(LabelConstant.WithinLimit, tickImage);
                 setPosition.SetSize(145, 128);
                 setPosition.SetPosition(80, 275);
-                workSheet.Cells[12, 5].Value = DocumentLabelConstant.WithinLimit;
+                workSheet.Cells[12, 5].Value = LabelConstant.WithinLimit;
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
             else
             {
-                var warningImage = Image.FromFile(path + DocumentLabelConstant.LimitsExceededImage);
-                var setPosition = workSheet.Drawings.AddPicture(DocumentLabelConstant.LimitsExceeded, warningImage);
+                var warningImage = Image.FromFile(path + LabelConstant.LimitsExceededImage);
+                var setPosition = workSheet.Drawings.AddPicture(LabelConstant.LimitsExceeded, warningImage);
                 setPosition.SetSize(145, 128);
                 setPosition.SetPosition(80, 275);
-                workSheet.Cells[12, 5].Value = DocumentLabelConstant.LimitsExceeded;
+                workSheet.Cells[12, 5].Value = LabelConstant.LimitsExceeded;
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
 
             var logoRange = workSheet.Cells[1, 3];
-            var logoImage = Image.FromFile(path + DocumentLabelConstant.LogoIcon);
+            var logoImage = Image.FromFile(path + LabelConstant.LogoIcon);
             var setLogoPosition = workSheet.Drawings.AddPicture(string.Empty, logoImage);
             setLogoPosition.SetSize(103, 63);
             setLogoPosition.SetPosition(10, 130);
@@ -71,40 +71,40 @@ namespace TempLite
             workSheet.Cells[4,1,4,5].Style.Border.Top.Color.SetColor(Color.Blue);
 
             workSheet.Cells[1, 5].Value = DateTime.UtcNow.ToString("dd/MM/yyyy HH:mm:sss UTC");
-            workSheet.Cells[2, 1].Value = DocumentLabelConstant.Title;
-            workSheet.Cells[2, 5].Value = DocumentLabelConstant.SerialNumber + pdfVariables.SerialNumber;
+            workSheet.Cells[2, 1].Value = LabelConstant.Title;
+            workSheet.Cells[2, 5].Value = LabelConstant.SerialNumber + pdfVariables.SerialNumber;
 
-            FillCells(workSheet, DocumentLabelConstant.Model, loggerInformation.LoggerName);
-            FillCells(workSheet, DocumentLabelConstant.LoggerState, pdfVariables.LoggerState);
-            FillCells(workSheet, DocumentLabelConstant.Battery, pdfVariables.BatteryPercentage);
-            FillCells(workSheet, DocumentLabelConstant.SamplePeriod, pdfVariables.SameplePeriod);
-            FillCells(workSheet, DocumentLabelConstant.StartDelay, pdfVariables.StartDelay);
-            FillCells(workSheet, DocumentLabelConstant.FirstSample, pdfVariables.FirstSample);
-            FillCells(workSheet, DocumentLabelConstant.LastSample, pdfVariables.LastSample);
-            FillCells(workSheet, DocumentLabelConstant.RecordedSample, pdfVariables.RecordedSamples.ToString());
-            FillCells(workSheet, DocumentLabelConstant.TagsPlaced, pdfVariables.TagsPlaced.ToString());
+            FillCells(workSheet, LabelConstant.Model, loggerInformation.LoggerName);
+            FillCells(workSheet, LabelConstant.LoggerState, pdfVariables.LoggerState);
+            FillCells(workSheet, LabelConstant.Battery, pdfVariables.BatteryPercentage);
+            FillCells(workSheet, LabelConstant.SamplePeriod, pdfVariables.SameplePeriod);
+            FillCells(workSheet, LabelConstant.StartDelay, pdfVariables.StartDelay);
+            FillCells(workSheet, LabelConstant.FirstSample, pdfVariables.FirstSample);
+            FillCells(workSheet, LabelConstant.LastSample, pdfVariables.LastSample);
+            FillCells(workSheet, LabelConstant.RecordedSample, pdfVariables.RecordedSamples.ToString());
+            FillCells(workSheet, LabelConstant.TagsPlaced, pdfVariables.TagsPlaced.ToString());
             row++;
 
-            FillCells(workSheet, DocumentLabelConstant.Channel, DocumentLabelConstant.ChannelOneLabel);
-            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = DocumentLabelConstant.ChannelTwoLabel;
+            FillCells(workSheet, LabelConstant.Channel, LabelConstant.ChannelOneLabel);
+            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = LabelConstant.ChannelTwoLabel;
             row++;
 
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.PresentLowerLimit, c => c.PresetLowerLimit.ToString("N2"));
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.Mean, c => c.Mean.ToString("N2"));
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.MKT, c => c.MKT_C.ToString("N2"));
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.Max, c => c.Max.ToString("N2"));
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.Min, c => c.Min.ToString("N2"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.SampleWithinLimits, c => c.WithinLimits.ToString("N1"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.TimeWithinLimits, c => c.TimeWithinLimits);
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.SampleOutofLimits, c => c.OutsideLimits.ToString("N1"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.TimeOutOfLimits, c => c.TimeOutLimits);
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.SampleAboveLimit, c => c.AboveLimits.ToString("N1"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.TimeAboveLimit, c => c.TimeAboveLimits);
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.SampleBelowLimit, c => c.BelowLimits.ToString("N1"));
-            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, DocumentLabelConstant.TimeBelowLimit, c => c.TimeBelowLimits);
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentLowerLimit, c => c.PresetLowerLimit.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Mean, c => c.Mean.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.MKT, c => c.MKT_C.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Max, c => c.Max.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Min, c => c.Min.ToString("N2"));
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleWithinLimits, c => c.WithinLimits.ToString("N1"));
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.TimeWithinLimits, c => c.TimeWithinLimits);
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleOutofLimits, c => c.OutsideLimits.ToString("N1"));
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.TimeOutOfLimits, c => c.TimeOutLimits);
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleAboveLimit, c => c.AboveLimits.ToString("N1"));
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.TimeAboveLimit, c => c.TimeAboveLimits);
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleBelowLimit, c => c.BelowLimits.ToString("N1"));
+            FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.TimeBelowLimit, c => c.TimeBelowLimits);
 
-            FillCells(workSheet, DocumentLabelConstant.UserComment, string.Empty);
+            FillCells(workSheet, LabelConstant.UserComment, string.Empty);
 
             if (pdfVariables.UserData.Length > 120)
             {
@@ -120,8 +120,8 @@ namespace TempLite
             }
 
             row = 50;
-            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = DocumentLabelConstant.ChannelTwoLabel;
-            FillCells(workSheet, DocumentLabelConstant.DateTime, DocumentLabelConstant.ChannelOneLabel);
+            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = LabelConstant.ChannelTwoLabel;
+            FillCells(workSheet, LabelConstant.DateTime, LabelConstant.ChannelOneLabel);
             row++;
 
             var startRange = row;
@@ -159,7 +159,7 @@ namespace TempLite
             worksheet.Cells[row, 1].Value = label;
             worksheet.Cells[row, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
             worksheet.Cells[row, 2].Value = getString(channelOne) + channelOne.Unit;
-            if (channelTwoEnabled && label!=DocumentLabelConstant.MKT)
+            if (channelTwoEnabled && label!=LabelConstant.MKT)
             {
                 worksheet.Cells[row, 3].Value = getString(channelTwo) + channelTwo.Unit;
             }
@@ -193,10 +193,10 @@ namespace TempLite
             {
                 var ySeries2 = worksheet.Cells[start, 3, end - 1, 3];
                 graph.Series.Add(ySeries2, xSeries);
-                graph.Series[1].Header = DocumentLabelConstant.ChannelTwoLabel + channelTwo.Unit;
+                graph.Series[1].Header = LabelConstant.ChannelTwoLabel + channelTwo.Unit;
             }
 
-            graph.Series[0].Header = DocumentLabelConstant.ChannelOneLabel + channelOne.Unit;
+            graph.Series[0].Header = LabelConstant.ChannelOneLabel + channelOne.Unit;
         }
     }
 }

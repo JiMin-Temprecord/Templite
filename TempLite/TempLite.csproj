@@ -13,7 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <TargetFrameworkProfile />
-    <PublishUrl>C:\Users\JiMin\AppData\Local\Temprecord\TempLite\</PublishUrl>
+    <PublishUrl>D:\Projects\TempLite\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -72,6 +72,7 @@
   <PropertyGroup>
     <StartupObject>TempLite.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup />
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
@@ -175,7 +176,7 @@
       <DependentUpon>EmailListUserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="AddressSection.cs" />
-    <Compile Include="Constant\DocumentLabelConstant.cs" />
+    <Compile Include="Constant\LabelConstant.cs" />
     <Compile Include="Constant\LogConstant.cs" />
     <Compile Include="LoggerInformation\ChannelConfig.cs" />
     <Compile Include="HexFileDecoder.cs" />
@@ -328,6 +329,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Json\MonT.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Json\MonT2.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

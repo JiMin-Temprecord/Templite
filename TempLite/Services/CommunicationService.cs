@@ -14,6 +14,7 @@ namespace TempLite.Services
         bool readFull = true;
         readonly int maxlenreading = 58;
         List<byte> recievemsg;
+        bool MonT2Overflown = false;
 
         public void FindLogger(SerialPort serialPort)
         {
@@ -74,8 +75,8 @@ namespace TempLite.Services
                         currentAddress.LengthLSB = (byte)(length & 0xff);
                     }
 
-                    ReaderAvailable = WriteBytes(new ReadLoggerByteWritter(currentAddress), serialPort);
-                    readFull = ReadBytesReadLogger(serialPort, currentAddress, Hexes);
+                    ReaderAvailable = WriteBytes(new ReadLoggerByteWritter(currentAddress, loggerInformation.LoggerType), serialPort);
+                    readFull = ReadBytesReadLogger(serialPort, loggerInformation.LoggerType, currentAddress, Hexes);
 
                     if (readFull == true)
                     {
@@ -136,7 +137,7 @@ namespace TempLite.Services
             {
                 msg = msg.Append(recievemsg[i].ToString("x02"));
             }
-            //Console.WriteLine("MSG : " + msg);
+            Console.WriteLine("MSG : " + msg);
             return msg;
         }
 
@@ -147,11 +148,24 @@ namespace TempLite.Services
         }
         void SetLoggerInformation(List<byte> messageReceived, LoggerInformation loggerInformation)
         {
-            byte[] serial = { messageReceived[5], messageReceived[6], messageReceived[7], messageReceived[8] };
-            loggerInformation.SerialNumber = GetSerialnumber(serial);
+            byte[] serial;
+            MonT2Overflown = false;
 
             switch (messageReceived[2])
             {
+                case 1:
+                    loggerInformation.LoggerName = "Mon T2";
+                    loggerInformation.LoggerType = 1;
+                    loggerInformation.JsonFile = "MonT2.json";
+                    loggerInformation.MaxMemory = 0x08;                                          //MON-T2
+                    loggerInformation.MemoryStart = new int[] { 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 }; //MON-T2
+                    loggerInformation.MemoryMax = new int[] { 0x0000, 0x0074, 0x0200, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x8000 };    //MON-T2
+                    
+                    loggerInformation.SerialNumber = GetMonT2Serialnumber(messageReceived);
+
+                    if ((recievemsg[23] >> 3 & 1) == 0)
+                        MonT2Overflown = true;
+                    break;
                 case 3:
                     loggerInformation.LoggerName = "Mon T";
                     loggerInformation.LoggerType = 3;
@@ -162,6 +176,10 @@ namespace TempLite.Services
                     loggerInformation.MemoryMax = new int[] { 0x2000, 0x0100, 0x0000, 0x0000, 0x2000 };    //MON-T
                     loggerInformation.RequestMemoryStartPointer = 3;
                     loggerInformation.RequestMemoryMaxPointer = 1;
+
+                    serial = new byte[] { messageReceived[5], messageReceived[6], messageReceived[7], messageReceived[8] };
+                    loggerInformation.SerialNumber = GetSerialnumber(serial);
+
                     break;
 
                 case 6:
@@ -174,6 +192,10 @@ namespace TempLite.Services
                     loggerInformation.MemoryMax = new int[] { 0x353C, 0x0100, 0x0000, 0x0000, 0x8000 };    //G4
                     loggerInformation.RequestMemoryStartPointer = 3;
                     loggerInformation.RequestMemoryMaxPointer = 1;
+
+                    serial = new byte[] { messageReceived[5], messageReceived[6], messageReceived[7], messageReceived[8] };
+                    loggerInformation.SerialNumber = GetSerialnumber(serial);
+
                     break;
             }
         }
@@ -190,14 +212,22 @@ namespace TempLite.Services
 
             if (msg.Length > 8)
             {
-                hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
-                var memoryAddress = (recievemsg[loggerInformation.MemoryHeaderPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.MemoryHeaderPointer] & 0xFF);
-                var memoryAddMSB = recievemsg[loggerInformation.MemoryHeaderPointer + 1];
-                var memoryAddLSB = recievemsg[loggerInformation.MemoryHeaderPointer];
-                var lengthMSB = (byte)((length >> 8) & 0xFF);
-                var lengthLSB = (byte)(length & 0xFF);
+                if (loggerInformation.LoggerType == 1)
+                {
+                    hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
+                    return new AddressSection(0, 0, 1, 0x00, 0x00, 0);
+                }
+                else
+                {
+                    hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
+                    var memoryAddress = (recievemsg[loggerInformation.MemoryHeaderPointer + 1] & 0xFF) << 8 | (recievemsg[loggerInformation.MemoryHeaderPointer] & 0xFF);
+                    var memoryAddMSB = recievemsg[loggerInformation.MemoryHeaderPointer + 1];
+                    var memoryAddLSB = recievemsg[loggerInformation.MemoryHeaderPointer];
+                    var lengthMSB = (byte)((length >> 8) & 0xFF);
+                    var lengthLSB = (byte)(length & 0xFF);
 
-                return new AddressSection(lengthLSB, lengthMSB, 0, memoryAddLSB, memoryAddMSB, memoryAddress);
+                    return new AddressSection(lengthLSB, lengthMSB, 0, memoryAddLSB, memoryAddMSB, memoryAddress);
+                }
             }
 
             return null;
@@ -207,10 +237,17 @@ namespace TempLite.Services
             var msg = ReadBytes(serialPort);
             length = maxlenreading;
 
-            if (msg.Length > 8)
+            if ((recievemsg.Count > 8) && (recievemsg[0] == 0x00))
             {
                 switch (loggerInformation.LoggerType)
                 {
+                    //MonT2
+                    case 1:
+                        loggerInformation.MemoryStart[8] = 0x0000;
+                        loggerInformation.MemoryMax[8] = ((recievemsg[13] << 8 | (recievemsg[12])) * 2);
+                        if (MonT2Overflown)
+                            loggerInformation.MemoryMax[8] = 0x81c0;
+                        break;
                     //MonT
                     case 3:
                         loggerInformation.MemoryStart[0] = 0x0000;
@@ -243,7 +280,7 @@ namespace TempLite.Services
                 currentAddress.LengthLSB = (byte)(length & 0xff);
             }
         }
-        bool ReadBytesReadLogger(SerialPort serialPort, AddressSection currentAddress, List<Hex> Hexes)
+        bool ReadBytesReadLogger(SerialPort serialPort, int loggerType, AddressSection currentAddress, List<Hex> Hexes)
         {
             length = maxlenreading;
             var msg = ReadBytes(serialPort);
@@ -254,14 +291,24 @@ namespace TempLite.Services
                 var finalmsg = string.Empty;
 
                 if (msg.Length > 124)
-                    finalmsg = msg.ToString(2, 116);
-
-                else if (msg.Length < (currentAddress.LengthLSB*2)+6 && currentAddress.MemoryNumber == 4)
+                {
+                    if (loggerType == 1)
+                        finalmsg = msg.ToString(12, 116);
+                    else
+                    {
+                        finalmsg = msg.ToString(2, 116);
+                    }
+                }
+                else if (msg.Length < (currentAddress.LengthLSB * 2) + 6 && currentAddress.MemoryNumber == 4)
                     return false;
 
                 else
-                    finalmsg = msg.ToString(2, msg.Length - 8);
-
+                {
+                    if (loggerType == 1)
+                        finalmsg = msg.ToString(12, msg.Length - 8);
+                    else
+                        finalmsg = msg.ToString(2, msg.Length - 8);
+                }
                 Hexes.Add(new Hex(addressRead, finalmsg));
             }
 
@@ -273,6 +320,11 @@ namespace TempLite.Services
         {
             var sendMessage = new byte[11];
             sendMessage = byteWriter.WriteBytes(sendMessage);
+
+            Console.Write("SEND : ");
+            for (int i = 0; i < sendMessage.Length; i++)
+                Console.Write(sendMessage[i].ToString("x02") + "-");
+            Console.WriteLine("");
 
             try
             {
@@ -440,9 +492,20 @@ namespace TempLite.Services
         }
         #endregion
 
+        string GetMonT2Serialnumber (List<byte> msg)
+        {
+            var serialNumber = string.Empty;
+
+            for(int i = 8; i < 18; i++)
+            {
+               serialNumber += Convert.ToChar(msg[i]);
+            }
+
+            return serialNumber;
+        }
         string GetSerialnumber(byte[] msg)
         {
-            var serialnumber = "";
+            var serialnumber = string.Empty;
 
             if ((msg[3] & 0xF0) == 0x50)
             {
