@@ -9,9 +9,10 @@ namespace TempLite
 {
     public class HexFileDecoder
     {
-        string loggerState;
-        string batteryPercentage;
-        string userData;
+        string loggerName = string.Empty;
+        string loggerState = string.Empty;
+        string batteryPercentage = string.Empty;
+        string userData = string.Empty;
         string emailID =  string.Empty;
 
         bool loopOverwrite = false;
@@ -92,6 +93,7 @@ namespace TempLite
 
             if (loggerInformation.LoggerName == DecodeConstant.G4)
             {
+                loggerName = "G4";
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
                 emailID = ReadStringFromJObject(jsonObject, DecodeConstant.EmailID);
@@ -120,6 +122,7 @@ namespace TempLite
 
             if (loggerInformation.LoggerName == DecodeConstant.MonT)
             {
+                loggerName = "MonT";
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
                 userData = ReadStringFromJObject(jsonObject, DecodeConstant.UserData);
@@ -148,12 +151,13 @@ namespace TempLite
 
             if (loggerInformation.LoggerName == DecodeConstant.MonT2)
             {
+                loggerName = ReadStringFromJObject(jsonObject, DecodeConstant.MonT2Model);
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 ch1Enabled = ReadBoolFromJObject(jsonObject, DecodeConstant.ChannelOneEnable);
                 if(ch1Enabled) sensorNumber++;
                 ch2Enabled = ReadBoolFromJObject(jsonObject, DecodeConstant.ChannelTwoEnable);
                 if (ch2Enabled) sensorNumber++;
-                userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
+                userDataLength = 128;
                 userData = ReadStringFromJObject(jsonObject, DecodeConstant.UserData);
                 loggerState = ReadStringFromJObject(jsonObject, DecodeConstant.LoggerState);
                 fahrenheit = ReadBoolFromJObject(jsonObject, DecodeConstant.IsFahrenhiet);
@@ -183,6 +187,7 @@ namespace TempLite
             ReadIntoJsonFileAndSetupDecoder();
 
             var loggerVariable = new LoggerVariables();
+            loggerInformation.LoggerName = loggerName;
             loggerVariable.RecordedSamples = recordedSamples;
             loggerVariable.SerialNumber = serialNumber;
             loggerVariable.LoggerState = loggerState;
@@ -193,9 +198,7 @@ namespace TempLite
             loggerVariable.LastSample = UNIXtoUTC(timeAtFirstSameple);
             loggerVariable.TagsPlaced = tagNumbers;
             loggerVariable.TotalTrip = totalUses;
-            loggerVariable.UserData = userData.Substring(0, userDataLength);
-
-            Console.WriteLine("FIRST SAMPLE : " + timeAtFirstSameple);
+            loggerVariable.UserData = userData.Substring(0,userDataLength);
 
             loggerInformation.EmailId = emailID;
 
@@ -253,13 +256,14 @@ namespace TempLite
             if (Data.Count > 0)
                 Channel.Data = Data[i];
 
-            if (sensorType[i] == 0 || sensorType[i] == 6)
+            if (loggerInformation.LoggerType == 1 && i == 1)
             {
-                if (fahrenheit)
-                    Channel.Unit = DecodeConstant.Farenhiet;
-
-                else
-                    Channel.Unit = DecodeConstant.Celcius;
+                Channel.Unit = DecodeConstant.Percentage;
+            }
+            else if (sensorType[i] == 0 || sensorType[i] == 6)
+            {
+                if (fahrenheit) Channel.Unit = DecodeConstant.Farenhiet;
+                else Channel.Unit = DecodeConstant.Celcius;
             }
             else
             {
@@ -550,6 +554,9 @@ namespace TempLite
 
                 case "*Logger_State":
                     return LoggerState(decodeByte);
+
+                case "MonT2_Model":
+                    return MonT2Model(decodeByte);
 
                 case "MonT2_Limit_Convert":
                     return MonT2LimitConvert(decodeByte);
@@ -905,7 +912,7 @@ namespace TempLite
         }
         string LoggerState(byte[] decodeByte)
         {
-            if (loggerInformation.LoggerType == 1)
+            if (loggerInformation.LoggerType == 1) // MonT2
             {
                 switch (decodeByte[0])
                 {
@@ -951,6 +958,40 @@ namespace TempLite
             double Limit = ((((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)) / 10);
             return Limit.ToString();
         }
+
+        string MonT2Model(byte[] decodeByte)
+        {
+            switch (decodeByte[0])
+            {
+                case 1:
+                    return "MonT2 Plain";
+                case 2:
+                    return"MonT2 Plain USB";
+                case 3:
+                    return "MonT2 Plain RH USB";
+                case 4:
+                    return "MonT2 LCD";
+                case 5:
+                    return "MonT2 LCD USB";
+                case 6:
+                    return "MonT2 LCD RH USB";
+                case 7:
+                    return "MonT2 PDF";
+                case 8:
+                    return "MonT2 RH PDF";
+                case 9:
+                    return "MonT2 LCD PDF";
+                case 10:
+                    return "MonT2 LCD RH PDF";
+                case 11:
+                    return "MonT2 Plain RH";
+                case 12:
+                    return "MonT2 LCD RH";
+                default:
+                    return "Unknown";
+            }
+        }
+
         string MonT2SampleNum(byte[] decodeByte)
         {
             int sampleNumber = ((((decodeByte[3]) & 0xFFFFFF) << 24) | (((decodeByte[2]) & 0xFFFF) << 16) | (((decodeByte[1]) & 0xFF) << 8) | (decodeByte[0] & 0xFF));
@@ -1041,7 +1082,7 @@ namespace TempLite
                 Data.Add(ch1List);
                 Data.Add(ch2List);
                 Tag = tagList;
-                
+                recordedSamples /= 2;
                 FinalizeStatistics(0);
                 FinalizeStatistics(1);
             }
@@ -1199,7 +1240,6 @@ namespace TempLite
                     UserDataString += Convert.ToChar(decodeByte[i]);
                 }
             }
-
             return UserDataString;
         }
         string TimeFirstSampleMonT(byte[] decodeByte)
@@ -1217,15 +1257,19 @@ namespace TempLite
         }
         string TimeFirstSampleMonT2(byte[] decodeByte)
         {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
             if (decodeByte[0] == (byte)0xFF && decodeByte[1] == (byte)0xFF && decodeByte[2] == (byte)0xFF && decodeByte[3] == (byte)0xFF && decodeByte[4] == (byte)0xFF && decodeByte[5] == (byte)0xFF)
             {
-                return string.Empty;
+                return "0";
             }
             else
             {
                 int year = (decodeByte[0] >> 1) + 2000;
                 int month = (((decodeByte[1] & 0xff) >> 4) - 1);
-                DateTime dateTime = new DateTime(year, month, decodeByte[2], decodeByte[3], decodeByte[4], decodeByte[5]);
+                var dateTime = new DateTime(year, month, decodeByte[2], decodeByte[3], decodeByte[4], decodeByte[5]);
+
+                Console.WriteLine("date time : " + dateTime);
 
                 if (!notOverflown && loopOverwrite)
                 {
@@ -1251,13 +1295,13 @@ namespace TempLite
                         var date = dateTime.AddSeconds(seconds);
                         date = date.AddSeconds(startDelay);
                         mont2Samples = 16384;
-                        return (date.Ticks/ 10000000).ToString();
+                        return (date - epoch).TotalSeconds.ToString();
                     }
                 }
                 else
                 {
-                    var timespan = (dateTime.AddSeconds(startDelay)).Ticks/ 1000000000;
-                    return timespan.ToString();
+                    dateTime = dateTime.AddSeconds(startDelay);
+                    return (dateTime - epoch).TotalSeconds.ToString();
                 }
 
             }

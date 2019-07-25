@@ -169,28 +169,24 @@
     "code": "MonT2_Limit_Convert",
     "hide": 0
   },
-
   "CHANNEL_INFO,UpperLimitCh1": {
     "add": "02007C",
     "len": "2",
     "code": "MonT2_Limit_Convert",
     "hide": 0
   },
-
   "CHANNEL_INFO,LowerLimitCh2": {
     "add": "020086",
     "len": "2",
     "code": "MonT2_Limit_Convert",
     "hide": 0
   },
-
   "CHANNEL_INFO,UpperLimitCh2": {
     "add": "020084",
     "len": "2",
     "code": "MonT2_Limit_Convert",
     "hide": 0
   },
-
   "SENSOR,SensorNumber": {
     "add": "FE0000",
     "len": "1",

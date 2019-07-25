@@ -215,7 +215,7 @@ namespace TempLite.Services
                 if (loggerInformation.LoggerType == 1)
                 {
                     hexes.Add(new Hex("FE0000", msg.ToString(0, (msg.Length - 6))));
-                    return new AddressSection(0, 0, 1, 0x00, 0x00, 0);
+                    return new AddressSection(0, 0, 0, 0x00, 0x00, 0);
                 }
                 else
                 {

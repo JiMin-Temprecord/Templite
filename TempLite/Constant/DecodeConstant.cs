@@ -45,6 +45,7 @@
         public const string NotOverflown = "DATA_INFO,NotOverflown";
         public const string SamplePointer = "DATA_INFO,SamplePointer";
         public const string EventsMarked = "DATA_INFO,EventsMarked";
+        public const string MonT2Model = "HEADER,Type";
         public const string MonT2TimeAtFirstSample = "DATA_INFO,Time_FirstSample_MonT2";
         public const string MonT2LowerLimitCh1 = "CHANNEL_INFO,LowerLimitCh1";
         public const string MonT2UpperLimitCh1 = "CHANNEL_INFO,UpperLimitCh1";

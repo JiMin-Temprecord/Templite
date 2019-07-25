@@ -125,7 +125,7 @@ namespace TempLite
             DrawChannelLimits(LabelConstant.TimeBelowLimit, c => c.TimeBelowLimits);
             DrawSection(LabelConstant.UserComment, string.Empty);
 
-            if (loggerVariables.UserData.Length > 120)
+            if (loggerVariables.UserData.Length > 280)
             {
                 var firstLine = loggerVariables.UserData.Substring(0, loggerVariables.UserData.Length/2);
                 var secondLine = loggerVariables.UserData.Substring(loggerVariables.UserData.Length / 2);
@@ -137,7 +137,7 @@ namespace TempLite
             }
             else
             {
-                pdfPage.DrawString(loggerVariables.UserData, font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
+                pdfPage.DrawString(loggerVariables.UserData.ToString(), font, XBrushes.Black, PDFcoordinates.first_column, lineCounter);
                 lineCounter += PDFcoordinates.line_inc;
             }
 
@@ -167,6 +167,8 @@ namespace TempLite
             var withinlimits = new XPen(XColors.ForestGreen);
             var abovelimit = new XPen(XColors.Coral);
             var belowlimit = new XPen(XColors.CornflowerBlue);
+            var abovelimitData = new XPen(XColors.Coral);
+            var belowlimitData = new XPen(XColors.CornflowerBlue);
 
             ch1Limits.DashStyle = XDashStyle.Dash;
             withinlimits.DashStyle = XDashStyle.Dash;
@@ -299,9 +301,9 @@ namespace TempLite
             while (i < pdfVariables.RecordedSamples && (pdfVariables.ChannelOne.Data != null))
             {
                 if(pdfVariables.ChannelOne.Data[i] > pdfVariables.ChannelOne.PresetUpperLimit)
-                    draw.DrawLine(abovelimit, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                    draw.DrawLine(abovelimitData, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
                 else if (pdfVariables.ChannelOne.Data[i] < pdfVariables.ChannelOne.PresetLowerLimit)
-                    draw.DrawLine(belowlimit, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                    draw.DrawLine(belowlimitData, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
                 else
                     draw.DrawLine(ch0, xGraphMaximum, yCH0, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelOne.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
 
@@ -310,9 +312,9 @@ namespace TempLite
                 if (pdfVariables.IsChannelTwoEnabled)
                 {
                     if(pdfVariables.ChannelTwo.Data[i] > pdfVariables.ChannelTwo.PresetUpperLimit)
-                        draw.DrawLine(abovelimit, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                        draw.DrawLine(abovelimitData, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
                     else if(pdfVariables.ChannelTwo.Data[i] < pdfVariables.ChannelTwo.PresetLowerLimit)
-                        draw.DrawLine(belowlimit, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
+                        draw.DrawLine(belowlimitData, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
                     else
                         draw.DrawLine(ch1, xGraphMaximum, yCH1, xGraphMaximum + xGraphScale, (float)(PDFcoordinates.graph_H - ((pdfVariables.ChannelTwo.Data[i] - (yLowest)) * yGraphScale)) + PDFcoordinates.graph_topY);
 
