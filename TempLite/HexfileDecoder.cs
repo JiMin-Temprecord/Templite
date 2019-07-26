@@ -1089,7 +1089,7 @@ namespace TempLite
             else if (ch1Enabled)
             {
                 InitSensorStatisticsField(0);
-                Console.WriteLine(mont2Samples);
+                //Console.WriteLine(mont2Samples);
                 for (int i = 0; i < mont2Samples * 2; i++)
                 {
                     sample1 = (short)(decodeByte[i] & 0xff);
@@ -1268,8 +1268,7 @@ namespace TempLite
                 int year = (decodeByte[0] >> 1) + 2000;
                 int month = (((decodeByte[1] & 0xff) >> 4) - 1);
                 var dateTime = new DateTime(year, month, decodeByte[2], decodeByte[3], decodeByte[4], decodeByte[5]);
-
-                Console.WriteLine("date time : " + dateTime);
+                
 
                 if (!notOverflown && loopOverwrite)
                 {

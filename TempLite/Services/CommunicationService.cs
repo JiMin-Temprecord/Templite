@@ -27,7 +27,7 @@ namespace TempLite.Services
             {
                 WriteBytes(new WakeUpByteWritter(), serialPort);
                 msg = ReadBytes(serialPort);
-                //Console.WriteLine("MSG" + msg);
+                Console.WriteLine("MSG" + msg);
                 System.Threading.Thread.Sleep(1000);
             }
         }
@@ -137,7 +137,6 @@ namespace TempLite.Services
             {
                 msg = msg.Append(recievemsg[i].ToString("x02"));
             }
-            Console.WriteLine("MSG : " + msg);
             return msg;
         }
 
