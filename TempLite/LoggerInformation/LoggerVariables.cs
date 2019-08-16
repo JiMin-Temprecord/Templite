@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace TempLite
 {
@@ -20,7 +21,9 @@ namespace TempLite
         public int TotalTrip { get; set; }
         public string UserData { get; set; }
         public ArrayList Time { get { return time; } set { time = value; } }
-        
+        public List<int> Tag { get; set; }
+
+
         ChannelConfig channelOne;
         ChannelConfig channelTwo;
         public ChannelConfig ChannelOne => channelOne ?? (channelOne = new ChannelConfig());

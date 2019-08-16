@@ -50,7 +50,7 @@
             this.loggerText.ReadOnly = true;
             this.loggerText.Size = new System.Drawing.Size(597, 83);
             this.loggerText.TabIndex = 7;
-            this.loggerText.Text = "Insert a G4 or MonT logger into the reader. \n Reading should start automatically";
+            this.loggerText.Text = "Insert  logger into the reader. \n Reading should start automatically";
             // 
             // loggerLabel
             // 
@@ -76,7 +76,7 @@
             // loggerImage
             // 
             this.loggerImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.loggerImage.Image = global::TempLite.Properties.Resources.logger_01;
+            this.loggerImage.Image = global::TempLite.Properties.Resources.logger;
             this.loggerImage.Location = new System.Drawing.Point(0, 0);
             this.loggerImage.Name = "loggerImage";
             this.loggerImage.Size = new System.Drawing.Size(725, 600);

@@ -137,7 +137,6 @@ namespace TempLite
             using (StreamReader sr = File.OpenText(path + ownerID + ".txt"))
             {
                 var firstEmail = sr.ReadLine();
-                //Console.WriteLine("EMAIL : " + firstEmail);
                 var start = firstEmail.IndexOf("@");
                 var hiddenEmail = "******" + firstEmail.Substring(start, firstEmail.Length - start);
 

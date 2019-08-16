@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using TempLite.Constant;
 
 namespace TempLite
 {
@@ -90,10 +89,10 @@ namespace TempLite
         public void ReadIntoJsonFileAndSetupDecoder()
         {
             var jsonObject = GetJsonObject();
-
+            
             if (loggerInformation.LoggerName == DecodeConstant.G4)
             {
-                loggerName = "G4";
+                loggerName = DecodeConstant.G4;
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
                 emailID = ReadStringFromJObject(jsonObject, DecodeConstant.EmailID);
@@ -120,9 +119,9 @@ namespace TempLite
                 ReadStringFromJObject(jsonObject, DecodeConstant.Data);
             }
 
-            if (loggerInformation.LoggerName == DecodeConstant.MonT)
+            else if (loggerInformation.LoggerName == DecodeConstant.MonT)
             {
-                loggerName = "MonT";
+                loggerName = DecodeConstant.MonT;
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
                 userData = ReadStringFromJObject(jsonObject, DecodeConstant.UserData);
@@ -142,14 +141,14 @@ namespace TempLite
                 ticksAtLastSample = ReadIntFromJObject(jsonObject, DecodeConstant.TicksSinceLastSample);
                 timeAtFirstSameple = ReadLongFromJObject(jsonObject, DecodeConstant.MonTTimeAtFirstSample);
                 lowestTemp = Convert.ToDouble(ReadStringFromJObject(jsonObject, DecodeConstant.LowestTemp));
-                resolution = Convert.ToDouble(ReadStringFromJObject(jsonObject, DecodeConstant.ResolutionRatio)) / 100;
+                resolution = (double)ReadIntFromJObject(jsonObject, DecodeConstant.ResolutionRatio) / 100;
                 recordedSamples = ReadIntFromJObject(jsonObject, DecodeConstant.TotalRecordedSamples);
                 lowerLimit = ReadArrayFromJObject(jsonObject, DecodeConstant.LowerLimit);
                 upperLimit = ReadArrayFromJObject(jsonObject, DecodeConstant.UpperLimit);
                 ReadStringFromJObject(jsonObject, DecodeConstant.MonTData);
             }
 
-            if (loggerInformation.LoggerName == DecodeConstant.MonT2)
+            else if (loggerInformation.LoggerName.Substring(0,6) == DecodeConstant.MonT2)
             {
                 loggerName = ReadStringFromJObject(jsonObject, DecodeConstant.MonT2Model);
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
@@ -199,6 +198,12 @@ namespace TempLite
             loggerVariable.TagsPlaced = tagNumbers;
             loggerVariable.TotalTrip = totalUses;
             loggerVariable.UserData = userData.Substring(0,userDataLength);
+            loggerVariable.Tag = Tag;
+
+            for(int i = 0; i < Tag.Count; i++)
+            {
+                Console.WriteLine("Tag : " + Tag[i]);
+            }
 
             loggerInformation.EmailId = emailID;
 
@@ -226,7 +231,7 @@ namespace TempLite
                 loggerVariable.IsChannelTwoEnabled = true;
                 AssignChannelValues(loggerVariable.ChannelTwo, 1);
             }
-
+            
             return loggerVariable;
         }
 
@@ -248,10 +253,10 @@ namespace TempLite
             Channel.TimeBelowLimits = HHMMSS(belowLimit[i] * samplePeriod);
 
             if (Channel.AboveLimits > 0)
-                Channel.BreachedAbove = DecodeConstant.Breached;
+                Channel.BreachedAbove = DecodeConstant.Exceeded;
 
             if (Channel.BelowLimits > 0)
-                Channel.BreachedBelow = DecodeConstant.Breached;
+                Channel.BreachedBelow = DecodeConstant.Exceeded;
 
             if (Data.Count > 0)
                 Channel.Data = Data[i];
@@ -437,7 +442,7 @@ namespace TempLite
                     return _1ByteToDecimal(decodeByte);
 
                 case "_2_Byte_to_Decimal":
-                    return (((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)).ToString();
+                    return _2ByteToDecimal(decodeByte);
 
                 case "_2_Byte_to_Decimal_Big_Endian":
                     return ToBigEndian(decodeByte);
@@ -614,13 +619,20 @@ namespace TempLite
         {
             return decodeByte[0].ToString("x02");
         }
+
+        string _2ByteToDecimal(byte[] decodeByte)
+        {
+            return (((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)).ToString("x02");
+        }
+
         string _2ByteToTemperatureMonT(byte[] decodeByte)
         {
-            var value = (((decodeByte[1]) & 0xFF) << 8) | (decodeByte[0] & 0xFF);
+            var value = ((((decodeByte[1]) & 0xFF) << 8) | (decodeByte[0] & 0xFF));
             value -= 4000;
             var V = ((double)value / 100);
             return V.ToString("N2");
         }
+
         string _3BytetoTemperatureArray(byte[] decodeByte)
         {
             var offset = 9;
@@ -754,7 +766,7 @@ namespace TempLite
 
             for (int i = 0; i < decodeByte.Length; i += 2)
             {
-                compressionTable[i / 2] = (((decodeByte[i / 2] & 0xff) << 8) | (decodeByte[i + 1] & 0xff));
+                compressionTable[i / 2] = (((decodeByte[i] & 0xff) << 8) | (decodeByte[i + 1] & 0xff));
                 value[i / 2] = compressionTable[i / 2];
             }
 
@@ -827,6 +839,7 @@ namespace TempLite
                         TemperatureStatistics(0, lowestTemp + ((decodeByte[a] & 0xFF) * resolution), array_pointer);
                         channelList.Add(lowestTemp + ((decodeByte[a] & 0xFF) * resolution));
                     }
+                    
                     a++;
                 }
                 Data.Add(channelList);
@@ -955,7 +968,7 @@ namespace TempLite
         }
         string MonT2LimitConvert(byte[] decodeByte)
         {
-            double Limit = ((((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)) / 10);
+            double Limit = (double)((short) (((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)) / 10);
             return Limit.ToString();
         }
 
@@ -964,29 +977,29 @@ namespace TempLite
             switch (decodeByte[0])
             {
                 case 1:
-                    return "MonT2 Plain";
+                    return "Mon T2 Plain";
                 case 2:
-                    return"MonT2 Plain USB";
+                    return"Mon T2 Plain USB";
                 case 3:
-                    return "MonT2 Plain RH USB";
+                    return "Mon T2 Plain RH USB";
                 case 4:
-                    return "MonT2 LCD";
+                    return "Mon T2 LCD";
                 case 5:
-                    return "MonT2 LCD USB";
+                    return "Mon T2 LCD USB";
                 case 6:
-                    return "MonT2 LCD RH USB";
+                    return "Mon T2 LCD RH USB";
                 case 7:
-                    return "MonT2 PDF";
+                    return "Mon T2 PDF";
                 case 8:
-                    return "MonT2 RH PDF";
+                    return "Mon T2 RH PDF";
                 case 9:
-                    return "MonT2 LCD PDF";
+                    return "Mon T2 LCD PDF";
                 case 10:
-                    return "MonT2 LCD RH PDF";
+                    return "Mon T2 LCD RH PDF";
                 case 11:
-                    return "MonT2 Plain RH";
+                    return "Mon T2 Plain RH";
                 case 12:
-                    return "MonT2 LCD RH";
+                    return "Mon T2 LCD RH";
                 default:
                     return "Unknown";
             }
@@ -1006,7 +1019,7 @@ namespace TempLite
             if (!notOverflown)
                 sampleNumber =  16384;
             
-            return sampleNumber.ToString();
+            return sampleNumber.ToString("x02");
         }
 
         void MonT2ValueDecode(byte[] decodeByte)
@@ -1030,6 +1043,7 @@ namespace TempLite
                 address += pageOffset;
 
                 var copyArrayList = new List<double>();
+                //Also problem with MonT2
                 //Creating a temporary array - 33280 is MAX memory size with an extra page of 512 bytes
                 for (int i = 0; i < 33280; i++)
                 {
@@ -1049,8 +1063,7 @@ namespace TempLite
                 }
 
             }
-
-
+            
             if (ch1Enabled && ch2Enabled)
             {
                 InitSensorStatisticsField(0);
@@ -1083,13 +1096,13 @@ namespace TempLite
                 Data.Add(ch2List);
                 Tag = tagList;
                 recordedSamples /= 2;
+
                 FinalizeStatistics(0);
                 FinalizeStatistics(1);
             }
             else if (ch1Enabled)
             {
                 InitSensorStatisticsField(0);
-                //Console.WriteLine(mont2Samples);
                 for (int i = 0; i < mont2Samples * 2; i++)
                 {
                     sample1 = (short)(decodeByte[i] & 0xff);
@@ -1160,20 +1173,27 @@ namespace TempLite
                     {
                         if (i == 0)
                         {
-                            tagList.Add(arrayPointer);
+                            tagList.Add(dataPointer);
                             tagNumbers++;
                         }
                     }
                     else
                     {
-                        if (decodeByte[dataPointer] > 0x7f) //> 0x7f
+                        if (decodeByte[dataPointer] > 0x7f)//> 0x7f
                         {
-                            sensorStartingValue[i] -= (decodeByte[dataPointer] & 0x7f); //compressionTable[(decodeByte[dataPointer] & 0x7f)];
+                            //Console.WriteLine("Value 0 : " + (double)sensorStartingValue[i]);
+                            sensorStartingValue[i] -= decodeByte[dataPointer] & 0x7F;// & 0x7F;
+                            //Console.WriteLine("channelList 0 : " + decodeByte[dataPointer].ToString("X02"));
+                            //Console.WriteLine("Value 0 : " + (double)sensorStartingValue[i] / 100);
                         }
                         else
                         {
-                            sensorStartingValue[i] += (decodeByte[dataPointer]);
+                            //Console.WriteLine("Value 1 : " + (double)sensorStartingValue[i] / 100);
+                            sensorStartingValue[i] += decodeByte[dataPointer];
+                            //Console.WriteLine("channelList 1 : " + decodeByte[dataPointer].ToString("X02"));
+                            //Console.WriteLine("Value 1 : " + (double)sensorStartingValue[i] / 100);
                         }
+                        
                         channelList.Add((double)sensorStartingValue[i] / 100);
                         TemperatureStatistics(i, ((double)sensorStartingValue[i] / 100), arrayPointer);
                         totalSameples++;
@@ -1215,8 +1235,8 @@ namespace TempLite
 
                 if (sensorInfoArray.Length != 0)
                 {
-                    var sensorData = sensorInfoArray[20] << 16 | sensorInfoArray[19] << 8 | sensorInfoArray[18];
-                    if (sensorType[i] == 0 || sensorType[i] == 6) // get yasiru to explain why
+                    var sensorData = (sensorInfoArray[20] & 0xFF) << 16 | (sensorInfoArray[19] & 0xFF) << 8 | (sensorInfoArray[18] & 0xFF);
+                    if (sensorType[i] == 0 || sensorType[i] == 6 || sensorType[i] == 2) 
                     {
                         sensorStartingValue[i] = Kelvin - sensorData;
                     }
@@ -1269,11 +1289,10 @@ namespace TempLite
                 int month = (((decodeByte[1] & 0xff) >> 4) - 1);
                 var dateTime = new DateTime(year, month, decodeByte[2], decodeByte[3], decodeByte[4], decodeByte[5]);
                 
-
                 if (!notOverflown && loopOverwrite)
                 {
                     long val;
-                    if (loggerState == "Running")
+                    if (loggerState == "Logging")
                     {
                         val = ((utcReferenceTime) - ((16384 / sensorNumber) * samplePeriod) - (ticksSinceStart - ticksAtLastSample));
                         mont2Samples = 16384;

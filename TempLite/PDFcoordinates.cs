@@ -2,13 +2,12 @@
 {
     public static class PDFcoordinates
     {
-        public static readonly int first_column = 20;
-        public static readonly int second_column = 275;
-        public static readonly int third_column = 530;
+        public static readonly int firstColumn = 20;
+        public static readonly int secondColumn = 275;
+        public static readonly int thirdColumn = 530;
 
-        public static readonly double line_counter = 80;
-        public static readonly double line_inc = 17;
-        public static readonly int section_inc = 25;
+        public static readonly double lineCounter = 80;
+        public static readonly double lineInc = 17;
 
         public static readonly int limitinfo_startX = 557;
         public static readonly int limitinfo_startY = 210;
@@ -43,11 +42,11 @@
         public static readonly int box3_Y1 = 900;
         public static readonly int box3_Y2 = 960;
           
-        public static readonly int commentX = 15;
-        public static readonly int commentY = 915;
+        public static readonly double commentX = 15;
+        public static readonly double commentY = 915;
               
-        public static readonly int sigX = 500;
-        public static readonly int sigY = 915;
+        public static readonly double sigX = 500;
+        public static readonly double sigY = 915;
          
         public static readonly int siteX = 300;
         public static readonly int siteY = 980;
@@ -58,21 +57,13 @@
         public static readonly int versionX = 10;
         public static readonly int versionY = 980;
  
-        public static readonly int graph_topY = 585;
-        public static readonly int graph_W = 610;
-        public static readonly int graph_H = 270;
-
-        public static readonly int graph_brush_thickness = 1;
-        public static readonly int graph_limit_label = 5;
-
-        public static readonly int graph_l_lineX_start = 55;
-        public static readonly int graph_l_lineX_end = 55 + 610;
+        public static readonly int Ymax = 585;
+        public static readonly int graphWidth = 610;
+        public static readonly int graphHeight = 270;
   
-        public static readonly int G_axis_startX = 55;
-        public static readonly int G_axis_startY = 585;
-        public static readonly int G_axis_meetX = 55;
-        public static readonly int G_axis_meetY = 585 + 270 + 10;
-        public static readonly int G_axis_endX = 55 + 610;
-        public static readonly int G_axis_endY = 585 + 270 + 10;
+        public static readonly int Xstart = 55;
+        public static readonly int Ystart = 585;
+        public static readonly int Xfinish = Xstart + graphWidth;
+        public static readonly int Yfinish = Ystart + graphHeight + 10;
     }
 }

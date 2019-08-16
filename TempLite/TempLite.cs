@@ -34,9 +34,6 @@ namespace TempLite
 
         public TempLite()
         {
-            System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
-            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
-            
             InitializeComponent();
             readerUserControl.Visible = true;
             CopyEmailFoldertoAppData();
@@ -203,10 +200,13 @@ namespace TempLite
         {
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
-            
-            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
+
+            /*loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
             if(loggerHasStarted)
-                excelGenerator.CreateExcel(loggerInformation);
+                excelGenerator.CreateExcel(loggerInformation);*/
+
+            loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
+            loggerHasStarted = excelGenerator.CreateExcel(loggerInformation);
         }
 
         void documentBW_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

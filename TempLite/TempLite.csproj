@@ -66,7 +66,7 @@
     <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>TempLite.ico</ApplicationIcon>
+    <ApplicationIcon>templite %282%29.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -162,6 +162,11 @@
     </Compile>
     <Compile Include="Form\UserConfirmationForm.Designer.cs">
       <DependentUpon>UserConfirmationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UserControl\EmailListUserControl.cs">
       <SubType>UserControl</SubType>
@@ -305,14 +310,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="UserControl\ReadingErrorUserControl.resx">
       <DependentUpon>ReadingErrorUserControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -381,7 +381,12 @@
     <Content Include="Email\TBS-WA.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\logger.png" />
+    <Content Include="Images\redwarning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\TempLiteHelp.html" />
+    <Content Include="templite %282%29.ico" />
     <Content Include="TempLite.ico" />
     <None Include="Images\errorWarning.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -392,14 +397,8 @@
     <Content Include="Images\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\redwarning.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <None Include="Resources\logger-01.png" />
     <None Include="Resources\emailSuccess.png" />
     <None Include="Resources\email.png" />
-    <None Include="Resources\reader_l.png" />
-    <None Include="Resources\loggers_l.jpg" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Core">

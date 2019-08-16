@@ -103,19 +103,9 @@ namespace TempLite.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap logger_01 {
+        internal static System.Drawing.Bitmap logger {
             get {
-                object obj = ResourceManager.GetObject("logger-01", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap loggers_l {
-            get {
-                object obj = ResourceManager.GetObject("loggers_l", resourceCulture);
+                object obj = ResourceManager.GetObject("logger", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -126,16 +116,6 @@ namespace TempLite.Properties {
         internal static System.Drawing.Bitmap pdf {
             get {
                 object obj = ResourceManager.GetObject("pdf", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap reader_l {
-            get {
-                object obj = ResourceManager.GetObject("reader_l", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

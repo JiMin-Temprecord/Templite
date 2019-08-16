@@ -3,7 +3,7 @@ namespace TempLite.Constant
 {
     public class LabelConstant
     {
-        public const string Title = "Loggger Report";
+        public const string Title = "Logger Report";
         public const string SerialNumber = "S/N: ";
         public const string CompanyName = "TEMPRECORD";
         public const string TradeMark = "TM";
@@ -34,6 +34,10 @@ namespace TempLite.Constant
         public const string SampleBelowLimit = "Sample below Lower Limit : ";
         public const string TimeBelowLimit = "Time below Lower Limit : ";
         public const string UserComment = "User Comments : ";
+
+        public const string Comment = "Comment ";
+        public const string Signature = "Signature ";
+
 
         public const string Channel = "Channel :";
         public const string ChannelOneLabel = "Temperature ";

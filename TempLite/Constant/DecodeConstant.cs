@@ -57,7 +57,7 @@
         public const string Celcius = "°C"; //°
         public const string Farenhiet = "°F";
         public const string Percentage = " %";
-        public const string Breached = " (breached)";
+        public const string Exceeded = " (exceeded)";
 
 
 
