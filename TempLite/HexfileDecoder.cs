@@ -89,10 +89,12 @@ namespace TempLite
         public void ReadIntoJsonFileAndSetupDecoder()
         {
             var jsonObject = GetJsonObject();
+            Console.WriteLine("==========================================================================================================================================================");
             
             if (loggerInformation.LoggerName == DecodeConstant.G4)
             {
                 loggerName = DecodeConstant.G4;
+                dataAddress = ReadIntFromJObject(jsonObject, DecodeConstant.DataEndPointer);
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
                 emailID = ReadStringFromJObject(jsonObject, DecodeConstant.EmailID);
@@ -113,7 +115,6 @@ namespace TempLite
                 timeAtFirstSameple = ReadLongFromJObject(jsonObject, DecodeConstant.TimeAtFirstSample);
                 ReadStringFromJObject(jsonObject, DecodeConstant.CompressionTable);
                 ReadStringFromJObject(jsonObject, DecodeConstant.Sensor);
-                dataAddress = ReadIntFromJObject(jsonObject, DecodeConstant.DataEndPointer);
                 lowerLimit = ReadArrayFromJObject(jsonObject, DecodeConstant.LowerLimit);
                 upperLimit = ReadArrayFromJObject(jsonObject, DecodeConstant.UpperLimit);
                 ReadStringFromJObject(jsonObject, DecodeConstant.Data);
@@ -156,7 +157,7 @@ namespace TempLite
                 if(ch1Enabled) sensorNumber++;
                 ch2Enabled = ReadBoolFromJObject(jsonObject, DecodeConstant.ChannelTwoEnable);
                 if (ch2Enabled) sensorNumber++;
-                userDataLength = 128;
+                userDataLength = 104;
                 userData = ReadStringFromJObject(jsonObject, DecodeConstant.UserData);
                 loggerState = ReadStringFromJObject(jsonObject, DecodeConstant.LoggerState);
                 fahrenheit = ReadBoolFromJObject(jsonObject, DecodeConstant.IsFahrenhiet);
@@ -289,7 +290,7 @@ namespace TempLite
                     using (var sr = new StreamReader(hexPath))
                     {
                         string line;
-                        int diff = 0;
+                        int dataFromAddress = -99;
                         while ((line = sr.ReadLine()) != null)
                         {
                             string address = line.Substring(0, 6);
@@ -297,70 +298,74 @@ namespace TempLite
                             string temp = string.Empty;
 
                             if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
-                                addtoread = address;
+                                dataFromAddress = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
 
-                            if (addtoread == address)
+                            if (dataFromAddress >= 0 && dataFromAddress < 58) // reader can only send 64bytes at a time
                             {
-                                diff = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
-                                if (diff >= 0 && diff < 58) // reader can only send 64bytes at a time
+                                int lengthToRead = Convert.ToInt32(currentinfo[1]);
+
+                                if (lengthToRead == 32768) // if we are reading DATA
                                 {
-                                    int infolength = Convert.ToInt32(currentinfo[1]);
+                                    lengthToRead = dataAddress;
 
-                                    if (infolength == 32768) // if we are reading DATA
-                                    {
-                                        infolength = dataAddress;
+                                    if (loopOverwriteStartAddress > 0)
+                                        lengthToRead = G4MemorySize + 1;
+                                }
 
-                                        if (loopOverwriteStartAddress > 0)
-                                            infolength = G4MemorySize + 1;
-                                    }
-                                    if (infolength > 58)
+                                if (lengthToRead > 58)
+                                {
+                                    int readinfo = data.Length/2 - dataFromAddress;
+
+                                    while (lengthToRead > 0)
                                     {
-                                        int readinfo = 58 - diff;
-                                        while (infolength > 0)
+                                        Console.WriteLine("lengthToRead  : " + lengthToRead);
+                                        Console.WriteLine("readinfo  : " + readinfo);
+                                        Console.WriteLine("temp  : " + temp.Length);
+
+                                        temp += data.Substring(dataFromAddress * 2, readinfo * 2);
+                                        line = sr.ReadLine();
+                                        if (line != null)
                                         {
-                                            temp += data.Substring(diff * 2, readinfo * 2);
-                                            line = sr.ReadLine();
-                                            if (line != null)
-                                            {
-                                                data = line.Substring(7, line.Length - 7);
-                                                infolength = infolength - readinfo;
-                                                diff = 0;
+                                            data = line.Substring(7, line.Length - 7);
+                                            Console.WriteLine("data  : " + data);
+                                            lengthToRead = lengthToRead - readinfo;
+                                            dataFromAddress = 0;
 
-                                                if (infolength > (data.Length / 2))
-                                                {
-                                                    readinfo = data.Length / 2;
-                                                }
-                                                else
-                                                {
-                                                    readinfo = infolength;
-                                                }
+                                            if (lengthToRead > (data.Length / 2))
+                                            {
+                                                readinfo = data.Length / 2;
                                             }
-                                            else { break; }
+                                            else
+                                            {
+                                                readinfo = lengthToRead;
+                                            }
                                         }
-                                        int totallength = temp.Length;
-                                        bytes = new byte[totallength / 2];
-                                        for (int i = 0; i < totallength; i += 2)
-                                            bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                        return bytes;
+                                        else { break; }
+                                    }
+
+                                    int totallength = temp.Length;
+                                    bytes = new byte[totallength / 2];
+                                    for (int i = 0; i < totallength; i += 2)
+                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                    return bytes;
+                                }
+                                else
+                                {
+                                    if (data.Length < (dataFromAddress + lengthToRead)*2)
+                                    {
+                                        var readNextLine = (dataFromAddress + lengthToRead - data.Length/2);
+                                        temp = data.Substring(dataFromAddress * 2, (lengthToRead - readNextLine)*2 );
+                                        line = sr.ReadLine();
+                                        data = line.Substring(7, line.Length - 7);
+                                        temp += data.Substring(0, readNextLine*2);
                                     }
                                     else
-                                    {
-                                        if (data.Length < diff * 2 + infolength * 2)
-                                        {
-                                            var readNextLine = (diff * 2 + infolength * 2) - 58 * 2;
-                                            temp = data.Substring(diff * 2, infolength * 2 - readNextLine);
-                                            line = sr.ReadLine();
-                                            data = line.Substring(7, line.Length - 7);
-                                            temp += data.Substring(0, readNextLine);
-                                        }
-                                        else
-                                            temp = data.Substring(diff * 2, infolength * 2);
-                                        int totallength = temp.Length;
-                                        bytes = new byte[totallength / 2];
-                                        for (int i = 0; i < totallength; i += 2)
-                                            bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                        return bytes;
-                                    }
+                                        temp = data.Substring(dataFromAddress * 2, lengthToRead * 2);
+                                    int totallength = temp.Length;
+                                    bytes = new byte[totallength / 2];
+                                    for (int i = 0; i < totallength; i += 2)
+                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
+                                    return bytes;
                                 }
                             }
                         }
@@ -878,7 +883,7 @@ namespace TempLite
             {
                 while (maxI > memoryStart)
                 {
-                    if ((decodeByte[memoryStart] == 0x7F) || (decodeByte[memoryStart] == 0xff)) //???????????????????????
+                    if ((decodeByte[memoryStart] == 0x7F) || (decodeByte[memoryStart] == 0xff)) 
                     {
                         return memoryStart;
                     }
@@ -1010,9 +1015,7 @@ namespace TempLite
             int sampleNumber = ((((decodeByte[3]) & 0xFFFFFF) << 24) | (((decodeByte[2]) & 0xFFFF) << 16) | (((decodeByte[1]) & 0xFF) << 8) | (decodeByte[0] & 0xFF));
 
             if (sensorNumber == 2)
-            {
                 sampleNumber *= 2;
-            }
 
             mont2Samples = sampleNumber;
 

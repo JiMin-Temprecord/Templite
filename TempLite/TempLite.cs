@@ -315,7 +315,7 @@ namespace TempLite
         #endregion
         #region Preview Panel
 
-        private void PreviewPanelPreviewPanel_VisibleChanged(object sender, EventArgs e)
+        /*private void PreviewPanelPreviewPanel_VisibleChanged(object sender, EventArgs e)
         {
             previewPanelBW = new BackgroundWorker();
             previewPanelBW.DoWork += previewPanelBW_DoWork;
@@ -344,7 +344,7 @@ namespace TempLite
                 previewPanel.Visible = false;
                 readyStateMessageUserControl.Visible = true;
             }
-        }
+        }*/
 
         private void previewPDF_Click(object sender, EventArgs e)
         {

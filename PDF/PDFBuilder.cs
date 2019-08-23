@@ -212,7 +212,7 @@ namespace PDF
         }
         public async Task Save(string content, string path)
         {
-            Debug.WriteLine(content);
+            //Debug.WriteLine(content);
             var pdfPath = path;
             var pdfContentByte = Encoding.GetEncoding("iso-8859-1").GetBytes(content);
             
