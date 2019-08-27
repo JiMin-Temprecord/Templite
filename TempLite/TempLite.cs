@@ -37,6 +37,8 @@ namespace TempLite
             InitializeComponent();
             readerUserControl.Visible = true;
             CopyEmailFoldertoAppData();
+            CopyImageFoldertoAppData();
+            CopyJsonFoldertoAppData();
             Log.Write(LogConstant.OpenApplication);
         }
         void TempLite_FormClosed(object sender, FormClosedEventArgs e)
@@ -345,7 +347,9 @@ namespace TempLite
         private void previewPDF_Click(object sender, EventArgs e)
         {
             Log.Write(LogConstant.PreviewPDF);
-            var filename = Path.GetTempPath() + loggerInformation.SerialNumber + ".pdf";
+
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var filename = saveFilePath + loggerInformation.SerialNumber + ".pdf";
             try
             {
                 Process.Start(filename);
@@ -378,7 +382,8 @@ namespace TempLite
         {
             Log.Write(LogConstant.PreviewExcel);
 
-            var filename = Path.GetTempPath() + loggerInformation.SerialNumber + ".xlsx";
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var filename = saveFilePath + loggerInformation.SerialNumber + ".xlsx";
             try
             {
                 Process.Start(filename);
@@ -588,21 +593,73 @@ namespace TempLite
 
 
         #endregion
-        
+
+        private void TempLite_HelpButtonClicked(object sender, CancelEventArgs e)
+        {
+            Process.Start("https://temprecord.com/help/templite/TempLiteHelp.pdf");
+        }
+
         void CopyEmailFoldertoAppData()
         {
             if (!Directory.Exists(Email.path))
+            {
                 Directory.CreateDirectory(Email.path);
 
-            var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Email\\");
+                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Email\\");
 
-            foreach (string file in files)
-            {
-                var filename = Path.GetFileName(file);
-                File.Copy(file, Email.path+ filename,true);
+                foreach (string file in files)
+                {
+                    var filename = Path.GetFileName(file);
+                    File.Copy(file, Email.path + filename, true);
+                    File.Delete(file);
+                }
+
+                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Email");
             }
+        }
 
-            //Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Email\\");
+        void CopyImageFoldertoAppData()
+        {
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var path = saveFilePath + "Images\\";
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+
+                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Images\\");
+
+                foreach (string file in files)
+                {
+                    var filename = Path.GetFileName(file);
+                    File.Copy(file, path + filename, true);
+                    File.Delete(file);
+                }
+
+                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Images");
+            }
+        }
+
+        void CopyJsonFoldertoAppData()
+        {
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var path = saveFilePath + "Json\\";
+
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+
+                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Json\\");
+
+                foreach (string file in files)
+                {
+                    var filename = Path.GetFileName(file);
+                    File.Copy(file, path + filename, true);
+                    File.Delete(file);
+                }
+
+                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Json");
+            }
         }
     }
 }

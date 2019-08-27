@@ -30,6 +30,7 @@ namespace TempLite
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.HelpProvider TempLiteHelp;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TempLite));
             this.Reading = new System.Windows.Forms.Panel();
             this.ReadingTextBox = new System.Windows.Forms.TextBox();
@@ -54,13 +55,17 @@ namespace TempLite
             this.emailListUserControl = new UserControls.EmailListUserControl();
             this.emailDoneUserControl = new UserControls.EmailDoneUserControl();
             this.sendingEmailUserControl = new UserControls.SendingEmailUserControl();
-            this.TempLiteHelp = new System.Windows.Forms.HelpProvider();
+            TempLiteHelp = new System.Windows.Forms.HelpProvider();
             this.Reading.SuspendLayout();
             this.bg.SuspendLayout();
             this.previewPanel.SuspendLayout();
             this.excelPanel.SuspendLayout();
             this.pdfPanel.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // TempLiteHelp
+            // 
+            resources.ApplyResources(TempLiteHelp, "TempLiteHelp");
             // 
             // Reading
             // 
@@ -71,7 +76,7 @@ namespace TempLite
             this.Reading.Controls.Add(this.ReadingLabel);
             resources.ApplyResources(this.Reading, "Reading");
             this.Reading.Name = "Reading";
-            this.TempLiteHelp.SetShowHelp(this.Reading, ((bool)(resources.GetObject("Reading.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.Reading, ((bool)(resources.GetObject("Reading.ShowHelp"))));
             // 
             // ReadingTextBox
             // 
@@ -79,13 +84,13 @@ namespace TempLite
             this.ReadingTextBox.Cursor = System.Windows.Forms.Cursors.Arrow;
             resources.ApplyResources(this.ReadingTextBox, "ReadingTextBox");
             this.ReadingTextBox.Name = "ReadingTextBox";
-            this.TempLiteHelp.SetShowHelp(this.ReadingTextBox, ((bool)(resources.GetObject("ReadingTextBox.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.ReadingTextBox, ((bool)(resources.GetObject("ReadingTextBox.ShowHelp"))));
             // 
             // ReadingProgressBar
             // 
             resources.ApplyResources(this.ReadingProgressBar, "ReadingProgressBar");
             this.ReadingProgressBar.Name = "ReadingProgressBar";
-            this.TempLiteHelp.SetShowHelp(this.ReadingProgressBar, ((bool)(resources.GetObject("ReadingProgressBar.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.ReadingProgressBar, ((bool)(resources.GetObject("ReadingProgressBar.ShowHelp"))));
             this.ReadingProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.ReadingProgressBar.Value = 35;
             // 
@@ -93,7 +98,7 @@ namespace TempLite
             // 
             resources.ApplyResources(this.ReadingLabel, "ReadingLabel");
             this.ReadingLabel.Name = "ReadingLabel";
-            this.TempLiteHelp.SetShowHelp(this.ReadingLabel, ((bool)(resources.GetObject("ReadingLabel.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.ReadingLabel, ((bool)(resources.GetObject("ReadingLabel.ShowHelp"))));
             // 
             // bg
             // 
@@ -112,14 +117,14 @@ namespace TempLite
             this.bg.Controls.Add(this.sendingEmailUserControl);
             resources.ApplyResources(this.bg, "bg");
             this.bg.Name = "bg";
-            this.TempLiteHelp.SetShowHelp(this.bg, ((bool)(resources.GetObject("bg.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.bg, ((bool)(resources.GetObject("bg.ShowHelp"))));
             // 
             // ReadLoggerButton
             // 
             this.ReadLoggerButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             resources.ApplyResources(this.ReadLoggerButton, "ReadLoggerButton");
             this.ReadLoggerButton.Name = "ReadLoggerButton";
-            this.TempLiteHelp.SetShowHelp(this.ReadLoggerButton, ((bool)(resources.GetObject("ReadLoggerButton.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.ReadLoggerButton, ((bool)(resources.GetObject("ReadLoggerButton.ShowHelp"))));
             this.ReadLoggerButton.UseVisualStyleBackColor = true;
             this.ReadLoggerButton.Click += new System.EventHandler(this.ReadLoggerButton_Click);
             // 
@@ -128,14 +133,14 @@ namespace TempLite
             this.readyStateMessageUserControl.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.readyStateMessageUserControl, "readyStateMessageUserControl");
             this.readyStateMessageUserControl.Name = "readyStateMessageUserControl";
-            this.TempLiteHelp.SetShowHelp(this.readyStateMessageUserControl, ((bool)(resources.GetObject("readyStateMessageUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.readyStateMessageUserControl, ((bool)(resources.GetObject("readyStateMessageUserControl.ShowHelp"))));
             // 
             // readingErrorUserControl
             // 
             resources.ApplyResources(this.readingErrorUserControl, "readingErrorUserControl");
             this.readingErrorUserControl.BackColor = System.Drawing.Color.White;
             this.readingErrorUserControl.Name = "readingErrorUserControl";
-            this.TempLiteHelp.SetShowHelp(this.readingErrorUserControl, ((bool)(resources.GetObject("readingErrorUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.readingErrorUserControl, ((bool)(resources.GetObject("readingErrorUserControl.ShowHelp"))));
             // 
             // loggerProgressBarUserControl
             // 
@@ -144,7 +149,7 @@ namespace TempLite
             this.loggerProgressBarUserControl.ForeColor = System.Drawing.Color.White;
             resources.ApplyResources(this.loggerProgressBarUserControl, "loggerProgressBarUserControl");
             this.loggerProgressBarUserControl.Name = "loggerProgressBarUserControl";
-            this.TempLiteHelp.SetShowHelp(this.loggerProgressBarUserControl, ((bool)(resources.GetObject("loggerProgressBarUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.loggerProgressBarUserControl, ((bool)(resources.GetObject("loggerProgressBarUserControl.ShowHelp"))));
             this.loggerProgressBarUserControl.VisibleChanged += new System.EventHandler(this.loggerProgressBarUserControl_VisibleChanged);
             // 
             // generateDocumentUserControl
@@ -154,7 +159,7 @@ namespace TempLite
             this.generateDocumentUserControl.ForeColor = System.Drawing.Color.White;
             resources.ApplyResources(this.generateDocumentUserControl, "generateDocumentUserControl");
             this.generateDocumentUserControl.Name = "generateDocumentUserControl";
-            this.TempLiteHelp.SetShowHelp(this.generateDocumentUserControl, ((bool)(resources.GetObject("generateDocumentUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.generateDocumentUserControl, ((bool)(resources.GetObject("generateDocumentUserControl.ShowHelp"))));
             this.generateDocumentUserControl.VisibleChanged += new System.EventHandler(this.generateDocumentUserControl_VisibleChanged);
             // 
             // readerUserControl
@@ -163,7 +168,7 @@ namespace TempLite
             this.readerUserControl.Cursor = System.Windows.Forms.Cursors.Default;
             resources.ApplyResources(this.readerUserControl, "readerUserControl");
             this.readerUserControl.Name = "readerUserControl";
-            this.TempLiteHelp.SetShowHelp(this.readerUserControl, ((bool)(resources.GetObject("readerUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.readerUserControl, ((bool)(resources.GetObject("readerUserControl.ShowHelp"))));
             this.readerUserControl.VisibleChanged += new System.EventHandler(this.readerUserControl_VisibleChanged);
             // 
             // loggerUserControl
@@ -171,7 +176,7 @@ namespace TempLite
             this.loggerUserControl.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.loggerUserControl, "loggerUserControl");
             this.loggerUserControl.Name = "loggerUserControl";
-            this.TempLiteHelp.SetShowHelp(this.loggerUserControl, ((bool)(resources.GetObject("loggerUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.loggerUserControl, ((bool)(resources.GetObject("loggerUserControl.ShowHelp"))));
             this.loggerUserControl.VisibleChanged += new System.EventHandler(this.loggerUserControl_VisibleChanged);
             // 
             // previewPanel
@@ -181,7 +186,7 @@ namespace TempLite
             this.previewPanel.Controls.Add(this.pdfPanel);
             resources.ApplyResources(this.previewPanel, "previewPanel");
             this.previewPanel.Name = "previewPanel";
-            this.TempLiteHelp.SetShowHelp(this.previewPanel, ((bool)(resources.GetObject("previewPanel.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.previewPanel, ((bool)(resources.GetObject("previewPanel.ShowHelp"))));
             // 
             // excelPanel
             // 
@@ -191,7 +196,7 @@ namespace TempLite
             this.excelPanel.Controls.Add(this.previewExcel);
             resources.ApplyResources(this.excelPanel, "excelPanel");
             this.excelPanel.Name = "excelPanel";
-            this.TempLiteHelp.SetShowHelp(this.excelPanel, ((bool)(resources.GetObject("excelPanel.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.excelPanel, ((bool)(resources.GetObject("excelPanel.ShowHelp"))));
             // 
             // emailExcel
             // 
@@ -199,7 +204,7 @@ namespace TempLite
             this.emailExcel.BackColor = System.Drawing.Color.White;
             this.emailExcel.BackgroundImage = global::TempLite.Properties.Resources.TempLite_04;
             this.emailExcel.Name = "emailExcel";
-            this.TempLiteHelp.SetShowHelp(this.emailExcel, ((bool)(resources.GetObject("emailExcel.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.emailExcel, ((bool)(resources.GetObject("emailExcel.ShowHelp"))));
             this.emailExcel.UseVisualStyleBackColor = false;
             this.emailExcel.Click += new System.EventHandler(this.emailExcel_Click);
             // 
@@ -209,7 +214,7 @@ namespace TempLite
             this.previewExcel.BackColor = System.Drawing.Color.White;
             this.previewExcel.BackgroundImage = global::TempLite.Properties.Resources.TempLite_051;
             this.previewExcel.Name = "previewExcel";
-            this.TempLiteHelp.SetShowHelp(this.previewExcel, ((bool)(resources.GetObject("previewExcel.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.previewExcel, ((bool)(resources.GetObject("previewExcel.ShowHelp"))));
             this.previewExcel.UseVisualStyleBackColor = false;
             this.previewExcel.Click += new System.EventHandler(this.previewExcel_Click);
             // 
@@ -221,7 +226,7 @@ namespace TempLite
             this.pdfPanel.Controls.Add(this.previewPDF);
             resources.ApplyResources(this.pdfPanel, "pdfPanel");
             this.pdfPanel.Name = "pdfPanel";
-            this.TempLiteHelp.SetShowHelp(this.pdfPanel, ((bool)(resources.GetObject("pdfPanel.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.pdfPanel, ((bool)(resources.GetObject("pdfPanel.ShowHelp"))));
             // 
             // emailPDF
             // 
@@ -229,7 +234,7 @@ namespace TempLite
             this.emailPDF.BackColor = System.Drawing.Color.White;
             this.emailPDF.BackgroundImage = global::TempLite.Properties.Resources.TempLite_01;
             this.emailPDF.Name = "emailPDF";
-            this.TempLiteHelp.SetShowHelp(this.emailPDF, ((bool)(resources.GetObject("emailPDF.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.emailPDF, ((bool)(resources.GetObject("emailPDF.ShowHelp"))));
             this.emailPDF.UseVisualStyleBackColor = false;
             this.emailPDF.Click += new System.EventHandler(this.emailPDF_Click);
             // 
@@ -239,7 +244,7 @@ namespace TempLite
             this.previewPDF.BackColor = System.Drawing.Color.White;
             this.previewPDF.BackgroundImage = global::TempLite.Properties.Resources.TempLite_021;
             this.previewPDF.Name = "previewPDF";
-            this.TempLiteHelp.SetShowHelp(this.previewPDF, ((bool)(resources.GetObject("previewPDF.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.previewPDF, ((bool)(resources.GetObject("previewPDF.ShowHelp"))));
             this.previewPDF.UseVisualStyleBackColor = false;
             this.previewPDF.Click += new System.EventHandler(this.previewPDF_Click);
             // 
@@ -248,7 +253,7 @@ namespace TempLite
             this.logUserControl.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.logUserControl, "logUserControl");
             this.logUserControl.Name = "logUserControl";
-            this.TempLiteHelp.SetShowHelp(this.logUserControl, ((bool)(resources.GetObject("logUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.logUserControl, ((bool)(resources.GetObject("logUserControl.ShowHelp"))));
             // 
             // emailListUserControl
             // 
@@ -256,25 +261,21 @@ namespace TempLite
             this.emailListUserControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             resources.ApplyResources(this.emailListUserControl, "emailListUserControl");
             this.emailListUserControl.Name = "emailListUserControl";
-            this.TempLiteHelp.SetShowHelp(this.emailListUserControl, ((bool)(resources.GetObject("emailListUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.emailListUserControl, ((bool)(resources.GetObject("emailListUserControl.ShowHelp"))));
             // 
             // emailDoneUserControl
             // 
             resources.ApplyResources(this.emailDoneUserControl, "emailDoneUserControl");
             this.emailDoneUserControl.Name = "emailDoneUserControl";
-            this.TempLiteHelp.SetShowHelp(this.emailDoneUserControl, ((bool)(resources.GetObject("emailDoneUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.emailDoneUserControl, ((bool)(resources.GetObject("emailDoneUserControl.ShowHelp"))));
             // 
             // sendingEmailUserControl
             // 
             this.sendingEmailUserControl.BackColor = System.Drawing.Color.White;
             resources.ApplyResources(this.sendingEmailUserControl, "sendingEmailUserControl");
             this.sendingEmailUserControl.Name = "sendingEmailUserControl";
-            this.TempLiteHelp.SetShowHelp(this.sendingEmailUserControl, ((bool)(resources.GetObject("sendingEmailUserControl.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this.sendingEmailUserControl, ((bool)(resources.GetObject("sendingEmailUserControl.ShowHelp"))));
             this.sendingEmailUserControl.VisibleChanged += new System.EventHandler(this.emailUserControl_VisibleChanged);
-            // 
-            // TempLiteHelp
-            // 
-            resources.ApplyResources(this.TempLiteHelp, "TempLiteHelp");
             // 
             // TempLite
             // 
@@ -282,14 +283,15 @@ namespace TempLite
             resources.ApplyResources(this, "$this");
             this.Controls.Add(this.bg);
             this.ForeColor = System.Drawing.Color.Black;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.HelpButton = true;
-            this.IsMdiContainer = true;
+            TempLiteHelp.SetHelpNavigator(this, ((System.Windows.Forms.HelpNavigator)(resources.GetObject("$this.HelpNavigator"))));
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "TempLite";
-            this.TempLiteHelp.SetShowHelp(this, ((bool)(resources.GetObject("$this.ShowHelp"))));
+            TempLiteHelp.SetShowHelp(this, ((bool)(resources.GetObject("$this.ShowHelp"))));
+            this.HelpButtonClicked += new System.ComponentModel.CancelEventHandler(this.TempLite_HelpButtonClicked);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.TempLite_KeyUp);
             this.Reading.ResumeLayout(false);
@@ -325,7 +327,6 @@ namespace TempLite
         private System.Windows.Forms.Button previewExcel;
         private EmailListUserControl emailListUserControl;
         private LogUserControl logUserControl;
-        private System.Windows.Forms.HelpProvider TempLiteHelp;
         public System.Windows.Forms.Panel bg;
     }
 }

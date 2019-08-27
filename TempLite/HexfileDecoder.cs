@@ -287,7 +287,8 @@ namespace TempLite
         {
             byte[] bytes = { };
             var addtoread = string.Empty;
-            var hexPath = Path.GetTempPath() + "\\" + serialNumber + ".hex";
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var hexPath = saveFilePath + "\\" + serialNumber + ".hex";
 
             try
             {
@@ -416,7 +417,8 @@ namespace TempLite
 
         JObject GetJsonObject()
         {
-            using (var sr = new StreamReader(path + "\\Json\\" + jsonFile))
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            using (var sr = new StreamReader(saveFilePath + "Json\\" + jsonFile))
             {
                 return JObject.Parse(sr.ReadToEnd());
             }

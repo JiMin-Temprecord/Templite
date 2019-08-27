@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 using TempLite.Constant;
 using UserControls;
@@ -19,8 +20,9 @@ namespace TempLite
 
         public void OpenApplication(string serialNumber, string onwerID, int file = 2)
         {
-            var PDF = Path.GetTempPath() + serialNumber + ".pdf";
-            var EXCEL = Path.GetTempPath() + serialNumber + ".xlsx";
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var PDF = saveFilePath + serialNumber + ".pdf";
+            var EXCEL = saveFilePath + serialNumber + ".xlsx";
             var emailSubject = "Temprecord Logger " + serialNumber;
 
             try

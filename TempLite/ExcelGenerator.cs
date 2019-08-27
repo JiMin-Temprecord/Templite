@@ -19,7 +19,8 @@ namespace TempLite
             if (loggerVariables.LoggerState != "Logging" && loggerVariables.LoggerState != "Stopped")
                 return false;
 
-            var excelPath = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".xlsx";
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var excelPath = saveFilePath + loggerInformation.SerialNumber + ".xlsx";
             var excel = new ExcelPackage();
             var workSheet = excel.Workbook.Worksheets.Add(loggerInformation.SerialNumber);
             CreateLayout(workSheet, loggerInformation, loggerVariables);
@@ -34,7 +35,9 @@ namespace TempLite
             var channelTwoEnabled = loggerVariables.IsChannelTwoEnabled;
             var channelOne = loggerVariables.ChannelOne;
             var channelTwo = loggerVariables.ChannelTwo;
-            var path = AppDomain.CurrentDomain.BaseDirectory + "Images\\";
+
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var path = saveFilePath + "Images\\";
 
             var imageRange = workSheet.Cells[5, 5];
             if (channelOne.OutsideLimits == 0 && channelTwo.OutsideLimits == 0)

@@ -154,7 +154,8 @@ namespace TempLite
             DrawGraph(decoder, loggerVariables, pdfPage, pen, font);
             FillInValues(decoder, loggerVariables, loggerInformation.SerialNumber);
 
-            string filename = Path.GetTempPath() + loggerInformation.SerialNumber + ".pdf";
+            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+            var filename = saveFilePath + loggerInformation.SerialNumber + ".pdf";
 
             pdfDocument.Save(filename);
             return true;

@@ -26,11 +26,9 @@ namespace TempLite.Services
             {
                 WriteBytes(new WakeUpByteWritter(), serialPort);
                 msg = ReadBytes(serialPort);
-                Console.WriteLine("===================================================================================== msg : " + msg);
                 System.Threading.Thread.Sleep(1000);
             }
         }
-
         public bool GenerateHexFile(SerialPort serialPort, LoggerInformation loggerInformation)
         {
             var Hexes = new List<Hex>();
@@ -38,7 +36,8 @@ namespace TempLite.Services
 
             if (Hexes.Count > 0)
             {
-                var path = Path.GetTempPath() + "\\" + loggerInformation.SerialNumber + ".hex";
+                var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
+                var path = saveFilePath + loggerInformation.SerialNumber + ".hex";
                 var sw = new StreamWriter(path);
                 foreach (var hex in Hexes)
                 {
@@ -50,10 +49,9 @@ namespace TempLite.Services
 
             return true; 
         }
-
         List<Hex> ReadLogger(SerialPort serialPort, LoggerInformation loggerInformation, List<Hex> Hexes)
         {
-            var readerAvailable = false;
+            var readerAvailable = true;
             var readFull = false;
 
             if (SerialPort.GetPortNames().Contains(serialPort.PortName) == false || serialPort.IsOpen == false )
@@ -66,22 +64,12 @@ namespace TempLite.Services
             //wake up the logger 
             WriteBytes(new WakeUpByteWritter(), serialPort);
             var currentAddress = ReadBytesWakeUp(serialPort, loggerInformation, recievemsg, Hexes);
-            
-            while (currentAddress == null || loggerInformation.LoggerType == 0)
-            {
-                WriteBytes(new WakeUpByteWritter(), serialPort);
-                currentAddress = ReadBytesWakeUp(serialPort, loggerInformation, recievemsg, Hexes);
-            }
+
             
             //set up logger information
             readerAvailable = WriteBytes(new SetReadByteWritter(loggerInformation.LoggerType), serialPort);
             if (readerAvailable) readFull = ReadBytesSetRead(serialPort, currentAddress, loggerInformation, Hexes);
 
-            while (readFull == false)
-            {
-                readerAvailable = WriteBytes(new SetReadByteWritter(loggerInformation.LoggerType), serialPort);
-                if (readerAvailable) readFull = ReadBytesSetRead(serialPort, currentAddress, loggerInformation, Hexes);
-            }
 
             //read logger data
             while (readerAvailable && currentAddress != null && (currentAddress.MemoryNumber <= loggerInformation.MaxMemory))
@@ -95,12 +83,9 @@ namespace TempLite.Services
                     currentAddress.LengthLSB = (byte)(length & 0xff);
                 }
 
-                Console.WriteLine("IS GOING TO READ : " + currentAddress.MemoryNumber.ToString("X02") + currentAddress.MemoryAddress.ToString("X04"));
                 readerAvailable = WriteBytes(new ReadLoggerByteWritter(currentAddress, loggerInformation.LoggerType), serialPort);
                 readFull = ReadBytesReadLogger(serialPort, loggerInformation, currentAddress, Hexes);
-
-                Console.WriteLine("readFull : " + readFull);
-
+                
                 if (readFull == true)
                     currentAddress = GetNextAddress(currentAddress, loggerInformation);
                 
@@ -121,7 +106,6 @@ namespace TempLite.Services
 
             return Hexes;
         }
-
         StringBuilder ReadBytes(SerialPort serialPort)
         {
             var msg = new StringBuilder();
@@ -165,7 +149,6 @@ namespace TempLite.Services
             }
             return msg;
         }
-
         AddressSection ReadBytesWakeUp(SerialPort serialPort, LoggerInformation loggerInformation, List<byte> messageReceived, List<Hex> hexes)
         {
             SetLoggerInformation(messageReceived, loggerInformation);
@@ -228,9 +211,7 @@ namespace TempLite.Services
         {
             var length = maxlenreading;
             var msg = ReadBytes(serialPort);
-
-            Console.WriteLine("logger Type : " + loggerInformation.LoggerType);
-
+            
             var timenow = "0000000000000000";
             var time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000;
             var hextime = time.ToString("x02");
@@ -262,9 +243,7 @@ namespace TempLite.Services
         {
             var msg = ReadBytes(serialPort);
             length = maxlenreading;
-
-            Console.WriteLine("msg : " + msg);
-
+            
             if (msg.Equals("System.TimeoutException"))
                 return false;
 
@@ -278,7 +257,6 @@ namespace TempLite.Services
                         loggerInformation.MemoryMax[8] = ((recievemsg[13] << 8 | (recievemsg[12])) * 2);
                         if (MonT2Overflown)
                             loggerInformation.MemoryMax[8] = 0x81c0;
-                        Console.WriteLine("============================= MAX ADDRESS : " + loggerInformation.MemoryMax[8].ToString("X04"));
                         break;
                     //MonT
                     case 3:
@@ -353,7 +331,10 @@ namespace TempLite.Services
 
             else if (currentAddress.MemoryNumber == 8)
             {
-                WriteBytes(new WakeUpByteWritter(), serialPort);
+                var sendMessage = new byte[2];
+                sendMessage[0] = 0x00;
+                sendMessage[1] = 0x55;
+                serialPort.Write(sendMessage, 0, sendMessage.Length);
                 return false;
             }
 
@@ -380,7 +361,6 @@ namespace TempLite.Services
             {
                 if(e is TimeoutException)
                 {
-                    Console.WriteLine("write Timeout " + recoverCount);
                     recoverCount++;
                 }
                 else if(e is IOException || e is InvalidOperationException )
