@@ -201,10 +201,6 @@ namespace TempLite
             var pdfGenerator = new PDFGenerator();
             var excelGenerator = new ExcelGenerator();
 
-            /*loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
-            if(loggerHasStarted)
-                excelGenerator.CreateExcel(loggerInformation);*/
-
             loggerHasStarted = pdfGenerator.CreatePDF(loggerInformation);
             loggerHasStarted = excelGenerator.CreateExcel(loggerInformation);
         }
@@ -315,7 +311,7 @@ namespace TempLite
         #endregion
         #region Preview Panel
 
-        /*private void PreviewPanelPreviewPanel_VisibleChanged(object sender, EventArgs e)
+        private void PreviewPanelPreviewPanel_VisibleChanged(object sender, EventArgs e)
         {
             previewPanelBW = new BackgroundWorker();
             previewPanelBW.DoWork += previewPanelBW_DoWork;
@@ -344,7 +340,7 @@ namespace TempLite
                 previewPanel.Visible = false;
                 readyStateMessageUserControl.Visible = true;
             }
-        }*/
+        }
 
         private void previewPDF_Click(object sender, EventArgs e)
         {
@@ -605,6 +601,8 @@ namespace TempLite
                 var filename = Path.GetFileName(file);
                 File.Copy(file, Email.path+ filename,true);
             }
+
+            //Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Email\\");
         }
     }
 }

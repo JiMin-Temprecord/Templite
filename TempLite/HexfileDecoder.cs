@@ -89,8 +89,6 @@ namespace TempLite
         public void ReadIntoJsonFileAndSetupDecoder()
         {
             var jsonObject = GetJsonObject();
-            Console.WriteLine("==========================================================================================================================================================");
-            
             if (loggerInformation.LoggerName == DecodeConstant.G4)
             {
                 loggerName = DecodeConstant.G4;
@@ -157,8 +155,8 @@ namespace TempLite
                 if(ch1Enabled) sensorNumber++;
                 ch2Enabled = ReadBoolFromJObject(jsonObject, DecodeConstant.ChannelTwoEnable);
                 if (ch2Enabled) sensorNumber++;
-                userDataLength = 104;
                 userData = ReadStringFromJObject(jsonObject, DecodeConstant.UserData);
+                userDataLength = userData.Length;
                 loggerState = ReadStringFromJObject(jsonObject, DecodeConstant.LoggerState);
                 fahrenheit = ReadBoolFromJObject(jsonObject, DecodeConstant.IsFahrenhiet);
                 utcReferenceTime = ReadIntFromJObject(jsonObject, DecodeConstant.UTCReferenceTime);
@@ -198,8 +196,16 @@ namespace TempLite
             loggerVariable.LastSample = UNIXtoUTC(timeAtFirstSameple);
             loggerVariable.TagsPlaced = tagNumbers;
             loggerVariable.TotalTrip = totalUses;
-            loggerVariable.UserData = userData.Substring(0,userDataLength);
             loggerVariable.Tag = Tag;
+
+            if (userData.Contains(loggerInformation.SerialNumber))
+            {
+                loggerVariable.UserData = userData.Substring(0, userData.IndexOf(loggerInformation.SerialNumber));
+            }
+            else
+            {
+                loggerVariable.UserData = userData.Substring(0, userDataLength);
+            }
 
             for(int i = 0; i < Tag.Count; i++)
             {
@@ -318,16 +324,11 @@ namespace TempLite
 
                                     while (lengthToRead > 0)
                                     {
-                                        Console.WriteLine("lengthToRead  : " + lengthToRead);
-                                        Console.WriteLine("readinfo  : " + readinfo);
-                                        Console.WriteLine("temp  : " + temp.Length);
-
                                         temp += data.Substring(dataFromAddress * 2, readinfo * 2);
                                         line = sr.ReadLine();
                                         if (line != null)
                                         {
                                             data = line.Substring(7, line.Length - 7);
-                                            Console.WriteLine("data  : " + data);
                                             lengthToRead = lengthToRead - readinfo;
                                             dataFromAddress = 0;
 
@@ -805,7 +806,7 @@ namespace TempLite
             int a = 0;
             int b = 0;
             int array_pointer = 0;
-            bool Flag_End = false;
+            bool flagEnd = false;
 
             if (recordedSamples > 0)
             {
@@ -833,11 +834,11 @@ namespace TempLite
 
                 }
 
-                while ((a < decodeByte.Length) && (!Flag_End))
+                while ((a < decodeByte.Length) && (!flagEnd))
                 {
                     if (decodeByte[a] == 0xFE || decodeByte[a] == 0xFF) //0xFE = 254 Two's complement || 0xFF = 255 Two's complement
                     {
-                        Flag_End = true;
+                        flagEnd = true;
                     }
                     else
                     {
@@ -1176,7 +1177,7 @@ namespace TempLite
                     {
                         if (i == 0)
                         {
-                            tagList.Add(dataPointer);
+                            tagList.Add(arrayPointer);
                             tagNumbers++;
                         }
                     }
@@ -1184,17 +1185,11 @@ namespace TempLite
                     {
                         if (decodeByte[dataPointer] > 0x7f)//> 0x7f
                         {
-                            //Console.WriteLine("Value 0 : " + (double)sensorStartingValue[i]);
-                            sensorStartingValue[i] -= decodeByte[dataPointer] & 0x7F;// & 0x7F;
-                            //Console.WriteLine("channelList 0 : " + decodeByte[dataPointer].ToString("X02"));
-                            //Console.WriteLine("Value 0 : " + (double)sensorStartingValue[i] / 100);
+                            sensorStartingValue[i] -= compressionTable[(decodeByte[dataPointer] & 0x7F)];
                         }
                         else
                         {
-                            //Console.WriteLine("Value 1 : " + (double)sensorStartingValue[i] / 100);
-                            sensorStartingValue[i] += decodeByte[dataPointer];
-                            //Console.WriteLine("channelList 1 : " + decodeByte[dataPointer].ToString("X02"));
-                            //Console.WriteLine("Value 1 : " + (double)sensorStartingValue[i] / 100);
+                            sensorStartingValue[i] += compressionTable[(decodeByte[dataPointer])];
                         }
                         
                         channelList.Add((double)sensorStartingValue[i] / 100);
@@ -1203,7 +1198,7 @@ namespace TempLite
                     }
 
                     dataPointer += numberChannel;
-                    dataPointer &= G4MemorySize;                                                           //& 0x007FFF is to allow buffer rotation
+                    dataPointer &= G4MemorySize;
                 }
 
                 FinalizeStatistics(i);
@@ -1253,13 +1248,15 @@ namespace TempLite
         string String(byte[] decodeByte)
         {
             string UserDataString = string.Empty;
-
+            Console.WriteLine("decodeByte.Length : " + decodeByte.Length);
             for (int i = 0; i < decodeByte.Length; i++)
             {
                 if (decodeByte[i] > 12 && decodeByte[i] < 127)
                 {
+                    Console.WriteLine("UserDataString : " + UserDataString);
+
                     if (decodeByte[i] == 13)
-                        decodeByte[i] = 32;
+                        decodeByte[i] = 0x20;
                     UserDataString += Convert.ToChar(decodeByte[i]);
                 }
             }

@@ -124,7 +124,7 @@ namespace TempLite
             DrawChannelLimits(LabelConstant.TimeBelowLimit, c => c.TimeBelowLimits);
             DrawSection(LabelConstant.UserComment, string.Empty);
 
-            if (loggerVariables.UserData.Length > 180)
+            if (loggerVariables.UserData.Length > 140)
             {
                 var firstLine = loggerVariables.UserData.Substring(0, loggerVariables.UserData.Length / 2);
                 var secondLine = loggerVariables.UserData.Substring(loggerVariables.UserData.Length / 2);

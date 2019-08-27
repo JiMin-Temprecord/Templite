@@ -151,13 +151,13 @@
 
 
   "USER_DATA,UserDataLen": {
-    "add": "0200B8",
+    "add": "0200BE",
     "len": "2",
     "code": "_2_Byte_to_Decimal",
     "hide": 1
   },
   "USER_DATA,UserData": {
-    "add": "0200BA",
+    "add": "0200BF",
     "len": "320",
     "code": "String",
     "hide": 0
