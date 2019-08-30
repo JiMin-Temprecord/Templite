@@ -36,9 +36,9 @@ namespace TempLite
         {
             InitializeComponent();
             readerUserControl.Visible = true;
-            CopyEmailFoldertoAppData();
-            CopyImageFoldertoAppData();
-            CopyJsonFoldertoAppData();
+            CopyFoldertoAppData("Email");
+            CopyFoldertoAppData("Images");
+            CopyFoldertoAppData("Json");
             Log.Write(LogConstant.OpenApplication);
         }
         void TempLite_FormClosed(object sender, FormClosedEventArgs e)
@@ -599,35 +599,16 @@ namespace TempLite
             Process.Start("https://temprecord.com/help/templite/TempLiteHelp.pdf");
         }
 
-        void CopyEmailFoldertoAppData()
-        {
-            if (!Directory.Exists(Email.path))
-            {
-                Directory.CreateDirectory(Email.path);
-
-                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Email\\");
-
-                foreach (string file in files)
-                {
-                    var filename = Path.GetFileName(file);
-                    File.Copy(file, Email.path + filename, true);
-                    File.Delete(file);
-                }
-
-                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Email");
-            }
-        }
-
-        void CopyImageFoldertoAppData()
+        void CopyFoldertoAppData(string Foldername)
         {
             var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
-            var path = saveFilePath + "Images\\";
+            var path = saveFilePath + Foldername;
 
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
 
-                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Images\\");
+                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + Foldername);
 
                 foreach (string file in files)
                 {
@@ -636,29 +617,7 @@ namespace TempLite
                     File.Delete(file);
                 }
 
-                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Images");
-            }
-        }
-
-        void CopyJsonFoldertoAppData()
-        {
-            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
-            var path = saveFilePath + "Json\\";
-
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-
-                var files = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory + "Json\\");
-
-                foreach (string file in files)
-                {
-                    var filename = Path.GetFileName(file);
-                    File.Copy(file, path + filename, true);
-                    File.Delete(file);
-                }
-
-                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + "Json");
+                Directory.Delete(AppDomain.CurrentDomain.BaseDirectory + Foldername);
             }
         }
     }

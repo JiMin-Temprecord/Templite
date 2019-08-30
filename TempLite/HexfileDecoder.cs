@@ -318,7 +318,7 @@ namespace TempLite
                                     if (loopOverwriteStartAddress > 0)
                                         lengthToRead = G4MemorySize + 1;
                                 }
-
+                                
                                 if (lengthToRead > 58)
                                 {
                                     int readinfo = data.Length/2 - dataFromAddress;
@@ -1037,8 +1037,7 @@ namespace TempLite
             short sample1;
             short sample2;
             int index = 0;
-
-
+            
             //When MonT2 is loop over writing
             if (!notOverflown && loopOverwrite)
             {
@@ -1152,12 +1151,14 @@ namespace TempLite
                     TemperatureStatistics(1, ((double)(sample2 >> 2)) / 10, index);
                     index++;
                 }
+                
                 Data.Add(ch1List);
                 Data.Add(ch2List);
                 Tag = tagList;
-                
+
                 FinalizeStatistics(1);
             }
+            
         }
         void ReadStoreData(byte[] decodeByte, int memoryStart)
         {
@@ -1250,13 +1251,10 @@ namespace TempLite
         string String(byte[] decodeByte)
         {
             string UserDataString = string.Empty;
-            Console.WriteLine("decodeByte.Length : " + decodeByte.Length);
             for (int i = 0; i < decodeByte.Length; i++)
             {
                 if (decodeByte[i] > 12 && decodeByte[i] < 127)
                 {
-                    Console.WriteLine("UserDataString : " + UserDataString);
-
                     if (decodeByte[i] == 13)
                         decodeByte[i] = 0x20;
                     UserDataString += Convert.ToChar(decodeByte[i]);
@@ -1288,7 +1286,7 @@ namespace TempLite
             else
             {
                 int year = (decodeByte[0] >> 1) + 2000;
-                int month = (((decodeByte[1] & 0xff) >> 4) - 1);
+                int month = ((decodeByte[1] & 0xff) >> 4);
                 var dateTime = new DateTime(year, month, decodeByte[2], decodeByte[3], decodeByte[4], decodeByte[5]);
                 
                 if (!notOverflown && loopOverwrite)

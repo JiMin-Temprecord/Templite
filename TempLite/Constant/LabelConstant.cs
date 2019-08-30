@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace TempLite.Constant
 {
     public class LabelConstant

@@ -360,6 +360,7 @@
     <Content Include="Email\Default.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Email\Email.txt" />
     <Content Include="Email\TBS-NSW.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
