@@ -302,12 +302,13 @@ namespace TempLite
                         {
                             string address = line.Substring(0, 6);
                             string data = line.Substring(7, line.Length - 7);
+
                             string temp = string.Empty;
 
                             if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
                                 dataFromAddress = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
 
-                            if (dataFromAddress >= 0 && dataFromAddress < 58) // reader can only send 64bytes at a time
+                            if (dataFromAddress >= 0 && dataFromAddress < 58)
                             {
                                 int lengthToRead = Convert.ToInt32(currentinfo[1]);
 
@@ -318,10 +319,10 @@ namespace TempLite
                                     if (loopOverwriteStartAddress > 0)
                                         lengthToRead = G4MemorySize + 1;
                                 }
-                                
+
                                 if (lengthToRead > 58)
                                 {
-                                    int readinfo = data.Length/2 - dataFromAddress;
+                                    int readinfo = data.Length / 2 - dataFromAddress;
 
                                     while (lengthToRead > 0)
                                     {
@@ -353,13 +354,13 @@ namespace TempLite
                                 }
                                 else
                                 {
-                                    if (data.Length < (dataFromAddress + lengthToRead)*2)
+                                    if (data.Length < (dataFromAddress + lengthToRead) * 2)
                                     {
-                                        var readNextLine = (dataFromAddress + lengthToRead - data.Length/2);
-                                        temp = data.Substring(dataFromAddress * 2, (lengthToRead - readNextLine)*2 );
+                                        var readNextLine = (dataFromAddress + lengthToRead - data.Length / 2);
+                                        temp = data.Substring(dataFromAddress * 2, (lengthToRead - readNextLine) * 2);
                                         line = sr.ReadLine();
                                         data = line.Substring(7, line.Length - 7);
-                                        temp += data.Substring(0, readNextLine*2);
+                                        temp += data.Substring(0, readNextLine * 2);
                                     }
                                     else
                                         temp = data.Substring(dataFromAddress * 2, lengthToRead * 2);

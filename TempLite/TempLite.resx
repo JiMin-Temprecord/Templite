@@ -553,7 +553,7 @@
     <value>3</value>
   </data>
   <data name="previewExcel.Text" xml:space="preserve">
-    <value>Preview EXCEL</value>
+    <value>Preview Excel</value>
   </data>
   <data name="previewExcel.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
     <value>BottomRight</value>
