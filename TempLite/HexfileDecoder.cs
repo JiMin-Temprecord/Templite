@@ -1020,12 +1020,11 @@ namespace TempLite
 
             if (sensorNumber == 2)
                 sampleNumber *= 2;
-
-            mont2Samples = sampleNumber;
-
+            
             if (!notOverflown)
                 sampleNumber =  16384;
-            
+
+            mont2Samples = sampleNumber;
             return sampleNumber.ToString("x02");
         }
 

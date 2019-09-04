@@ -180,7 +180,7 @@ namespace TempLite.Services
                     
                     loggerInformation.SerialNumber = GetMonT2Serialnumber(messageReceived);
 
-                    if ((recievemsg[23] >> 3 & 1) == 0)
+                    if ((recievemsg[22] >> 3 & 1) == 0)
                         MonT2Overflown = true;
                     break;
                 case 3:
