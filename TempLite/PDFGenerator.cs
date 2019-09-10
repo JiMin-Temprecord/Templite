@@ -17,7 +17,7 @@ namespace TempLite
             double lineCounter = 80;
 
             var decoder = new HexFileDecoder(loggerInformation);
-            var loggerVariables = decoder.AssignLoggerValue();
+            var loggerVariables = decoder.AssignLoggerVariables();
 
             var channelOne = loggerVariables.ChannelOne;
             var channelTwo = loggerVariables.ChannelTwo;
@@ -107,7 +107,7 @@ namespace TempLite
             if (channelTwo.BelowLimits > 0) pdfPage.DrawString(DecodeConstant.Exceeded, font, Color.Black, PDFcoordinates.thirdColumn + 50, (float)lineCounter);
             DrawChannelStatistics(LabelConstant.PresentLowerLimit, c => c.PresetLowerLimit.ToString("N2"));
             DrawChannelStatistics(LabelConstant.Mean, c => c.Mean.ToString("N2"));
-            DrawChannelStatistics(LabelConstant.MKT, c => c.MKT_C.ToString("N2"));
+            DrawChannelStatistics(LabelConstant.MKT, c => c.MKT.ToString("N2"));
             DrawChannelStatistics(LabelConstant.Max, c => c.Max.ToString("N2"));
             DrawChannelStatistics(LabelConstant.Min, c => c.Min.ToString("N2"));
             lineCounter += (PDFcoordinates.lineInc * 0.5);

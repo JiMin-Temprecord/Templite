@@ -77,7 +77,7 @@ namespace TempLite
         readonly LoggerInformation loggerInformation;
         readonly string serialNumber;
         readonly string jsonFile;
-        readonly string path = AppDomain.CurrentDomain.BaseDirectory;
+        readonly string saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
 
         public HexFileDecoder(LoggerInformation loggerInformation)
         {
@@ -86,7 +86,7 @@ namespace TempLite
             this.jsonFile = loggerInformation.JsonFile;
         }
 
-        public void ReadIntoJsonFileAndSetupDecoder()
+        public void ReadJsonandDecodeLoggerInformation()
         {
             var jsonObject = GetJsonObject();
             if (loggerInformation.LoggerName == DecodeConstant.G4)
@@ -95,8 +95,8 @@ namespace TempLite
                 dataAddress = ReadIntFromJObject(jsonObject, DecodeConstant.DataEndPointer);
                 numberChannel = ReadIntFromJObject(jsonObject, DecodeConstant.NumberOfChannels);
                 userDataLength = ReadIntFromJObject(jsonObject, DecodeConstant.UserDataLength);
-                emailID = ReadStringFromJObject(jsonObject, DecodeConstant.EmailID);
                 userData = ReadStringFromJObject(jsonObject, DecodeConstant.UserData);
+                emailID = ReadStringFromJObject(jsonObject, DecodeConstant.EmailID);
                 loggerState = ReadStringFromJObject(jsonObject, DecodeConstant.LoggerState);
                 batteryPercentage = ReadIntFromJObject(jsonObject, DecodeConstant.BatteryPercentage) + DecodeConstant.Percentage;
                 loopOverwriteStartAddress = ReadIntFromJObject(jsonObject, DecodeConstant.LoopOverwriteAddress);
@@ -180,9 +180,9 @@ namespace TempLite
             }
         }
 
-        public LoggerVariables AssignLoggerValue()
+        public LoggerVariables AssignLoggerVariables()
         {
-            ReadIntoJsonFileAndSetupDecoder();
+            ReadJsonandDecodeLoggerInformation();
 
             var loggerVariable = new LoggerVariables();
             loggerInformation.LoggerName = loggerName;
@@ -197,6 +197,7 @@ namespace TempLite
             loggerVariable.TagsPlaced = tagNumbers;
             loggerVariable.TotalTrip = totalUses;
             loggerVariable.Tag = Tag;
+            loggerInformation.EmailId = emailID;
 
             if (userData.Contains(loggerInformation.SerialNumber))
             {
@@ -206,14 +207,7 @@ namespace TempLite
             {
                 loggerVariable.UserData = userData.Substring(0, userDataLength);
             }
-
-            for(int i = 0; i < Tag.Count; i++)
-            {
-                Console.WriteLine("Tag : " + Tag[i]);
-            }
-
-            loggerInformation.EmailId = emailID;
-
+            
             if (batteryPercentage == "255%")
             {
                 loggerVariable.BatteryPercentage = "100%";
@@ -231,23 +225,23 @@ namespace TempLite
                 loggerVariable.LastSample = UNIXtoUTC(timeLastSample);
             }
 
-            AssignChannelValues(loggerVariable.ChannelOne, 0);
+            AssignChannelStatistics(loggerVariable.ChannelOne, 0);
 
             if (numberChannel > 1 || ch2Enabled)
             {
                 loggerVariable.IsChannelTwoEnabled = true;
-                AssignChannelValues(loggerVariable.ChannelTwo, 1);
+                AssignChannelStatistics(loggerVariable.ChannelTwo, 1);
             }
             
             return loggerVariable;
         }
 
-        void AssignChannelValues(ChannelConfig Channel, int i)
+        void AssignChannelStatistics(ChannelConfig Channel, int i)
         {
             Channel.PresetLowerLimit = lowerLimit[i];
             Channel.PresetUpperLimit = upperLimit[i];
             Channel.Mean = mean[i];
-            Channel.MKT_C = mkt[i] - KelvinDec;
+            Channel.MKT = mkt[i] - KelvinDec;
             Channel.Max = sensorMax[i];
             Channel.Min = sensorMin[i];
             Channel.WithinLimits = withinLimit[i];
@@ -283,149 +277,164 @@ namespace TempLite
             }
         }
 
-        byte[] ReadHex(string[] currentinfo)
+        #region Retrieve Bytes from HexFile
+        byte[] RetrieveBytesfromHexFile(string[] currentinfo)
         {
-            byte[] bytes = { };
-            var addtoread = string.Empty;
-            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
             var hexPath = saveFilePath + "\\" + serialNumber + ".hex";
-
-            try
+            if (File.Exists(hexPath))
             {
-                if (File.Exists(hexPath))
+                try
                 {
                     using (var sr = new StreamReader(hexPath))
                     {
-                        string line;
-                        int dataFromAddress = -99;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            string address = line.Substring(0, 6);
-                            string data = line.Substring(7, line.Length - 7);
+                        var retreievedHexline = RetrieveRelativeHexline(sr, currentinfo[0]);
 
-                            string temp = string.Empty;
+                        var retrievedAddress = retreievedHexline.Substring(0, 6);
+                        var retrievedBytes = retreievedHexline.Substring(7, retreievedHexline.Length - 7);
 
-                            if (Convert.ToInt32(currentinfo[0], 16) >= Convert.ToInt32(address, 16))
-                                dataFromAddress = Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(address, 16);
-
-                            if (dataFromAddress >= 0 && dataFromAddress < 58)
-                            {
-                                int lengthToRead = Convert.ToInt32(currentinfo[1]);
-
-                                if (lengthToRead == 32768) // if we are reading DATA
-                                {
-                                    lengthToRead = dataAddress;
-
-                                    if (loopOverwriteStartAddress > 0)
-                                        lengthToRead = G4MemorySize + 1;
-                                }
-
-                                if (lengthToRead > 58)
-                                {
-                                    int readinfo = data.Length / 2 - dataFromAddress;
-
-                                    while (lengthToRead > 0)
-                                    {
-                                        temp += data.Substring(dataFromAddress * 2, readinfo * 2);
-                                        line = sr.ReadLine();
-                                        if (line != null)
-                                        {
-                                            data = line.Substring(7, line.Length - 7);
-                                            lengthToRead = lengthToRead - readinfo;
-                                            dataFromAddress = 0;
-
-                                            if (lengthToRead > (data.Length / 2))
-                                            {
-                                                readinfo = data.Length / 2;
-                                            }
-                                            else
-                                            {
-                                                readinfo = lengthToRead;
-                                            }
-                                        }
-                                        else { break; }
-                                    }
-
-                                    int totallength = temp.Length;
-                                    bytes = new byte[totallength / 2];
-                                    for (int i = 0; i < totallength; i += 2)
-                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                    return bytes;
-                                }
-                                else
-                                {
-                                    if (data.Length < (dataFromAddress + lengthToRead) * 2)
-                                    {
-                                        var readNextLine = (dataFromAddress + lengthToRead - data.Length / 2);
-                                        temp = data.Substring(dataFromAddress * 2, (lengthToRead - readNextLine) * 2);
-                                        line = sr.ReadLine();
-                                        data = line.Substring(7, line.Length - 7);
-                                        temp += data.Substring(0, readNextLine * 2);
-                                    }
-                                    else
-                                        temp = data.Substring(dataFromAddress * 2, lengthToRead * 2);
-                                    int totallength = temp.Length;
-                                    bytes = new byte[totallength / 2];
-                                    for (int i = 0; i < totallength; i += 2)
-                                        bytes[i / 2] = (byte)(Convert.ToByte(temp.Substring(i, 2), 16));
-                                    return bytes;
-                                }
-                            }
-                        }
+                        var addressStartIndex = ((Convert.ToInt32(currentinfo[0], 16) - Convert.ToInt32(retrievedAddress, 16)) * 2); //two bytes represented for each address
+                        var dataLength = RetrieveDataLength (currentinfo[1]);
+                        
+                        var validBytes = RetrieveValidData(sr, retrievedBytes, addressStartIndex, dataLength);
+                        return StringtoByteArray(validBytes);
                     }
                 }
+                catch (Exception e)
+                {
+                    // Let the user know what went wrong.
+                    Console.WriteLine("The file could not be read:");
+                    Console.WriteLine(e.Message);
+                }
             }
-            catch (Exception e)
+
+            return null;
+        }
+
+        string RetrieveRelativeHexline(StreamReader sr, string objectAddress)
+        {
+            string hexLine = string.Empty;
+            int dataFromAddress = -99;
+
+            while ((hexLine = sr.ReadLine()) != null)
             {
-                // Let the user know what went wrong.
-                Console.WriteLine("The file could not be read:");
-                Console.WriteLine(e.Message);
+                if (Convert.ToInt32(objectAddress, 16) >= Convert.ToInt32(hexLine.Substring(0,6), 16))
+                    dataFromAddress = Convert.ToInt32(objectAddress, 16) - Convert.ToInt32(hexLine.Substring(0, 6), 16);
+
+                if (dataFromAddress >= 0 && dataFromAddress < 58)
+                {
+                    return hexLine;
+                }
             }
+
+            return hexLine;
+        }
+
+        int RetrieveDataLength (string dataLengthFromJson)
+        {
+            var dataLength = Convert.ToInt32(dataLengthFromJson);
+
+            if (dataLength == 32768) // if we are reading DATA
+            {
+                dataLength = dataAddress;
+
+                if (loopOverwriteStartAddress > 0)
+                    dataLength = G4MemorySize + 1;
+            }
+
+            return dataLength*2;
+        }
+
+        string RetrieveValidData(StreamReader sr, string retrievedBytes, int addressStartIndex, int dataLength)
+        {
+            var validBytes = string.Empty;
+            
+            int validByteLength = retrievedBytes.Length - addressStartIndex;
+
+            if (dataLength > 116)
+            {
+                while (dataLength > 0)
+                {
+                    validBytes += retrievedBytes.Substring(addressStartIndex, validByteLength);
+                    
+                    dataLength = dataLength - validByteLength;
+                    addressStartIndex = 0;
+
+                    var retreievedHexline = sr.ReadLine();
+                    if (retreievedHexline != null)
+                    {
+                        retrievedBytes = retreievedHexline.Substring(7, retreievedHexline.Length - 7);
+                        
+                        if (dataLength > retrievedBytes.Length)
+                            validByteLength = retrievedBytes.Length;
+                        else
+                            validByteLength = dataLength;
+                    }
+                    else
+                        break;
+                }
+            }
+            else
+            {
+                validBytes += retrievedBytes.Substring(addressStartIndex, dataLength);
+            }
+
+            return validBytes;
+        }
+
+        byte[] StringtoByteArray (string validBytes)
+        {
+            var bytes = new byte[] { };
+
+            int totallength = validBytes.Length;
+            bytes = new byte[totallength / 2];
+            for (int i = 0; i < totallength; i += 2)
+                bytes[i / 2] = (byte)(Convert.ToByte(validBytes.Substring(i, 2), 16));
             return bytes;
         }
+
+        #endregion
 
         #region Reading Json File
         string ReadStringFromJObject(JObject jsonObject, string info)
         {
-            var decodeInfo = JsontoString(jsonObject, info);
+            var decodeInfo = JsontoStringArray(jsonObject, info);
             return CallDecodeFunctions(decodeInfo);
         }
 
         int ReadIntFromJObject(JObject jsonObject, string info)
         {
-            var decodeInfo = JsontoString(jsonObject, info);
+            var decodeInfo = JsontoStringArray(jsonObject, info);
             return Convert.ToInt32(CallDecodeFunctions(decodeInfo), 16);
         }
 
         long ReadLongFromJObject(JObject jsonObject, string info)
         {
-            var decodeInfo = JsontoString(jsonObject, info);
+            var decodeInfo = JsontoStringArray(jsonObject, info);
             return Convert.ToInt32(CallDecodeFunctions(decodeInfo));
         }
 
         double[] ReadArrayFromJObject(JObject jsonObject, string info)
         {
-            var decodeInfo = JsontoString(jsonObject, info);
+            var decodeInfo = JsontoStringArray(jsonObject, info);
             var limit = CallDecodeFunctions(decodeInfo).Split(','); ;
             return Array.ConvertAll<string, double>(limit, Double.Parse);
         }
 
         bool ReadBoolFromJObject(JObject jsonObject, string info)
         {
-            var decodeInfo = JsontoString(jsonObject, info);
+            var decodeInfo = JsontoStringArray(jsonObject, info);
             return Convert.ToBoolean(CallDecodeFunctions(decodeInfo));
         }
 
         JObject GetJsonObject()
         {
-            var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
             using (var sr = new StreamReader(saveFilePath + "Json\\" + jsonFile))
             {
                 return JObject.Parse(sr.ReadToEnd());
             }
         }
 
-        string[] JsontoString(JObject jsonObject, string info)
+        string[] JsontoStringArray(JObject jsonObject, string info)
         {
             var add = jsonObject.GetValue(info).First.Last.ToString();
             var len = jsonObject.GetValue(info).First.Next.Last.ToString();
@@ -441,7 +450,7 @@ namespace TempLite
         string CallDecodeFunctions(string[] stringArrayInfo)
         {
             bool bitbool = false;
-            var decodeByte = ReadHex(stringArrayInfo);
+            var decodeByte = RetrieveBytesfromHexFile(stringArrayInfo);
             switch (stringArrayInfo[2])
             {
                 case "_1_Byte_to_Boolean":
@@ -1232,7 +1241,7 @@ namespace TempLite
                 sensorAddressArray[0] = decodeByte[pointer + 10].ToString("x02") + decodeByte[pointer + 9].ToString("x02");
                 sensorAddressArray[1] = "21"; // size of the sensor information 
 
-                var sensorInfoArray = ReadHex(sensorAddressArray);
+                var sensorInfoArray = RetrieveBytesfromHexFile(sensorAddressArray);
 
                 if (sensorInfoArray.Length != 0)
                 {

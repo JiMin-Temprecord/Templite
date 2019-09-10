@@ -12,7 +12,7 @@ namespace TempLite
         public double PresetUpperLimit { get; set; }
         public double PresetLowerLimit { get; set; }
         public double Mean { get; set; }
-        public double MKT_C { get; set; }
+        public double MKT { get; set; }
         public double Max { get; set; }
         public double Min { get; set; }
         public double WithinLimits { get; set; }

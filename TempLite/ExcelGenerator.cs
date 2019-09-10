@@ -14,7 +14,7 @@ namespace TempLite
         public bool CreateExcel(LoggerInformation loggerInformation)
         {
             var decoder = new HexFileDecoder(loggerInformation);
-            var loggerVariables = decoder.AssignLoggerValue();
+            var loggerVariables = decoder.AssignLoggerVariables();
 
             if (loggerVariables.LoggerState != "Logging" && loggerVariables.LoggerState != "Stopped")
                 return false;
@@ -97,7 +97,7 @@ namespace TempLite
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentLowerLimit, c => c.PresetLowerLimit.ToString("N2"));
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Mean, c => c.Mean.ToString("N2"));
-            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.MKT, c => c.MKT_C.ToString("N2"));
+            FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.MKT, c => c.MKT.ToString("N2"));
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Max, c => c.Max.ToString("N2"));
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.Min, c => c.Min.ToString("N2"));
             FillChannelCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.SampleWithinLimits, c => c.WithinLimits.ToString());
