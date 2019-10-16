@@ -595,7 +595,7 @@ namespace TempLite
                     break;
 
                 case "SamplePointer":
-                    return decodeByte[0].ToString();
+                    return (((decodeByte[1] & 0xFF) << 8) | (decodeByte[0] & 0xFF)).ToString();
 
                 case "SampleNumber_logged_MonT":
                     return SampleNumberLoggedMonT(decodeByte);
@@ -1026,7 +1026,7 @@ namespace TempLite
         string MonT2SampleNum(byte[] decodeByte)
         {
             int sampleNumber = ((((decodeByte[3]) & 0xFFFFFF) << 24) | (((decodeByte[2]) & 0xFFFF) << 16) | (((decodeByte[1]) & 0xFF) << 8) | (decodeByte[0] & 0xFF));
-
+            Console.WriteLine("sample number : " + sampleNumber.ToString("x02"));
             if (sensorNumber == 2)
                 sampleNumber *= 2;
             
@@ -1075,6 +1075,9 @@ namespace TempLite
                     decodeByte[position] = (byte)(copyArrayList[i]);
                     position++;
                 }
+
+                Console.WriteLine("sample Pointer : " + samplePointer);
+                Console.WriteLine("copyArrayList : " + copyArrayList.Count);
 
             }
             
@@ -1189,7 +1192,8 @@ namespace TempLite
                     {
                         if (i == 0)
                         {
-                            tagList.Add(arrayPointer);
+                            tagList.Add(dataPointer);
+                            Console.WriteLine("TAG : " + dataPointer);
                             tagNumbers++;
                         }
                     }

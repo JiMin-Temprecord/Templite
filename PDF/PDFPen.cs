@@ -8,8 +8,8 @@ namespace PDF
         public PDFColor pdfColor;
         public Color Color { get; set; } = Color.Black;
         public PenStyle Style { get; set; } = PenStyle.Solid;
-        public int Thickness { get; set; } = 1;
-        public PDFPen(Color color, int thickness, PenStyle style = PenStyle.Solid)
+        public double Thickness { get; set; } = 1;
+        public PDFPen(Color color, double thickness, PenStyle style = PenStyle.Solid)
         {
             Color = color;
             Thickness = thickness;

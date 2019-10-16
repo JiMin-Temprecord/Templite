@@ -38,14 +38,13 @@ namespace TempLite
 
             var saveFilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Temprecord\\TempLite\\";
             var path = saveFilePath + "Images\\";
-
-            var imageRange = workSheet.Cells[5, 5];
+            
             if (channelOne.OutsideLimits == 0 && channelTwo.OutsideLimits == 0)
             {
                 var tickImage = Image.FromFile(path + LabelConstant.WithinLimitImage);
                 var setPosition = workSheet.Drawings.AddPicture(LabelConstant.WithinLimit, tickImage);
                 setPosition.SetSize(145, 128);
-                setPosition.SetPosition(80, 275);
+                setPosition.SetPosition(80, 295);
                 workSheet.Cells[12, 5].Value = LabelConstant.WithinLimit;
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -55,7 +54,7 @@ namespace TempLite
                 var warningImage = Image.FromFile(path + LabelConstant.LimitsExceededImage);
                 var setPosition = workSheet.Drawings.AddPicture(LabelConstant.LimitsExceeded, warningImage);
                 setPosition.SetSize(145, 128);
-                setPosition.SetPosition(80, 275);
+                setPosition.SetPosition(80, 295);
                 workSheet.Cells[12, 5].Value = LabelConstant.LimitsExceeded;
                 workSheet.Cells[12, 5].Style.Font.Bold = true;
                 workSheet.Cells[12, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -65,13 +64,13 @@ namespace TempLite
             var logoImage = Image.FromFile(path + LabelConstant.LogoIcon);
             var setLogoPosition = workSheet.Drawings.AddPicture(string.Empty, logoImage);
             setLogoPosition.SetSize(103, 63);
-            setLogoPosition.SetPosition(10, 130);
+            setLogoPosition.SetPosition(10, 65);
 
             workSheet.Cells[15,2,15,3].Style.Font.Bold = true;
             workSheet.Cells[50,2,50,3].Style.Font.Bold = true;
             workSheet.Cells[2,1,2,5].Style.Font.Size = 20;
             workSheet.Cells[2,1,2,5].Style.Font.Color.SetColor (Color.Blue);
-            workSheet.Cells[2,1 ,5,2].Style.Font.Bold = true;
+            workSheet.Cells[2,1 ,2,5].Style.Font.Bold = true;
             workSheet.Cells[4,1,4,5].Style.Border.Top.Style = ExcelBorderStyle.Double;
             workSheet.Cells[4,1,4,5].Style.Border.Top.Color.SetColor(Color.Blue);
 
@@ -91,7 +90,7 @@ namespace TempLite
             row++;
 
             FillCells(workSheet, LabelConstant.Channel, LabelConstant.ChannelOneLabel);
-            if (channelTwoEnabled)workSheet.Cells[row, 3].Value = LabelConstant.ChannelTwoLabel;
+            if (channelTwoEnabled)workSheet.Cells[row-1, 3].Value = LabelConstant.ChannelTwoLabel;
             row++;
 
             FillChannelStatCells(workSheet, channelOne, channelTwo, channelTwoEnabled, LabelConstant.PresentUpperLimit, c => c.PresetUpperLimit.ToString("N2"));
@@ -177,9 +176,13 @@ namespace TempLite
             {
                 worksheet.Cells[start+i,1].Value = decoder.UNIXtoUTC(Convert.ToInt32(pdfVariables.Time[i]));
                 worksheet.Cells[start +i,2].Value = channelOne.Data[i];
+                worksheet.Cells[start + i, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
                 if (pdfVariables.IsChannelTwoEnabled == true)
+                {
                     worksheet.Cells[start + i, 3].Value = channelTwo.Data[i];
+                    worksheet.Cells[start + i, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+                }
             }
             
         }
@@ -188,7 +191,7 @@ namespace TempLite
         {
             var graph = worksheet.Drawings.AddChart(pdfVariables.SerialNumber, OfficeOpenXml.Drawing.Chart.eChartType.Line);
             graph.SetPosition(675,0);
-            graph.SetSize(500, 300);
+            graph.SetSize(325,300);
 
             var xSeries = worksheet.Cells[start,1,end-1,1];
             var ySeries = worksheet.Cells[start,2,end-1,2];

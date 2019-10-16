@@ -47,8 +47,8 @@ namespace TempLite.Constant
 
         public const string WithinLimit = " Within Limits ";
         public const string LimitsExceeded = " Limits Exceeded ";
-        public const string UpperLimit = "Upper Limit ";
-        public const string LowerLimit = "Lower Limit " ;
+        public const string UpperLimit = " Upper Limit ";
+        public const string LowerLimit = " Lower Limit " ;
 
         public const string DateTime = "Date Time ";
         public const string TimeSuffix = " (hh:mm:ss)";
